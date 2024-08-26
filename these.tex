@@ -1,0 +1,81 @@
+\documentclass[english]{amu_these}
+\begin{document}
+
+	\selectlanguage{english}										
+	
+	\input{tex_open/titre.tex}				%% page de titre
+										
+	\input{tex_open/affidavit}				%% affidavit et licence
+
+	\input{tex_open/publications}			%% liste de publications et participation aux conférences
+
+	\input{tex_open/resume}					%% résumé
+
+	\input{tex_open/abstract}				%% abstract
+
+	\input{tex_open/remercie}				%% remerciements
+
+    \microtypesetup{protrusion=false}	%% désactive la protrusion (TOC LOFT GLS)
+	\tableofcontents					%% TOC
+	\listoffigures						%% LOF
+	\listoftables						%% LOT
+	\printglossary[						%% acronymes
+		type=\acronymtype,
+		title={List of acronymes},
+		toctitle={List of acronymes}
+		]
+	\printglossary[						%% glossaire
+		title={Glossary},
+		toctitle={Glossary}
+		]
+	\printglossary[						%% nomenclature
+		type=notation,
+		title={Naming convention},
+		toctitle={Naming convention}
+		]
+    \microtypesetup{protrusion=true}	%% rétabli la protrusion
+
+	\ohead{\leftmark\Ifstr{\rightmark}{\leftmark}{}{ -- \rightmark}}	%% place le chapître et la partie en en-tête
+	
+	\part[Introduction]{Introduction}
+	\label{part:Introduction}	
+	\input{tex_body/Introduction}
+	
+	\part[Fundamental Concepts of Fluid Models for Magnetized Plasmas]{Fundamental Concepts of Fluid Models for Magnetized Plasmas}
+	\label{part:FundamentalsPlasmaSimulations}
+	\input{tex_body/TokamakBasics}
+	\input{tex_body/PlasmaDescription}
+	\input{tex_body/ElectromagneticTheory}
+
+	\part[An Electromagnetic Model for SOLEDGE3X]{An Electromagnetic Model for SOLEDGE3X}
+	\label{part:ElectromagneticModel}
+	\input{tex_body/S3XFramework}
+	\input{tex_body/ImplementationS3X}
+	\input{tex_body/VerificationValidation}
+	
+	\part[Impact of Electromagnetic Effects on Plasma Simulations]{Impact of Electromagnetic Effects on Plasma Simulations}
+	\label{part:EM_Impact}
+	\input{tex_body/ANALYTICsimulations}
+	\input{tex_body/TCVsimulations}
+	
+	\part[Further Applications: Ripple Simulations]{Further Applications: Ripple Simulations}
+	\label{part:Ripple}
+	\input{tex_body/ripple}
+	% \input{tex_body/Observations}
+
+	\input{tex_body/conc}
+
+	\appendix
+
+	\newpage
+	\printbibliography[heading=bibintoc] %% bibliographie
+	
+	\newpage
+	\printindex							%% index
+	
+	\newpage
+	\printendnotes						%% notes
+
+	\input{tex_append/annexes}			%% annexes
+
+\end{document}

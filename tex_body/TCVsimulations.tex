@@ -1,0 +1,104 @@
+\chapter{Electromagnetic simulations on a realistic diverted geometry}
+
+To demonstrate the abilities of SOLEDGE3X to perform electromagnetic turbulence simulations of a realistic tokamak geometry, the configuration of the test cases has been inspired by the TCV-X21 benchmark \cite{oliveira2022}. This latter addresses L-mode discharges in TCV with a single lower X-point. The semi-implicit time discretization implemented in this model allows comparisons to be made between the electrostatic and electromagnetic models using the same code. Four cases have therefore been considered here: electrostatic (ES), electrostatic with electron inertia (ES-inert), electromagnetic (EM), and electromagnetic with flutter (EM-Flutter). \newline
+
+\section{Simulation set-up}
+
+The plasma is pure deuterium, and only a quarter-torus with a relatively low resolution of approximately 1.9 million cells has been considered to speed up computations (see the mesh in a poloidal plane in Fig. \ref{fig:TCVmesh}). A constant heat source of 25 kW is applied to both electrons and ions, equating to a full-torus equivalent total Ohmic heating of 200 kW. The external toroidal magnetic field is $B_t = 0.95$ T, and the density at the separatrix is targeted to $7 \cdot 10^{18}$ part/m$^3$. \newline
+
+Since the aim of these preliminary computations was to focus on electromagnetic effects, neutrals have been omitted to speed up the convergence of the solutions. Simulations with a more complete physical model will be performed in a further work, including in particular the latest fluid neutral model \cite{quadri2024} developed for regimes dominated by charge exchanges \cite{horsten2017}. \newline
+
+In all cases, the initial condition is the corresponding 2D transport solution obtained by increased perpendicular diffusion coefficients. \newline
+
+In Fig. \ref{fig:EMsnapshots}, typical poloidal cuts of important plasma fields are shown. The local value of $\beta$ varies between $10^{-3}$ at the hot core boundary, $10^{-4}$ around the separatrix and divertor region, and $10^{-5}$ or lower in the far SOL. Consequently, the flutter perturbation $\tilde{B}$ of the magnetic field remains small compared to the equilibrium field, barely exceeding 0.1\% of $B_t$ on the hot core side of the domain. The advection velocity associated with the flutter is also minimal, contributing to less than 0.1\% of the cross-field transport, dominated by the electric "ExB" drift. \newline
+
+\begin{figure}[H]\centering
+	\centering
+	\makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{schemes/TCVnoNeutrSnapshots.png}}    
+	\caption{Simulation snapshots of the full electromagnetic scenario with flutter. The first poloidal plane is shown after 6 ms simulated plasma time on the TCV case. From left to right, the first row shows the ion density $n_i$, the electron temperature $T_e$, the electric potential $\Phi$, and the radial "ExB" drift velocity $v_E^\psi$. The second row shows the parallel magnetic potential $A_\parallel$, the parallel current density $j_\parallel$, the amplitude of the flutter field $\norm{\mathbf{\tilde{B}}}$, and the radial flutter advection velocity $v_{\tilde{b}^\psi}$.}
+	\label{fig:EMsnapshots}
+\end{figure}
+
+
+
+
+\section{Comparison between the scenarios}
+
+We now compare the impact of the different levels of new physics on the TCV scenario. Since turbulent structures are essentially driven by the electric "ExB" drift, we consider the associated total kinetic energy $E_{ExB} = \frac{1}{2}m_i \int_V n_i \norm{v_E}^2 dV$ to estimate the turbulence level. As shown in Fig. \ref{fig:KE_ExB}, a finite electron mass does not change the energy level with respect to the reference electrostatic scenario. Next, adding magnetic induction with $A_\parallel$ further amplifies the turbulent interchange. This enhancement arises from the increased coupling between the magnetic and electric fields, leading to more instabilities and modified turbulent dynamics. Consequently, turbulent filaments give way to smaller, rounder blobs. Finally, the inclusion of flutter has a stabilizing effect on the turbulence, where fluctuations fall again to the level in the electrostatic case. Nonlinear effects in the parallel current equation, namely from the parallel pressure gradient $\nabla_\parallel p_e$, substantially impact the profiles of $j_\parallel$ and hence the response of the potential $\Phi$. The direct consequence is a modification of the radial electric field and a modified evolution of "ExB" drifts. This does not contradict our previous observation that magnetic advection is negligible with respect to the electric drift. \newline
+
+With a different turbulence level, the heat exhaust is also affected, as shown in Fig. \ref{fig:HeatExhaust}. Without radiative effects, the quasi-totality of the heat leaves the tokamak at two divertor targets. The supplementary radial turbulent transport in the magnetic inductive scenario allows more hot particles to cross the separatrix from the core, which will then eventually reach the divertor. Overall, the heat flux is multiplied by a factor of 10. Electron inertia alone leads to an increase by a factor of 2, despite very similar turbulence levels. This phenomenon needs further investigation. Flutter does not reduce further the heat exhaust as one might expect because it is already very low in the electrostatic case. \newline
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/KE_ExB.png}
+		\subcaption{Kinetic energy of the "ExB" drift on D$^+$ ions.}
+		\label{fig:KE_ExB}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/heatExhaust.png}
+		\subcaption{Total heat exhaust}
+		\label{fig:HeatExhaust}
+	\end{subfigure}
+	\caption{Evolution of the kinetic energy and heat exhaust over time iterations on the turbulent TCV scenario. It indicates the turbulence level and its consequence on the total heat transport.}
+	\label{fig:performanceMetric}
+\end{figure}
+
+The change in turbulence intensity naturally impacts the mean profiles in Fig. \ref{fig:OMP_profiles}. The most noticeable change affects the electromagnetic inductive scenario, where density and temperature gradients are considerably reduced by the additional radial turbulent transport. Again, the finite electron mass has no significant impact, and the reduced turbulence levels by flutter lead to steeper gradients. At this point, we stress the similarity to the simplified drift wave simulations on slab in Sec. \ref{ssec:plasmaturbslab}, where the gradients from the dense core follow the same pattern. \newline
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.30\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/OMP_profiles_e-_n.png}
+		\subcaption{Plasma density $n$}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.30\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/OMP_profiles_e-_T.png}
+		\subcaption{Electron temperature $T_e$}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.30\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/OMP_profiles_global_fields_PHI.png}
+		\subcaption{Electric potential $\Phi$}
+	\end{subfigure}
+	\caption{Radial profiles at the outer mid-plane after 6 ms simulated plasma time. These profiles were obtained by averaging simulation data across all 32 toroidal planes and over the last 20 available plasma saves.}
+	\label{fig:OMP_profiles}
+\end{figure}
+
+
+
+\section{Numerical performances}
+\label{performances}
+
+In our previous work \cite{tamain2016tokam3x, Bufferand2021} about the electrostatic model, it was pointed out that solving the implicit 3D vorticity operator is the most expensive and tricky operation in the algorithm. Adding new variables inevitably modifies the code's performance. With the rather coarse mesh used in the present work, simulations have been run on 16 nodes with 48 CPUs each on the MARCONI supercomputer operated by CINECA \cite{iannone2018marconi-fusion}. Implicit systems, such as the 3D vorticity operator, have been inverted using the stabilized biconjugate gradient method (BCGS) \cite{vandervorst1992bicgstab} with the generalized algebraic multigrid preconditioner (GAMG) by PETSc \cite{petsc-web-page}. \newline
+
+The overall performance of the code largely depends on how quickly a certain plasma timespan can be calculated. Table \ref{tab:performanceMetric} presents the average simulation time for one timestep, broken down by the cost of each implicit solver. For the vorticity system, we also provide the number of iterations the BCGS needed to match the imposed tolerance ($10^{-8}$), as it relates to the condition number of the matrix. This system has always accounted for a considerable share of the total execution time and was heavily modified with the new electromagnetic model. Finally, the timestep size is provided, as a higher timestep size can compensate a costlier problem because the desired simulation time is reached in fewer iterations. As described earlier in Sec. \ref{sec:EquationDiscretization}, SOLEDGE3X uses a variable timestep scheme to maximize the CFL condition with the calculated fluxes. \newline
+
+\begin{table}[h!]
+	\centering
+	\makebox[\textwidth][c]{
+		\begin{tabularx}{1.13\textwidth}{|X|>{\centering\arraybackslash}p{0.12\textwidth}|>{\centering\arraybackslash}p{0.12\textwidth}|>{\centering\arraybackslash}p{0.12\textwidth}|>{\centering\arraybackslash}p{0.12\textwidth}|>{\centering\arraybackslash}p{0.12\textwidth}|>{\centering\arraybackslash}p{0.12\textwidth}|}
+			\hline
+			& Total execution time per timestep [ms] & Execution time for the viscosity [ms]  & Execution time for the heat diffusion [ms] & Execution time for the vorticity [ms] & N° of vorticity solver iterations & Timestep size [ns]  \\
+			\hline
+			\textbf{ES}         & 664  & 61  & 76  & 339  & 80  & 15.6 \\
+			\hline    
+			\textbf{ES-inert}   & 523  & 61  & 77  & 193  & 32  & 16.4 \\
+			\hline    
+			\textbf{EM}         & 895  & 63  & 82  & 552  & 60  & 15.9 \\
+			\hline    
+			\textbf{EM-flutter} & 2019 & 225 & 390 & 1147 & 55  & 16.6 \\
+			\hline  
+		\end{tabularx}
+	}	
+	\caption{Numerical metrics on the four TCV scenarios for one timestep. All quantities are averaged over the last 20000 timesteps of the simulation. The execution time refers to the wall-clock time and must be multiplied by the number of used processors (768) to get the actual used CPU time.}
+	\label{tab:performanceMetric}
+\end{table}
+
+Introducing finite electron mass to the vorticity system significantly reduces the number of BCGS iterations and the overall solve time. This improvement occurs because electron inertia effects dominate Ohm's law, thereby reducing the anisotropy between the perpendicular and parallel Laplacians on $\Phi$ in the electrostatic scenario. This reduction in anisotropy is due to the parallel diffusion coefficient being the conductivity $\sigma_\parallel$ in the electrostatic case, but a finite electron mass $m_e$ imposes an upper limit on it. Adding $A_\parallel$ doubles the size of the matrix and introduces a more complex structure, challenging the solvers and requiring more iterations. Despite the higher complexity, a finite electron mass allows the solver to converge in fewer iterations than in the reference electrostatic case. However, the effective solve time is still worse due to the doubling in system size. Finally, including flutter slightly improves the matrix condition compared to the scenario with only magnetic induction, but the execution time is significantly increased. At first glance, one would expect the solve time to correlate with the number of BCGS iterations as both electromagnetic scenarios solve a coupled 3D system on $\Phi$ and $A_\parallel$. Since flutter introduces the radial direction to parallel gradients, and the coupling terms between the two unknowns are exactly a parallel gradient and a divergence (see Eq. \ref{eq:implicitSytem}), the matrix exhibits a decreased sparsity ratio. This circumstance is further aggravated by the fact that $A_\parallel$ is not staggered in the radial direction, so the radial discrete gradient/divergence operator has a larger stencil width than its poloidal and toroidal counterparts. \newline
+
+The viscosity and heat diffusion solvers are not directly affected by the electromagnetic model, and their solve times are similar for the first three scenarios. Electromagnetic flutter, however, with its radial gradient (again), heavily modifies the parallel diffusion operators and requires solving one global 3D system instead of separate 2D systems on each flux surface (see Sec. \ref{ssec:3DGunter}). This is immediately reflected in the code performance, as both solvers take up to 5 times longer to solve. \newline
+
+In total, electron inertia decreases the computing time with an excellent improvement of the vorticity matrix condition. The magnetic inductive model means slightly higher computational costs, because the implicit vorticity problem doubles in size. Including electromagnetic flutter in the system almost quadruples the execution time compared to the original implementation because the radial parallel gradient complicates both the implicit vorticity and the parallel diffusion problem. The timestep size does not vary considerably between the scenarios and hence has only a limited impact on the overall performance.

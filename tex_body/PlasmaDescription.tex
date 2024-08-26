@@ -1,0 +1,178 @@
+\chapter{Description of Plasmas}
+\label{chap:PlasmaSimulations}
+
+Plasmas can be modeled using various sets of equations that trade off between accuracy and computational feasibility. Generally, more accurate models are prohibitively expensive and are beyond the capabilities of current high-performance computing (HPC) infrastructure when applied to large systems. In this chapter, we introduce the major approaches that are used nowadays, with a special care to highlight how they are connected and where they differ. The most comprehensive approach in Sec. \ref{sec:desc_directDesciption} rely on plasma particles themselves or their statistical distribution. From there, the Chapman-Enskog expansion in Sec. \ref{sec:desc_fluidMoments} allows to express conservation equations on averaged plasma quantities and lay the foundations for fluid models. Finally, MHD models in Sec. \ref{sec:desc_MHD} offer a framework to combine those conservation equations with the evolution of electromagnetic properties of the plasma. 
+
+\section{Direct description of Plasma Particles}
+\label{sec:desc_directDesciption}
+Particles are the foundation of the first set of models. They can either be solved individually as in Sec. \ref{ssec:desc_particleTracking} or represented by their distribution functions in the so-called kinetic models (Sec. \ref{ssec:desc_kineticModels}).
+
+\subsection{Particle Tracking}
+\label{ssec:desc_particleTracking}
+In the most general description, each particle in a tokamak—whether neutron, ion, atom, or electron—is represented individually with three degrees of freedom for both position $\mathbf{x}$ and velocity $\mathbf{v}$. The system's dynamics are governed by the Lorentz force:
+\begin{align}
+	\pdv{\mathbf{v}}{t} &= \mathbf{F} = q\mathbf{E} + q\mathbf{v} \times \mathbf{B} \label{eq:desc_particle}\\
+	\pdv{\mathbf{x}}{t} &= \mathbf{v}
+\end{align}
+where $\mathbf{E}$ is the electric field, $\mathbf{B}$ the magnetic field, and $q$ the charge of the particle. \newline
+Given that a medium-sized tokamak like WEST contains approximately $N_p \approx 10^{20}$ particles, each with six degrees of freedom, direct numerical simulation is infeasible. Computational effort can be reduced by using macro-particles, which represent many real particles. A prominent approach utilizing this concept is the particle-in-cell (PIC) method \cite{tskhakaya2007particle}, where macro-particles evolve in pre-calculated fields on a mesh or interact directly with one another. PIC methods are employed to study phenomena such as collisions with neutral particles \cite{birdsall1991particle}, plasma-wall interactions \cite{khaziev2018hpic}, or instabilities induced by fusion products \cite{cook2013particle}.
+
+
+
+\subsection{Kinetic Models}
+\label{ssec:desc_kineticModels}
+As a further abstraction, an ensemble of particles can be described statistically through a distribution function $f(\mathbf{x}, \mathbf{v},t)$. This kinetic description replaces individual particles with a probability distribution, avoiding the need to calculate exact positions and velocities at each moment in time. The behavior of the distribution function is governed by the Boltzmann equation:
+\begin{equation}
+	\label{eq:BoltzmannEquationKineticDescription}
+	\pdv{f}{t} + \mathbf{v} \cdot \nabla_{\mathbf{x}} f + \frac{\mathbf{F}}{m} \cdot \nabla_{\mathbf{v}} f = C_{\text{coll}} + C_{\text{other}}
+\end{equation}
+where $C_{\text{coll}}$ represents the collision operator, handling Coulomb collisions as introduced in Sec. \ref{sec:intro_collisions}, and $C_{\text{other}}$ includes additional source terms. Substituting the force vector $\mathbf{F}$ with the Lorentz force (Eq. \ref{eq:desc_particle}) yields the Vlasov equation. \newline
+To achieve sufficient accuracy, approximately $N_x = 10^9$ spatial discretization points and $N_\sigma = 10^6$ points for the distribution function are required. Considering that both position and velocity have three components each, this results in $6 \cdot 10^{15}$ degrees of freedom—significantly fewer than in the particle description. \newline
+Further simplification is achieved through the gyrokinetic approach. While particles in a plasma predominantly follow magnetic field lines, their motion forms a helical trajectory characterized by the Larmor frequency and radius:
+\begin{equation}
+	\omega_L = \frac{qB}{m} \qquad\qquad l_L = \frac{mv_\perp}{qB}
+\end{equation}
+This allows the elimination of one degree of freedom in the distribution function, as the velocity can be described by its parallel component $v_\parallel$ along the magnetic field line and its perpendicular component $v_\perp$. This simplification is valid only when the Larmor frequency and radius are much smaller than any characteristic frequency or length in the system, which is typically true in the core of the tokamak but not in the scrape-off layer (SOL), where the gyrokinetic approach is less suitable.
+
+
+\section{Three Fluid Moments of the Kinetic Equation}
+\label{sec:desc_fluidMoments}
+Deriving transport equations for plasma quantities analogous to the Navier-Stokes equations in classical fluid dynamics is highly desirable. Such an approach would enable the use of established computational fluid dynamics (CFD) methods for turbulence modeling, significantly reducing the number of degrees of freedom. Starting with the distribution function $f$, the $k$-th moment of the transport equation is obtained by applying the tensor product $\mathbf{v} \otimes \dots$ $k$ times and then integrating over the velocity:
+
+\begin{equation}
+	\mathcal{M}^k = \int_\mathbf{v} f\mathbf{v}^k d\mathbf{v}^3
+\end{equation}
+
+Substituting the kinetic equation \ref{eq:BoltzmannEquationKineticDescription} into this expression yields the following equation for the $k$-th moment:
+
+\begin{align}
+	\partial_t \int_\mathbf{v} f\mathbf{v}^k d\mathbf{v}^3 + \int_\mathbf{v} \mathbf{v}^k \mathbf{v} \cdot \nabla_{\mathbf{x}} f d\mathbf{v}^3 + \int_\mathbf{v} \mathbf{v}^k \frac{\mathbf{F}}{m} \cdot \nabla_{\mathbf{v}} f d\mathbf{v}^3 &= \int_\mathbf{v} \mathbf{v}^k C d\mathbf{v}^3 \nonumber \\
+	\partial_t \mathcal{M}^k + \nabla_{\mathbf{x}} \cdot \mathcal{M}^{k+1} - \frac{k}{m} \mathbf{F} \otimes \mathcal{M}^{k-1} &= \int_\mathbf{v} \mathbf{v}^k C d\mathbf{v}^3 \label{eq:desc_generalMomentsEq}
+\end{align}
+
+Expressing the $k$-th moment requires knowledge of the $k-1$-th and $k+1$-th moments. Consequently, a fully consistent plasma description would require infinitely many equations, which is impractical. Therefore, we typically consider only the first three moments, using fluid closures to compensate for the missing higher-order equations. These moments effectively allow us to replace a particle-based description with averaged quantities:
+
+\begin{align}
+	&\text{Particle density:} & \mathcal{M}^0 &= n = \int_\mathbf{v} f d\mathbf{v}^3 && \left[\text{m}^{-3}\right] \\
+	&\text{Momentum density:} & \mathcal{M}^1 &= \boldsymbol{\gamma}  = n \mathbf{u} = \int_\mathbf{v} f \mathbf{v} d\mathbf{v}^3 && \left[\text{m}^{-2} \cdot \text{s}^{-1}\right] \\
+	&\text{Pressure tensor:}   &  m \mathcal{M}^2 &= \boldsymbol{\Pi} = m \int_\mathbf{v} f \mathbf{v} \otimes \mathbf{v} d\mathbf{v}^3 && \left[\text{kg} \cdot \text{m}^{-1} \cdot \text{s}^{-2}\right]
+\end{align}
+
+where $\mathbf{u}$ is the fluid velocity and $m$ the particle mass. This framework sets the stage for deriving the three fundamental conservation equations for fluid models of plasmas.
+
+
+
+\subsection{Mass Balance (\textit{k} = 0)}
+
+Starting from Eq. \ref{eq:BoltzmannEquationKineticDescription}, the mass balance equation for the unknowns $n$ and $\mathbf{u}$ is derived as follows:
+\begin{equation}
+	\label{eq:ZeroMomentTransportEquation}
+	\partial_t n + \nabla \cdot (n\mathbf{u}) = S_n
+\end{equation}
+This equation provides one relation but involves four unknowns, necessitating additional equations to fully describe the system. The term $S_n$ accounts for particle sources arising from non-elastic collisions in $C_{\text{other}}$, such as ionization or recombination processes.
+
+\subsection{Momentum Balance (\textit{k} = 1)}
+
+For the first moment equation, we multiply the Boltzmann equation \ref{eq:BoltzmannEquationKineticDescription} by $\mathbf{v}$ and integrate over the velocity space, yielding:
+\begin{equation}
+	\partial_t \left( \int_\mathbf{v} \mathbf{v} f d\mathbf{v} \right) + \int_\mathbf{v} \mathbf{v} \otimes \mathbf{v} \cdot \nabla_{\mathbf{x}} f d\mathbf{v} + \int_\mathbf{v} \mathbf{v} \frac{\mathbf{F}}{m} \cdot \nabla_{\mathbf{v}} f d\mathbf{v} = \int_\mathbf{v} C \mathbf{v} d\mathbf{v}
+\end{equation}
+To simplify the tensor product, we decompose the velocity $\mathbf{v}$ into the fluid velocity $\mathbf{u}$ and a new quantity $\mathbf{w}$, such that $\mathbf{v} = \mathbf{u} + \mathbf{w}$. We introduce the static pressure tensor:
+\begin{equation}
+	\boldsymbol{P} = m \int_\mathbf{w} f \mathbf{w} \otimes \mathbf{w} d\mathbf{w}
+\end{equation}
+The pressure tensor $\boldsymbol{\Pi}$ can then be expressed as:
+\begin{equation}
+	\boldsymbol{\Pi} = m \int_\mathbf{w} f \mathbf{u} \otimes \mathbf{u} d\mathbf{w} + m \int_\mathbf{w} f \mathbf{w} \otimes \mathbf{w} d\mathbf{w} = mn \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P}
+\end{equation}
+Substituting this into the first moment equation, we obtain the conservation equation for momentum:
+\begin{equation}
+	\label{eq:FirstMomentTransportEquation}
+	m \partial_t (n \mathbf{u}) + m \nabla \cdot \left( n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right) = qn \mathbf{E} + qn \mathbf{u} \times \mathbf{B} + S_u + R
+\end{equation}
+Here, $S_u$ represents the momentum source term, and $R$ accounts for friction, both arising from $C_{\text{coll}}$ and $C_{\text{other}}$.
+
+\subsection{Energy Balance (\textit{k} = 2)}
+
+Finally, to solve for the static pressure tensor $\boldsymbol{P}$, we assume isotropic pressure in the plasma, simplifying the pressure tensor to a scalar pressure $p$ such that $\boldsymbol{P} = p \boldsymbol{I}$. This reduces the nine unknowns in $\boldsymbol{P}$ to a single scalar $p$. Given that $p = nT$, the second moment can be expressed as an energy conservation equation. The total energy density $\varepsilon$ is the sum of kinetic and thermal energy in the plasma:
+\begin{equation}
+	\varepsilon = \frac{3}{2} nT + \frac{1}{2} mn \norm{\mathbf{u}}^2
+\end{equation}
+To derive a conservation equation for $\varepsilon$, we multiply Vlasov's equation \ref{eq:BoltzmannEquationKineticDescription} by the kinetic energy per unit mass:
+\begin{equation}
+	\partial_t \left( \int_\mathbf{v} \frac{1}{2} u^2 f d\mathbf{v} \right) + \int_\mathbf{v} \frac{1}{2} u^2 \mathbf{v} \cdot \nabla_{\mathbf{x}} f d\mathbf{v} + \int_\mathbf{v} \frac{1}{2} u^2 \frac{\mathbf{F}}{m} \cdot \nabla_{\mathbf{v}} f d\mathbf{v} = \int_\mathbf{v} \frac{1}{2} u^2 C d\mathbf{v}
+\end{equation}
+This simplifies to:
+\begin{equation}
+	\label{eq:SecondMomentTransportEquation}
+	\partial_t \varepsilon + m \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
+\end{equation}
+The collisional heat flux $\mathbf{q}$ arises from the fluid closure, replacing all higher-order moments. The term $Q$ represents a collisional heat source, while $R_\varepsilon$ accounts for sources associated with non-Coulombian collisions in $C_{\text{other}}$. Notably, the magnetic field term $\mathbf{u} \times \mathbf{B}$ does not appear in the energy equation, as the torque $\frac{1}{2} u^2 \mathbf{u} \times \mathbf{B} \cdot \nabla_{\mathbf{v}} f$ does not perform work and therefore does not contribute to energy changes. \newline
+
+The three conservation equations for density $n$, momentum $\boldsymbol{\gamma}$, and energy $\varepsilon$ form the foundation of the SOLEDGE3X model. These terms will be further developed in Chapter \ref{sec:S3X_equations}.
+
+
+
+\section{MHD description of plasmas}
+\label{sec:desc_MHD}
+In the magnetohydrodynamics (MHD) approach, the conservation equations are coupled to Maxwell's and Ohm's laws, introducing electromagnetic behavior into the system. Unlike earlier models, the magnetic equilibrium is not static; the electric and magnetic fields evolve over time. MHD models typically differentiate between ideal MHD and extended models that include resistive and two-fluid effects, which are essential for accurately describing tokamak plasmas. The ideal MHD model and its extension with tokamak-specific terms in Sec. \ref{ssec:desc_extendedMHD} is the most accurate approach to simulate the electromagnetic intrications in plasmas. Fast wave dynamics represent a major restriction and reduced models in Sec. \ref{ssec:desc_reducedMHD} are therefore much more widespread. 
+
+\subsection{Extended MHD Model}
+\label{ssec:desc_extendedMHD}
+Many of the explanations in this section are based on the lecture notes by E. Franck\cite{lessig2016fluid}. The complete set of MHD equations is as follows:
+\begin{align}
+	m\partial_t n + \nabla \cdot (n \mathbf{u}) &= 0 \label{eq:desc_MHDmass} \\
+	mn\partial_t\mathbf{u} + mn\mathbf{u}\cdot\nabla\mathbf{u} + \nabla p &= \mathbf{j} \times \mathbf{B} \boxed{- \nabla \cdot \boldsymbol{\Pi}} \label{eq:desc_MHDmomentum} \\
+	\frac{3}{2}\partial_t p_i + \frac{3}{2} \mathbf{u} \cdot \nabla p_i + \frac{5}{2}p_i \nabla \cdot \mathbf{u} &= \boxed{- \nabla \cdot \mathbf{q}_i - \nabla \cdot (\boldsymbol{\Pi}_i : \nabla \mathbf{u})} \label{eq:desc_MHDionpressure} \\
+	\frac{3}{2}\partial_t p_e + \frac{3}{2} \mathbf{u} \cdot \nabla p_e + \frac{5}{2}p_e \nabla \cdot \mathbf{u}  &= \boxed{- \nabla \cdot \mathbf{q}_e - \nabla \cdot (\boldsymbol{\Pi}_e : \nabla \mathbf{u}) + \eta \norm{\mathbf{j}}^2 + \frac{3}{2}\mathbf{j}\cdot \bm{\mathcal{P}}} \label{eq:desc_MHDelectronpressure} \\
+	\partial_t \mathbf{B} &= -\nabla \times \left(-\mathbf{u} \times \mathbf{B} \boxed{+ \eta \mathbf{j} - \bm{\mathcal{P}} + \bm{\mathcal{H}}}\right) \label{eq:desc_MHDohmlaw} \\
+	\nabla \cdot \mathbf{B} &= 0 \label{eq:desc_MHDgausslaw} \\
+	\nabla \times \mathbf{B} &= \mu_0 \mathbf{j} \label{eq:desc_MHDamperelaw}
+\end{align}
+
+Equations \ref{eq:desc_MHDmass} through \ref{eq:desc_MHDamperelaw} are derived directly from the fluid moments described in Sec. \ref{sec:desc_fluidMoments}, where the pressure replaces the energy and is solved for both ions and electrons. These equations are coupled with Ohm's law (Eq. \ref{eq:desc_MHDohmlaw}) under the magnetostatic assumption, Gauss's law for magnetism (Eq. \ref{eq:desc_MHDgausslaw}), and Ampère's law (Eq. \ref{eq:desc_MHDamperelaw}). In ideal steady-state, we see that the momentum balance is dominated by the equilibrium between thermodynamic and magnetic forces $\grad p = \mathbf{j}\cross\mathbf{B}$. In combination with Ampère's law, all components are available to derive the Grad-Shafranov equation \ref{eq:intro_GradShafranovEquation} as it has been done in Sec. \ref{sec:intro_GradShafranov}. \\
+The terms enclosed in boxes represent the additional terms required for extending the model from ideal MHD. These include viscous-resistive effects, as well as a pressure term $\bm{\mathcal{P}}$ and a Hall term $\bm{\mathcal{H}}$. Without these boxed terms, the system describes the ideal MHD model. Linearizing the ideal MHD equations results in three types of waves:
+\begin{itemize}
+	\item \textbf{Alfvén waves}: These incompressible waves cause the magnetic field lines to bend and propagate only in the parallel direction. In the low-beta limit, their propagation speed, $v_A^2 = \frac{B^2}{mn\mu_0}$, is much greater than the speed of sound in the plasma, $c_s^2 = \frac{eT}{m}$.
+	\item \textbf{Slow magnetoacoustic waves}: These waves propagate only in the parallel direction, causing compression in the plasma without perturbing the magnetic field lines. Their propagation speed $v_s$ is similar to the speed of sound.
+	\item \textbf{Fast magnetoacoustic waves}: These waves can propagate in any direction and compress magnetic field lines. They have a propagation speed approximately given by $v_f^2 = v_A^2 + c_s^2$.
+\end{itemize}
+
+Fast waves, in particular, pose challenges for numerical modeling as they require very small timesteps and implicit methods to be accurately resolved. The full MHD model introduces two additional dispersive waves into the system.
+
+
+
+
+
+\subsection{Reduced MHD model}
+\label{ssec:desc_reducedMHD}
+To eliminate the fast magnetoacoustic waves and to reduce the size of the system, physicists often resort to reduced MHD models. Instead of solving for all components of $\mathbf{B}$, we decompose the magnetic field into the the polodial flux $\Psi$ and the toroidal field function $F$ as in Eq. \ref{eq:intro_BeqMagneticFluxes}. The toroidal field $B_\varphi$ and $F$ are imposed, so we only remain with the unknown scalar $\Psi$ to replace the three unknowns of $\mathbf{B}$. As a reminder from Sec. \ref{sec:intro_GradShafranov}, $\Psi$ is equivalent to the toroidal component $A_\varphi$ of the magnetic vector potential and uniquely defines the poloidal field $B_p$. Consequently, Ampère's law \ref{eq:desc_MHDamperelaw} reduces to: 
+
+\begin{equation}
+	\mu_0 j_\varphi = \Delta^* \Psi = R^2\grad\cdot\left(\frac{1}{R^2}\grad_p\Psi\right)
+\end{equation}
+
+with the poloidal gradient $\grad_p$. \\
+
+In the second simplification for the reduced MHD model, the velocity vector is decomposed into a parallel and a perpendicular component. The projected fields are:
+
+\begin{align}
+	u_\perp     &= \mathbf{e}_\varphi\cdot \grad\cross\left(R^2\mathbf{u}\right)  \\
+	u_\parallel &= \mathbf{B}\cdot\mathbf{u} \\
+\end{align}
+
+This projection is consequently applied to all terms in the momentum conservation equation \ref{eq:desc_MHDmomentum}, that can then be solved independently for both velocities. In addition to reducing the number of equations from three to two, it permits to split the slow magnetoacoustic waves, that propagate at sound speed in the parallel directions, from the much slower dynamics in the poloidal plane that consist of electric and diamagnetic drifts (A proper introduction to the various plasma drifts will be given in the next chapter). 
+
+
+\section{Fluid closures}
+\label{sec:desc_fluidClosures}
+
+We only considered MHD models up to the second moment. To maintain the validity of the model, we need additional closure terms in the momentum and energy equations. They rely on the fact that plasma collisions dominate higher-order moments. 
+
+\subsection{Spizer-Härm model}
+
+¸
+\subsection{Braginskii and Zhdanov closures}
+
+
+\subsection{Reduced Ohm's law}
