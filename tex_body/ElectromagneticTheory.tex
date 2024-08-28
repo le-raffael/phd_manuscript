@@ -142,7 +142,7 @@ where the time variation $\partial_t A_\parallel$ accounts for magnetic inductio
 The separation of scales allows for fluid-drift models, where the parallel and perpendicular momentum equations are treated independently. Mikhailovskii and Tsypin\cite{mikhailovskii1971transport} first described slow drift dynamics from a theoretical viewpoint in 1971 with $\rho_L = 0$. Hazeltine et al.\cite{hazeltine1985four} extended the framework to include a finite ion Larmor radius. To understand their approach, it is useful to introduce the vorticity $ \boldsymbol{\Omega} = \nabla \times \mathbf{v}$, which measures the local rotation of a fluid element. It is a vector quantity, where the direction indicates the axis of rotation and its magnitude indicates the strength of the rotational motion. As perpendicular phenomena are essentially described by the parallel component of $\boldsymbol{\Omega}$, we only solve for the conservation of $\Omega_\parallel$. Furthermore, assuming that the electric drift dominates the perpendicular direction, we can express:
 
 \begin{equation}
-	\Omega_\parallel = \mathbf{b} \cdot \nabla \times \mathbf{v}_E = \nabla_\perp^2 \Phi
+	\Omega_\parallel = \mathbf{b} \cdot \nabla \times \mathbf{v}_E = \nabla_\perp^2 \Phi + \frac{1}{n}\nabla_\perp^2 p
 \end{equation}
 
 Taking the curl of the perpendicular (drift) momentum balance, we obtain a conservation equation for the ion vorticity:
@@ -171,25 +171,33 @@ To understand how turbulent structures appear and travel in the plasma, it is es
 
 
 \subsubsection{Non-adiabatic drift waves}
-
-One key mechanism within this framework is the non-adiabatic density response to potential perturbations. In this context, resistivity induces a phase shift between density and potential perturbations, which can either amplify or dampen these perturbations. The Hasegawa-Wakatani model \cite{hasegawa1983plasma} provides a foundational understanding of this process. This model considers an isothermal plasma with an unsheared magnetic field, where particles are advected solely by the electric drift, and parallel ion motion is neglected. Perturbations on any quantity are expressed as $ X = X_0(\psi) + \tilde{X} $, with $\tilde{X} = \epsilon e^{-\omega t - \mathbf{k} \cdot \mathbf{x}} $. The equilibrium fields $ X_0 $ vary across flux surfaces, with an imposed gradient in the radial direction. The governing equations are:
+\label{ssec:edge_nonAdiabaticResponse}
+One key mechanism within this framework is the non-adiabatic density response to potential perturbations. In this context, resistivity induces a phase shift between density and potential perturbations, which can either amplify or dampen these perturbations. The Hasegawa-Wakatani model \cite{hasegawa1983plasma} provides a foundational understanding of this process. This model considers an isothermal plasma with an unsheared magnetic field, where particles are advected solely by the electric drift, and parallel ion motion is neglected. We assume that the magnetic field is purely toroidal, and radial density gradients are imposed by the pressure gradient. We then remain with two degrees of freedom on which to perform the linear analysis: a perpendicular, poloidal direction and a parallel, toroidal direction. Perturbations on any quantity are expressed as $ X = X_0(\psi) + \tilde{X}(\theta,\varphi) $, with $\tilde{X}(\theta,\varphi) = \epsilon e^{i(-\omega t + k_\perp\theta+k_\parallel\varphi )}$ and the equilibrium fields $ X_0 $ varies across flux surfaces. Radial density gradients are imposed from the pressure gradient and can be approximated $\partial_\psi n_0 = \bar{n}_0 / \lambda_p$ where $\lambda_p$ is a characteristic length for the pressure gradient. In a slab equations, the perpendicular direction is hence perpendicular to both the magnetic field and the density gradient. The governing equations are:
 
 \begin{align}
 	\partial_t n + \mathbf{v}_E \cdot \nabla n &= -\frac{1}{e} \nabla \cdot (j_\parallel \mathbf{b}) \\
-	\eta_\parallel j_\parallel &= -\frac{T_e}{en} \nabla_\parallel n + \nabla \Phi \\
-	\frac{nm_i}{B^2} \left(\partial_t \nabla_\perp^2 \Phi + \mathbf{v}_E \cdot \nabla \nabla_\perp^2 \Phi\right) &= -\nabla \cdot (j_\parallel \mathbf{b})
+	\eta_\parallel j_\parallel &= T_e \nabla_\parallel \log(n) - \nabla_\parallel \Phi \\
+	\frac{nm_i}{B^2} \left(\partial_t \nabla_\perp^2 \Phi + \mathbf{v}_E \cdot \nabla \nabla_\perp^2 \Phi\right) &= \nabla \cdot (j_\parallel \mathbf{b})
+\end{align}
+
+The advection term by the electric drift can be expressed using Poisson brackets:
+\begin{align}
+	\mathbf{v}_E\cdot\grad n &= -\frac{1}{B}\left(\grad\Phi\cross \mathbf{b} \right)\cdot\grad n = -\frac{1}{B} \left(\partial_\theta\Phi \partial_\psi n - \partial_\psi\Phi \partial_\theta n\right) \nonumber \\ 
+	&= -\frac{1}{B}\left[\Phi,n\right]_{\psi,\theta} \label{eq:edge_poissonBracket}
 \end{align}
 
 The wavenumber vector $ \mathbf{k} $ contains both parallel and perpendicular components, such that in the Fourier space $ k_\parallel^2 \sim \nabla_\parallel^2 $ and $ k_\perp^2 \sim \nabla_\perp^2 $. The dispersion relation for the system is then:
 
+
 \begin{equation}
-	\omega^2 + i\frac{1+k_\perp^2\rho_L^2}{k_\perp^2\rho_L^2} \frac{k_\parallel^2 T_e}{e^2n_0\eta_\parallel}\omega + i\frac{k_\parallel^2 T_e}{e^2n_0\eta_\parallel k_\perp^2\rho_L^2}\frac{m_i T_e}{en_0 a B}\partial_\psi n_0 = 0
+	\omega^2 + \left[i\frac{B^2k_\parallel}{\eta_\parallel m_i n_0 k_\perp^2} - \frac{T_ek_\parallel^2}{e\eta_\parallel n_0}\right]\omega + i\frac{BT_ek_\parallel^2}{\eta_\parallel m_i n_0 \lambda_p k_\perp} = 0
 \end{equation}
+
 
 The solution to this system can be decomposed into a real component $ \omega_* $ that corresponds to the natural frequency of the system and an imaginary component $ \gamma $ that describes the growth or damping rate. From the drift-ordering parameters, we know that $ k_\perp \rho_L $ must be small, simplifying the system. The first solution is purely real, and the second is purely imaginary, with:
 
 \begin{align}
-	\omega_* &= \frac{1}{k_\perp^2 \rho_L^2}\frac{m_i T_e}{eaB}\frac{\partial_\psi n_0 }{n_0} k_\parallel^2 & \gamma &= \frac{1}{k_\perp^2 \rho_L^2}\frac{T_e}{e^2 n_0 \eta_\parallel} k_\parallel^2
+	\omega_* &= \frac{T_e k_\perp}{B\lambda_p} & \gamma &= \frac{1}{k_\perp^2 \rho_L^2}\frac{T_e}{e^2 n_0 \eta_\parallel} k_\parallel^2
 \end{align}
 
 The system frequency $ \omega_* $ is called the diamagnetic frequency and is driven by the density gradient. We observe that the growth rate $ \gamma $ is positive, indicating that under certain conditions, perturbations may grow indefinitely. In an ideal plasma with zero resistivity, the dispersion relation has only real solutions, and the system remains stable. In this case, the interaction is adiabatic, and density and potential oscillate in phase.
@@ -208,14 +216,15 @@ Density and velocity perturbations then travel in the parallel direction at the 
 
 
 \subsubsection{Shear Alfvén waves}
+\label{ssec:edge_shearAlfvenWaves}
 
 Density perturbations provoke an electromagnetic response. To this effect, we consider a standard four-field model that couples the electron density $n_e$ with the parallel current density $j_\parallel$ and both potentials $\Phi$ and $A_\parallel$. The governing equations now are: 
 
 \begin{align}
 	\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad^2_\perp\Phi\right] &= \grad\cdot(j_\parallel\mathbf{b}) \\
 	\grad^2_\perp A_\parallel &= -\mu_0j_\parallel \\
-	\eta_\parallel j_\parallel + \frac{ m_e}{n_ee^2} \partial_t j_\parallel  &= \left(-\grad_\parallel\Phi - \partial_t A_\parallel + \frac{ T_e}{e}\grad_\parallel\log(n_e)\right) \\
-	\partial_t n_e &= \frac{1}{e}\grad\cdot j_\parallel 
+	\eta_\parallel j_\parallel + \frac{ m_e}{n_ee^2} \partial_t j_\parallel  &= \left(-\grad_\parallel\Phi - \partial_t A_\parallel + T_e\grad_\parallel\log(n_e)\right) \\
+	\partial_t n_e &= \frac{1}{e}\grad\cdot (j_\parallel\mathbf{b}) 
 	\label{eq:fourFieldModel}
 \end{align}
 
@@ -232,7 +241,9 @@ The dispersion relation describes "shear Alfvén waves", according to which pert
 
 Magnetic curvature also plays an important role in the formation of drift waves. The effective gravity force opposes the pressure gradient, leading to inherent plasma instability and the development of resistive ballooning modes \cite{hastie2003drift}. In the vorticity conservation equation, as given in Eq. \ref{eq:edge_vorticityConservation}, the term $ \nabla \cdot \mathbf{v}_\perp $ appears. Both the electric and diamagnetic drifts take the form $ ( \mathbf{B} \times \nabla X)/B^2 $. In a homogeneous magnetic field, as assumed above, the divergence of the drifts vanishes. However, in a curved magnetic field, this term introduces additional coupling between the vorticity and the density and potential gradients. In a realistic tokamak configuration with both poloidal and toroidal field components and a high aspect ratio $ R/a $, poloidal perturbations can be expressed as $ \tilde{X} = \sum_m \tilde{X}_m e^{im\theta} $. A perturbation mode $ m $ in the density or potential is then coupled to the modes $ m-1 $ and $ m+1 $ of the other fields. \newline 
 
-So far we have considered several wave dynamics in the plasma individually, with each their own characteristic frequency. ---------- WRITE DOWN CHARACTERISTIC VALUES ----------- In reality, all these modes impact the plasma simultaneously. The actual linear behavior is far more complex and combines all frequencies. 
+So far we have considered several wave dynamics in the plasma individually, with each their own characteristic frequency. 
+---------- WRITE DOWN CHARACTERISTIC VALUES ----------- 
+In reality, all these modes impact the plasma simultaneously. The actual linear behavior is far more complex and combines all frequencies. 
 
 Leddy et al. \cite{leddy2015validity} compared the linear behavior of drift-reduced and full-velocity descriptions of plasmas. They found that while the drift reduction suppresses fast wave dynamics, easing timestep constraints and motivating the use of reduced MHD models as introduced in Sec. \ref{ssec:desc_reducedMHD}, the linear behavior of the two approaches only agrees within a limited parameter space, generally including tokamak conditions. However, the agreement is only robust in the edge region, with significant discrepancies appearing in the core, limiting the validity of drift-reduced models in simulation that consider both sides of the separatrix.
 
@@ -284,15 +295,78 @@ It was found on HSX that electron inertia effect might dominate resistivity for 
 
 follow scotts derivation
 
+The magnetic field can be decomposed in equilibrium and fluctuation components:
+
+\begin{equation}
+	\mathbf{B} = \mathbf{B}_{eq} + \mathbf{\tilde{B}}
+\end{equation}
+
+The fundamental definition \ref{eq:intro_magneticVectorPotential} of the magnetic field through its vector potential will be used. In the drift-reduced framework, we only consider the parallel projection of the magnetic vector potential $\mathbf{A} \approx A_\parallel\mathbf{b}$. It is then possible to calculate the fluctuating field $\mathbf{\tilde{B}}$:
+
+\begin{equation}
+	\mathbf{\tilde{B}} = \grad A_\parallel\cross\mathbf{b}_{eq} + A_\parallel \grad\cross \mathbf{b}_{eq}
+\end{equation}
+
+The second term contains the plain $A_\parallel$ without its derivative, which might seem counterintuitive from the the definition of the magnetic field. It is needed to maintain $\mathbf{B}$ divergence-free as we assume that the fluctuation is always perpendicular to the equilibrium field. The contribution of this second term to the flutter field is however negligible compared to the first.
+
+With respect to the equilibrium field, flutter can be viewed as an additional drift acting on the plasma. Indeed, a new advection . In reality it is not an actual drift as flutter transport is in fact a deformation of the magnetic field lines and a redirection of the parallel advection. 
 
 
 \section{Drift-Alfvén waves}
 
-look at Kaiyu zhang on mode shifts
+In this section, we are interested in interaction between the three new terms (magnetic induction, electron inertia and flutter) and drift-wave instabilities. As they all appear in Ohm's law, they will compete with the resistive term and modify the non-adiabatic response of the plasma. 
 
-\subsection{Linear analysis}
+\subsection{Dispersion relation}
 
-\subsection{Non-linear effects}
+Let us consider the same system as in Sec. \ref{ssec:edge_nonAdiabaticResponse} and combine it with the shear Alfvén dynamics from Sec. \ref{ssec:edge_shearAlfvenWaves}. We then have the system: 
+
+\begin{align}
+	\partial_t n + \mathbf{v}_E\cdot\nabla n &= -\frac{1}{e}\nabla\cdot(j_\parallel \mathbf{b}) \\
+	\frac{nm_i}{B^2}\partial_t\nabla_\perp^2\Phi &= -\nabla\cdot(j_\parallel \mathbf{b}) \\
+	\left(\eta_\parallel + \mu\partial_t \right) j_\parallel &= \frac{T_e}{en}\grad_\parallel n - \grad_\parallel \Phi - \partial_t A_\parallel \\
+	\nabla_\perp^2 A_\parallel &= -\mu_0 j_\parallel
+\end{align}
+
+with the electron-inertia coefficient $\mu = m_e / (n_ee^2)$. 
+
+Here parallel gradients and divergence use the total magnetic field $\mathbf{b}$. As in the previous setting the equilibrium field is purely toroidal and $\mathbf{b}_{eq} = (0,0,1)^T$. Again, only consider poloidal and toroidal perturbations with respective wavenumbers $k_\perp$ and $k_\parallel$. If we only consider the dominating term of $\mathbf{\tilde{b}}$, any gradient $\grad_\parallel f$ can be expressed as:
+
+\begin{align}
+	\mathbf{b}\cdot\grad f &= \mathbf{b}_{eq}\cdot\grad f + \mathbf{\tilde{b}} \cdot \grad f \nonumber\\
+	&= \mathbf{b}_{eq}\cdot\grad f + \frac{1}{B}(\grad A_\parallel \cross \mathbf{b})\cdot\grad f \nonumber\\ 
+	&= \partial_\varphi f + \frac{1}{B}\left[A_\parallel,f\right]_{\psi,\theta}
+\end{align}
+
+One can see from this expression the similarity between the flutter contribution to the advection and the "ExB" advection in Eq. \ref{eq:edge_poissonBracket}, reassuring us in the idea to consider flutter as a new drift. Parallel divergences can be written in the exact same way, as on a slab geometry the terms $f\partial_\psi\partial_\theta A_\parallel$ and $f\partial_\theta\partial_\psi A_\parallel$ cancel out.
+
+\begin{equation}
+	\grad \cdot (f\mathbf{b}) = \partial_\varphi f + \frac{1}{B}\left[A_\parallel,f\right]_{\psi,\theta}
+\end{equation}
+
+From the thermodynamic force, radial density gradients are prescribed to $n_0 / \lambda_p$, but $\partial_\psi\Phi$, $\partial_\psi j_\parallel$ or $\partial_\psi A_\parallel$ are assumed to zero in the linear analysis. The system of study can then be rewritten as:
+\begin{align}
+	\partial_t n - \frac{n_0}{B\lambda_p}\partial_\theta\Phi &= -\frac{1}{e}\partial_\varphi j_\parallel \\
+	\frac{nm_i}{B^2}\partial_t\nabla_\perp^2\Phi &= -\partial_\varphi j_\parallel \\
+	\left(\eta_\parallel + \mu\partial_t \right) j_\parallel &= \frac{T_e}{en_0}\partial_\varphi n - \partial_\varphi \Phi  + \left(\frac{n_0}{B\lambda_p}\partial_\theta - \partial_t\right) A_\parallel \\
+	\partial_\theta^2 A_\parallel &= -\mu_0 j_\parallel
+\end{align}
+
+This system can now be transformed to the Fourier space:
+
+\begin{equation}
+	\begin{pmatrix}
+		-i\omega                  & -i\frac{n_0}{B\lambda_p}k_\perp     & i\frac{1}{e}k_\parallel & 0                  \\ 
+		0                         & i\frac{nm_i}{B^2}             & ik_\parallel            & 0                  \\ 
+		-i\frac{T_e}{en_0}k_\perp & ik_\perp & \eta_\parallel - i\mu\omega & -i\frac{n_0}{B\lambda_p}k_\perp - i\omega \\ 
+		0                         & 0                             & \mu_0                   & k_\perp^2
+	\end{pmatrix}\begin{pmatrix}
+		\hat{n} \\ \hat{\Phi} \\ \hat{j}_\parallel \\ \hat{A}_\parallel
+	\end{pmatrix} = \begin{pmatrix}
+		0 \\ 0 \\ 0 \\ 0
+ 	\end{pmatrix}
+\end{equation}
+
+
 
 %\section{Electromagnetism in Other Software Projects}
 %The fluid model is a somewhat popular approach to simulate transport phenomena of edge plasma and is followed by various research groups in the fusion community. Among the major actors appear the..., ..., ... . This section gives more detailed insights into the Bout++ and GRILLIX software projects, as they are both relevant for the further research done within this thesis.
