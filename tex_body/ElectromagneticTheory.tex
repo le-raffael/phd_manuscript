@@ -161,7 +161,7 @@ where the perpendicular current arises from drifts in opposite directions for el
 A full derivation of the drift-reduced equations, including all possible terms, was provided by Simakov and Catto\cite{simakov_2003}. Notably, they derived a self-consistent expression for the ion parallel and gyroviscous stress tensors, ensuring full energy conservation in the fluid model.
 
 
-´
+
 
 \subsection{Linear plasma instabilities}
 \label{ssec:edge_linearDriftWaves}
@@ -175,8 +175,8 @@ To understand how turbulent structures appear and travel in the plasma, it is es
 One key mechanism within this framework is the non-adiabatic density response to potential perturbations. In this context, resistivity induces a phase shift between density and potential perturbations, which can either amplify or dampen these perturbations. The Hasegawa-Wakatani model \cite{hasegawa1983plasma} provides a foundational understanding of this process. This model considers an isothermal plasma with an unsheared magnetic field, where particles are advected solely by the electric drift, and parallel ion motion is neglected. We assume that the magnetic field is purely toroidal, and radial density gradients are imposed by the pressure gradient. We then remain with two degrees of freedom on which to perform the linear analysis: a perpendicular, poloidal direction and a parallel, toroidal direction. Perturbations on any quantity are expressed as $ X = X_0(\psi) + \tilde{X}(\theta,\varphi) $, with $\tilde{X}(\theta,\varphi) = \epsilon e^{i(-\omega t + k_\perp\theta+k_\parallel\varphi )}$ and the equilibrium fields $ X_0 $ varies across flux surfaces. Radial density gradients are imposed from the pressure gradient and can be approximated $\partial_\psi n_0 = \bar{n}_0 / \lambda_p$ where $\lambda_p$ is a characteristic length for the pressure gradient. In a slab equations, the perpendicular direction is hence perpendicular to both the magnetic field and the density gradient. The governing equations are:
 
 \begin{align}
-	\partial_t n + \mathbf{v}_E \cdot \nabla n &= -\frac{1}{e} \nabla \cdot (j_\parallel \mathbf{b}) \\
-	\eta_\parallel j_\parallel &= T_e \nabla_\parallel \log(n) - \nabla_\parallel \Phi \\
+	\partial_t n + \mathbf{v}_E \cdot \nabla n &= \frac{1}{e} \nabla \cdot (j_\parallel \mathbf{b}) \\
+	\eta_\parallel j_\parallel &= T_0 \nabla_\parallel \log(n) - \nabla_\parallel \Phi \\
 	\frac{nm_i}{B^2} \left(\partial_t \nabla_\perp^2 \Phi + \mathbf{v}_E \cdot \nabla \nabla_\perp^2 \Phi\right) &= \nabla \cdot (j_\parallel \mathbf{b})
 \end{align}
 
@@ -186,21 +186,20 @@ The advection term by the electric drift can be expressed using Poisson brackets
 	&= -\frac{1}{B}\left[\Phi,n\right]_{\psi,\theta} \label{eq:edge_poissonBracket}
 \end{align}
 
-The wavenumber vector $ \mathbf{k} $ contains both parallel and perpendicular components, such that in the Fourier space $ k_\parallel^2 \sim \nabla_\parallel^2 $ and $ k_\perp^2 \sim \nabla_\perp^2 $. The dispersion relation for the system is then:
-
+The wavenumber vector $ \mathbf{k} $ contains both parallel and perpendicular components, such that in the Fourier space $ k_\parallel^2 \sim \nabla_\parallel^2 $ and $ k_\perp^2 \sim \nabla_\perp^2 $. Using the ion Larmor radius $\rho_L^2 = T_0m_i/(eB^2)$, the dispersion relation for the system is: 
 
 \begin{equation}
-	\omega^2 + \left[i\frac{B^2k_\parallel}{\eta_\parallel m_i n_0 k_\perp^2} - \frac{T_ek_\parallel^2}{e\eta_\parallel n_0}\right]\omega + i\frac{BT_ek_\parallel^2}{\eta_\parallel m_i n_0 \lambda_p k_\perp} = 0
+	\omega^2 + i\frac{1 + \rho_L^2k_\perp^2}{\rho_L^2k_\perp^2}\frac{T_0k_\parallel^2}{en_0\eta_\parallel}\omega - i\frac{1}{\rho_L^2k_\perp^2}\frac{T_0^2k_\perp k_\parallel^2}{en_0B\lambda_p\eta_\parallel} = 0
 \end{equation}
 
 
-The solution to this system can be decomposed into a real component $ \omega_* $ that corresponds to the natural frequency of the system and an imaginary component $ \gamma $ that describes the growth or damping rate. From the drift-ordering parameters, we know that $ k_\perp \rho_L $ must be small, simplifying the system. The first solution is purely real, and the second is purely imaginary, with:
+The solution to this system can be decomposed into a real component $ \omega_* $ that corresponds to the natural frequency of the system and an imaginary component $ \gamma $ that describes the growth or damping rate. From the drift-ordering parameters, we know that $ k_\perp^2 \rho_L^2 $ must be small, simplifying the system. If we assume the resistivity small, we can estimate the solutions:
 
 \begin{align}
-	\omega_* &= \frac{T_e k_\perp}{B\lambda_p} & \gamma &= \frac{1}{k_\perp^2 \rho_L^2}\frac{T_e}{e^2 n_0 \eta_\parallel} k_\parallel^2
+	\omega_* &= \frac{T_e k_\perp}{B\lambda_p} & \gamma &= \frac{\rho_L^2k_\perp^2en_0\eta_\parallel}{T_0k_\parallel^2}\omega_*^2
 \end{align}
 
-The system frequency $ \omega_* $ is called the diamagnetic frequency and is driven by the density gradient. We observe that the growth rate $ \gamma $ is positive, indicating that under certain conditions, perturbations may grow indefinitely. In an ideal plasma with zero resistivity, the dispersion relation has only real solutions, and the system remains stable. In this case, the interaction is adiabatic, and density and potential oscillate in phase.
+The system frequency $ \omega_* $ is called the diamagnetic frequency and is driven by the density gradient. We observe that the growth rate $ \gamma $ is positive, indicating that under certain conditions, perturbations may grow indefinitely. The more resistive a plasma is, the faster perturbations grow and in an ideal plasma with zero resistivity, the system remains stable with the single real solution $\omega_*$. In this case, the interaction is adiabatic, and density and potential oscillate in phase at the diamagnetic frequency.
 
 
 \subsubsection{Sound waves}
