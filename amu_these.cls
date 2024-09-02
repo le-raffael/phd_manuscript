@@ -40,6 +40,7 @@
 \RequirePackage[bottom=10em]{geometry}		%% réduit le bas de page pour pouvoir numéroter les pdf insérés (réduire plus si nécessaire)
 \RequirePackage{setspace}					%% modification de l'interligne
 \RequirePackage{bm}
+\RequirePackage{textcomp}
 
 \pagestyle{scrheadings}						%% style de page
 %\setkomafont{disposition}{\bfseries}		%% titrage en police sérif (décommenter)

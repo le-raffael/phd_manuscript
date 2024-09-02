@@ -13,9 +13,6 @@ Sec. \ref{sec:edge_driftWaves} introduces the origin of drift waves, main driver
 \section{Drift wave turbulence}
 \label{sec:edge_driftWaves}
 
-
-
-
 \subsection{Plasma drifts}
 \label{ssec:edge_plasmaDrifts}
 
@@ -211,7 +208,7 @@ Parallel ion motion produces sound waves. If we consider only the parallel veloc
 	m_i n \left(\partial_t v_\parallel + \nabla \cdot \left(v_\parallel^2 \mathbf{b}\right)\right) &= -\nabla_\parallel (p_i + p_e)
 \end{align}
 
-Density and velocity perturbations then travel in the parallel direction at the sound speed $ c_s = \sqrt{(T_e + T_i)/m_i} $. Sound waves do not lead to instabilities nor do they grow or damp, but they naturally arise with perturbations and interact with other wave dynamics.
+Density and velocity perturbations then travel in the parallel direction at the sound speed $ c_s = \sqrt{e(T_e + T_i)/m_i} $. Sound waves do not lead to instabilities nor do they grow or damp, but they naturally arise with perturbations and interact with other wave dynamics. The associated frequency is $\omega_s = c_s k_\parallel$.
 
 
 \subsubsection{Shear Alfvén waves}
@@ -251,21 +248,33 @@ Leddy et al. \cite{leddy2015validity} compared the linear behavior of drift-redu
 \section{Electromagnetic effects in edge plasma}
 \label{sec:edge_EMeffects}
 
+Numerous studies have demonstrated the electromagnetic effects on edge dynamics, both on blob dynamics in simple geometries \cite{lee2015, Stepanenko_2020}, and on turbulence and transport properties in real tokamak geometries \cite{zhu2023, zholobenko_2024}. Their impact increases with $\beta$ and can become crucial, particularly when approaching the L-H transition or in large machines like ITER operating in the high confinement mode (H-mode)\cite{zholobenko_2024}. In these electromagnetic models, magnetic fluctuations are explicitly determined by Ampère's and Ohm’s laws \cite{DUDSON_2009, Ricci_2012, dudson2015, stegmeir2019, giacomin2022gbs, zhang2024}. Thus, electron inertia is retained, and magnetic effects occur both through magnetic induction and flutter. 
+
+Magnetic induction is captured by the time derivative of the parallel vector potential $A_\parallel$, which is principally a linear phenomenon, with the Coulomb gauge $E_\parallel = - \grad_\parallel \Phi - \partial_t A_\parallel$, such that fluctuations in the electrostatic potential induce magnetic fluctuations. Magnetic flutter\cite{callen_1977}, on the other hand, refers to additional transport by magnetic fluctuations appearing through the perturbed parallel gradient such as $A_\parallel = (\boldsymbol{b} + \boldsymbol{\tilde{B}}/B) \cdot \nabla$ (where $\boldsymbol{b}$ is the equilibrium magnetic field unit vector and $\boldsymbol{\tilde{B}} = \nabla \times (\tilde{A}_\parallel \boldsymbol{b})$), involving purely nonlinear phenomena. However, up to very recently, most studies did not discuss these effects \cite{DUDSON_2009}, their implementation being motivated by improving numerical stability when using explicit time solvers \cite{stegmeir2019, giacomin2022gbs}. 
+
+
 One particular interaction we want to study is the impact of electromagnetic effects on edge plasma turbulence. Shear Alfvén waves have already been introduced above, however they travel at much higher speeds than drift waves. In this section, we focus more on drift-Alfvén waves, which appear with the presence of a magnetic induction term in the non-adiabatic response. We then discuss the nonlinear impact of fluctuations of the magnetic equilibrium on the plasma.
 
 
 \subsection{Magnetic induction}
 
 As early as 1997, Scott\cite{scott1997} questioned the importance of magnetic induction for the evolution of drift waves. In the electrostatic model, whose existing implementation in Soledge3X was descrbed in the previous chapter, the parallel current density in Ohm's law balances the plasma pressure with electric forces and resistive friction. As soon as we consider a finite $\beta$, the variation of the electromagnetic vector potential $\mathbf{A}$ adds to the electric potential gradient in the definition of the electric field $ \mathbf{E} = -\partial_t \mathbf{A} - \grad \Phi$. At drift scales, $k_\parallel \ll k_\perp$ and only the parallel component $A_\parallel = \mathbf{A}\cdot\mathbf{b}$ of the electromagnetic potential effectively impacts electric forces. It is directly linked to the current density via Ampère's law: 
+
 \begin{equation}
-	\label{eq:AmpereLaw}
+	\label{eq:edge_AmpereLaw}
 	\grad\cdot\grad A_\parallel = -\mu_0 j_\parallel
 \end{equation}
 
 If we then include $A_\parallel$ in the parallel electric field, magnetic induction leads to an extended, electromagnetic Ohm's law:
 
 \begin{equation}
-	\label{eq:electromagneticOhmsLaw}
+	\label{eq:edge_EparaElectromagnetic}
+	E_\parallel = -\grad_\parallel \Phi - \partial_tA_\parallel
+\end{equation}
+
+
+\begin{equation}
+	\label{eq:edge_electromagneticOhmsLaw}
 	\partial_t A_\parallel + \eta_\parallel j_\parallel = -\grad\Phi + \frac{1}{n_ee}\grad p_\parallel + \frac{1}{n_ee}R_\parallel
 \end{equation}
 
@@ -313,20 +322,18 @@ With respect to the equilibrium field, flutter can be viewed as an additional dr
 
 \section{Drift-Alfvén waves}
 
-In this section, we are interested in interaction between the three new terms (magnetic induction, electron inertia and flutter) and drift-wave instabilities. As they all appear in Ohm's law, they will compete with the resistive term and modify the non-adiabatic response of the plasma. 
+In this section, we take a more formal approach to the interaction between the three new terms (magnetic induction, electron inertia and flutter) and the well-known resistive drift-wave instabilities. As they all terms appear in Ohm's law, this is the place where they will all compete and modify the non-adiabatic response of the plasma. 
 
 \subsection{Dispersion relation}
 
 Let us consider the same system as in Sec. \ref{ssec:edge_nonAdiabaticResponse} and combine it with the shear Alfvén dynamics from Sec. \ref{ssec:edge_shearAlfvenWaves}. We then have the system: 
 
 \begin{align}
-	\partial_t n + \mathbf{v}_E\cdot\nabla n &= -\frac{1}{e}\nabla\cdot(j_\parallel \mathbf{b}) \\
-	\frac{nm_i}{B^2}\partial_t\nabla_\perp^2\Phi &= -\nabla\cdot(j_\parallel \mathbf{b}) \\
-	\left(\eta_\parallel + \mu\partial_t \right) j_\parallel &= \frac{T_e}{en}\grad_\parallel n - \grad_\parallel \Phi - \partial_t A_\parallel \\
+	\partial_t n + \mathbf{v}_E\cdot\nabla n &= \frac{1}{e}\nabla\cdot(j_\parallel \mathbf{b}) \\
+	\frac{nm_i}{B^2}\partial_t\nabla_\perp^2\Phi &= \nabla\cdot(j_\parallel \mathbf{b}) \\
+	\left(\eta_\parallel + \frac{m_e}{n_ee^2}\partial_t \right) j_\parallel &= \frac{T_e}{n}\grad_\parallel n - \grad_\parallel \Phi - \partial_t A_\parallel \\
 	\nabla_\perp^2 A_\parallel &= -\mu_0 j_\parallel
 \end{align}
-
-with the electron-inertia coefficient $\mu = m_e / (n_ee^2)$. 
 
 Here parallel gradients and divergence use the total magnetic field $\mathbf{b}$. As in the previous setting the equilibrium field is purely toroidal and $\mathbf{b}_{eq} = (0,0,1)^T$. Again, only consider poloidal and toroidal perturbations with respective wavenumbers $k_\perp$ and $k_\parallel$. If we only consider the dominating term of $\mathbf{\tilde{b}}$, any gradient $\grad_\parallel f$ can be expressed as:
 
@@ -344,26 +351,144 @@ One can see from this expression the similarity between the flutter contribution
 
 From the thermodynamic force, radial density gradients are prescribed to $n_0 / \lambda_p$, but $\partial_\psi\Phi$, $\partial_\psi j_\parallel$ or $\partial_\psi A_\parallel$ are assumed to zero in the linear analysis. The system of study can then be rewritten as:
 \begin{align}
-	\partial_t n - \frac{n_0}{B\lambda_p}\partial_\theta\Phi &= -\frac{1}{e}\partial_\varphi j_\parallel \\
-	\frac{nm_i}{B^2}\partial_t\nabla_\perp^2\Phi &= -\partial_\varphi j_\parallel \\
-	\left(\eta_\parallel + \mu\partial_t \right) j_\parallel &= \frac{T_e}{en_0}\partial_\varphi n - \partial_\varphi \Phi  + \left(\frac{n_0}{B\lambda_p}\partial_\theta - \partial_t\right) A_\parallel \\
-	\partial_\theta^2 A_\parallel &= -\mu_0 j_\parallel
+	\partial_t n - \frac{n_0}{B\lambda_p}\partial_\theta\Phi - \frac{1}{e}\partial_\varphi j_\parallel &= 0 \\
+	\frac{nm_i}{B^2}\partial_t\nabla_\perp^2\Phi - \partial_\varphi j_\parallel &= 0\\
+	\left(\eta_\parallel + \frac{m_e}{n_ee^2}\partial_t \right) j_\parallel - \frac{T_e}{n_0}\partial_\varphi n + \partial_\varphi \Phi  + \left(\frac{T_e}{\partial_t - B\lambda_p}\partial_\theta\right) A_\parallel &= 0 \\
+	\partial_\theta^2 A_\parallel + \mu_0 j_\parallel &= 0
 \end{align}
 
 This system can now be transformed to the Fourier space:
 
 \begin{equation}
 	\begin{pmatrix}
-		-i\omega                  & -i\frac{n_0}{B\lambda_p}k_\perp     & i\frac{1}{e}k_\parallel & 0                  \\ 
-		0                         & i\frac{nm_i}{B^2}             & ik_\parallel            & 0                  \\ 
-		-i\frac{T_e}{en_0}k_\perp & ik_\perp & \eta_\parallel - i\mu\omega & -i\frac{n_0}{B\lambda_p}k_\perp - i\omega \\ 
-		0                         & 0                             & \mu_0                   & k_\perp^2
+		-i\omega                  & i\frac{n_0}{T_0}\omega_*    & -i\frac{1}{e}k_\parallel & 0                  \\ 
+		0                         & i\frac{en_0}{T_0}\rho_L^2k_\perp^2\omega        & -ik_\parallel            & 0                  \\ 
+		-i\frac{T_0}{n_0}k_\parallel & ik_\parallel & \eta_\parallel - i\frac{m_e}{(n_ee^2)}\omega & i\omega_* - i\omega \\ 
+		0                         & 0                             & \mu_0                   & -k_\perp^2
 	\end{pmatrix}\begin{pmatrix}
 		\hat{n} \\ \hat{\Phi} \\ \hat{j}_\parallel \\ \hat{A}_\parallel
 	\end{pmatrix} = \begin{pmatrix}
 		0 \\ 0 \\ 0 \\ 0
  	\end{pmatrix}
 \end{equation}
+
+To get the complex system frequencies, we need to solve the determinant of the matrix for $\omega$. We can express the dispersion relation as a third order polynomial equation on $\omega$:
+´\begin{equation}
+	\label{eq:edge_DAWdispersionRelation}
+	i\left(\underbrace{\rho_{L,e}^2k_\perp^2}_{\text{finite }m_e} + \underbrace{\beta_0}_{\text{induct.}}\right)\omega^3 + \left(-\underbrace{i\beta_0\omega_*}_{\text{flutter}} - \underbrace{\frac{\eta_\parallel en_0T_0k_\perp^2}{B^2}}_{\text{resistivity}}\right)\omega^2 - i\omega_s^2\left(\omega_*-\left(1 + \rho_L^2 k_\perp^2\right)\omega\right) = 0
+\end{equation}
+
+with the electron Larmor radius $\rho_{L,e}^2 = m_eT_0/(eB^2)$ and the pressure ratio $\beta_0 = en_0T_0 \mu_0 / B^2$. The terms arising from the different components of the electromagnetic model are clearly labeled. 
+
+%For more clarity in the upcoming
+%\begin{equation}
+%	\left[i\rho_{L,e}^2k_\perp^2 \omega + i\beta_0\left(\omega - \omega_*\right)- \frac{\eta_\parallel en_0T_0k_\perp^2}{B^2}\right]\omega^2 - \omega_s^2\left(\omega-\omega_*\right) = 0
+%\end{equation}
+
+The solution to the dispersion relation takes the form $\omega_{DAW} = \omega_0 +i\gamma$. To obtain a neat expression for the wave phase frequency $\omega_0$ and the growth rate $\gamma$, let us assume that the drift-Alfvén frequency $\omega_{DAW}$ is close to the diamagnetic frequency, with $\delta = \omega_{DAW} - \omega_*$ such that higher orders $\delta^n$ can be ignored. To improve the readability, let us refer to the resistive term as $R = \eta_\parallel en_0T_0/B^2$. We can then express $\delta$: 
+
+\begin{align}
+	\delta &= \frac{Rk_\perp\omega_*^2 - i\rho_{L,e}^2k_\perp^2\omega_*^3}{i\left(\beta_0 - 3\rho_{L,e}^2k_\perp^2\right)\omega_*^2 - 2Rk_\perp\omega_* - i\omega_s^2} %\\
+%&= \frac{\omega_*^{3} \left(- 2 R^2 + k_\perp^2 \rho_{L,e}^2 \left(c_{s}^2 k_\parallel^2 - \omega_*^2 \left(\beta_{0} + 3 k_\perp^2 \rho_{L,e}^2\right)\right)\right)}{4 R^2 \omega_*^2 + \left(c_{s}^2 k_\parallel^2 - \omega_*^2 \left(\beta_{0} + 3 k_\perp^2 \rho_{L,e}^2\right)\right)^2} + i\frac{R \omega_*^2 \left(c_{s}^2 k_\parallel^2 + 2 k_\perp^2 \omega_*^2 \rho_{L,e}^2 - \omega_*^2 \left(\beta_{0} + 3 k_\perp^2 \rho_{L,e}^2\right)\right)}{4 R^2 \omega_*^2 + \left(c_{s}^2 k_\parallel^2 - \omega_*^2 \left(\beta_{0} + 3 k_\perp^2 \rho_{L,e}^2\right)\right)^2}
+\end{align}
+
+If we further assume a small but still finite resistivity $R$ (dropping higher-order terms), we can concisely express the real and imaginary parts of $\delta$.
+
+\begin{equation}
+	\delta \approx \frac{\rho_{L,e}^2k_\perp^{2} \omega_*^{3} }{\left(\beta_{0}  - 3 \rho_{L,e}^2 k_\perp^{2}\right)\omega_*^{2} + \omega_s^{2}} + i\frac{Rk_\perp\omega_*^{2}}{\left(\beta_{0}  - 3 \rho_{L,e}^2 k_\perp^{2}\right)\omega_*^{2} + \omega_s^{2} }	
+\end{equation}
+
+At this point, a single term remains for electromagnetic induction and flutter. This is because the flutter has a stabilizing effect on the inductive term. It already appears in the dispersion relation \ref{eq:edge_DAWdispersionRelation} that the flutter term largely compensates the electromagnetic induction in the difference $i\beta_0\left(\omega - \omega_*\right)\omega^2$. Without the flutter correction, one would get for $\delta$:
+
+
+
+
+it is interesting to discuss how the electromagnetic terms modify the characteristic drift-wave frequency $\omega_*$ known from the electrostatic setting. Since we estimated the drift-Alfvén wave by $\omega_{DAW} = \omega_* + \delta$, it is also essential to justify the assumptions made above. For that, let us compare of $\delta$ to the diamagnetic frequency. 
+
+\begin{equation}
+	\frac{\Re{\delta}}{\omega_*} = \frac{\rho_{L,e}^2k_\perp^{2} \omega_*^{2} }{\left(\beta_{0}  - 3 \rho_{L,e}^2 k_\perp^{2}\right)\omega_*^{2} + \omega_s^{2} }
+\end{equation}
+
+The resistive terms do not contribute to a change of frequency. 
+
+This discussion is only valid in cases where $\rho_L^2k_\perp^2$ is small and hence $\omega_{DAW}$ is close to the diamagnetic frequency $\omega_*$. This is not necessarily the case everywhere in the edge, and in the next section we consider numerically the raw dispersion relation.
+
+
+\subsection{Discussion of the modal analysis}
+
+The objective of this section is to analyze the impact of electromagnetic terms on drift-wave turbulence within the linearized system. Specifically, we compare the effects of a finite electron mass (EI-inert), electromagnetic induction with electron mass (EM), and electromagnetic induction with both flutter and electron mass (EM-flutter) in comparison to the baseline electrostatic case. The dispersion relation from Eq. \ref{eq:edge_DAWdispersionRelation} is adjusted to each of the four scenarios and solved exactly using the Python library SymPy for symbolic computation. Notably, we use the full dispersion relation without applying the simplifications used in the previous section's discussion.
+
+Given the coupled nature system, there are several complex solutions for $\omega$ for each scenario, where each corresponds to a different mode. In Fig. \ref{fig:edge_modalBehavior}, the real and imaginary components of all modes are plotted as functions of the perpendicular wave number $k_\perp$, with typical parameters for a mid-sized tokamak. The real component $\omega_R$ represents the wave phase frequency, while the imaginary component $\gamma$ describes the growth or damping rate of each mode. A positive $\gamma$ indicates an unstable mode with exponential growth, whereas a negative $\gamma$ corresponds to a stable mode that is damped over time.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
+		\subcaption{Electrostatic system}
+		\label{fig:edge_modesES}
+	\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+	\ContinuedFloat
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/modes_ES-inert.jpg}
+		\subcaption{Electrostatic system with electron inertia}
+		\label{fig:edge_modesEI}
+	\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+	\ContinuedFloat
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/modes_EM.jpg}
+%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
+		\subcaption{Electromagnetic system}
+		\label{fig:edge_modesEM}
+	\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+	\ContinuedFloat
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
+		\includegraphics[width=1\textwidth]{schemes/modes_EM-flutter.jpg}
+		\subcaption{Electromagnetic system with flutter}
+		\label{fig:edge_modesFlutter}
+	\end{subfigure}
+	\caption{Dependency on the perpendicular wavenumber $k_\perp$ of the real and imaginary parts of the all solutions $\omega$ to the dispersion relation \ref{eq:edge_DAWdispersionRelation}. Except for $k_\perp$, all other values derive from: $B = 1$T, $n = 2\cdot10^{19}$m$^{-3}$, $T = 100$eV, $\lambda_p = 0.1$m and $k_\parallel = 0.6$m$^{-1}$. On a pair of graphs, a given color represents the same mode. In the left plots for $\Re{\omega}$, characteristic frequencies of the system are shown for reference ("--" diamagnetic $\omega_*$,"$\cdots$" electron sound $\omega_{s,e}$, "-$\cdot$-" Alfvén $\omega_A$).} 
+	\label{fig:edge_modalBehavior}
+\end{figure}
+
+In the green curve, we observe the characteristic drift-wave frequency, which initially follows the diamagnetic frequency $\omega_*$ in the lower $k_\perp$ limit and reaches its maximum at $k_\perp \rho_L = 1$, before declining again. When the electron inertia term is introduced, a new mode emerges, starting at a significantly higher frequency before stabilizing at the electron sound frequency $\omega_{s,e} = v_{th,e} k_\parallel$. The introduction of electromagnetic terms governs the behavior of the new modes in the lower $k_\perp$ limit, which are then bounded by the shear Alfvén phase velocity. Qualitatively, the phase frequencies exhibit similar characteristics with or without flutter, with the primary difference being a more pronounced separation between the two modes as they transition from $\omega_A$ to $\omega_{s,e}$ in the pure induction. Overall, the characteristic frequencies of the electromagnetic modes are several orders of magnitude higher than the drift-wave frequency.
+
+Looking at the growth rates associated with the modes, we first observe that drift waves are unstable with strong positive growth rates where the frequency is maximal, consistent with the earlier discussion about drift-wave instabilities. On the other hand, electromagnetic (and electron inertial) modes are very stable, showing strong negative $\gamma$. If one intends to study the growth and propagation of turbulent structures and their global impact, Alfvénic modes will only marginally contribute. It is hence possible to avoid the numerical costs involved with the high-frequency modes without much loss of accuracy.
+
+It is more important to consider the effects of electromagnetic contributions on the drift-wave mode. For this purpose, Fig. \ref{fig:edge_comparisonDW} compares the real and imaginary parts of the drift-wave modes in the three electromagnetic scenarios with those in the electrostatic scenario.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/comparison_DW_real.png}
+		\subcaption{Real component}
+		\label{fig:edge_comparisonDWreal}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/comparison_DW_imag.png}
+		\subcaption{Imaginary component}
+		\label{fig:edge_comparisonDWimag}
+	\end{subfigure}
+	\caption{Relative difference of drift-wave frequency in the electromagnetic scenarios to the reference electrostatic case.} 
+	\label{fig:edge_comparisonDW}
+\end{figure}
+
+The real part is altered by the electromagnetic additions, but the change of phase frequency will only have a minor impact on production cases. On the other hand, the growth rate increases with electron inertia and even more with electromagnetic induction. Electromagnetic flutter on the other largely mitigates the instabilities, and can even reduce the growth rate observed in electrostatic drift waves.
 
 
 
