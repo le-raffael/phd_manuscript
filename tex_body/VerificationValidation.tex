@@ -331,18 +331,61 @@ First we investigate the underdamped scenario by opposing simulation results to 
 
 
 
-\subsubsection{Diagonal perturbation}
-Another approach that
- 
-\autoref{eq:electromagneticSLAB_PHI} on the potential is then replaced by:
-\begin{equation*}
-	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] + \varepsilon \Phi= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA\right) + \varepsilon \Phi_e
-\end{equation*}
+%\subsubsection{Diagonal perturbation}
+%Another approach that
+% 
+%\autoref{eq:electromagneticSLAB_PHI} on the potential is then replaced by:
+%\begin{equation*}
+%	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] + \varepsilon \Phi= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA\right) + \varepsilon \Phi_e
+%\end{equation*}
+%
+%This addition naturally affects the dispersion relation and we end up with:
+%\begin{equation*}
+%	\omega^2+\left(i\gamma k_\perp^2 - \frac{B^2\epsilon}{m_in_ik_\perp^2}\right)\omega-v_A^2k_\parallel^2+\frac{v_A^2 \epsilon}{\sigma_\parallel}=0
+%\end{equation*}
+%
+%This eventually changes the previously calculated frequencies and damping rates. For the overdamped case, we get:
+%$$ \lambda = \frac{\gamma}{2}k_\perp^2 - \frac{B^2\epsilon}{2m_in_ik_\perp^2} \pm \sqrt{\frac{\gamma^2}{4}k_\perp^4-v_A^2k_\parallel^2}$$
 
-This addition naturally affects the dispersion relation and we end up with:
-\begin{equation*}
-	\omega^2+\left(i\gamma k_\perp^2 - \frac{B^2\epsilon}{m_in_ik_\perp^2}\right)\omega-v_A^2k_\parallel^2+\frac{v_A^2 \epsilon}{\sigma_\parallel}=0
-\end{equation*}
 
-This eventually changes the previously calculated frequencies and damping rates. For the overdamped case, we get:
-$$ \lambda = \frac{\gamma}{2}k_\perp^2 - \frac{B^2\epsilon}{2m_in_ik_\perp^2} \pm \sqrt{\frac{\gamma^2}{4}k_\perp^4-v_A^2k_\parallel^2}$$
+\subsection{Linear transition from Alfvén to thermal electron waves}
+
+In Sec. \ref{sec:edge_DAW}, we introduced drift-Alfvén waves. With the electromagnetic extensions, drift-waves are coupled to higher-frequency modes that transition from the Alfvén to the thermal electron speed and travel along magnetic field lines. These modes are associated with negative growth rate and usually dampen out quite fast. They can however be used to validate the electromagnetic implementation. The thought behind it is that if we reduce the system to suppress drift-waves, and run simulations with a sufficiently temporal resolution, the transition should appear in the SOLEDGE3X simulations. \\
+
+The following simplified model (Eq. \ref{eq:VV_fourFieldModel}) is considered on the electron density $n_e$, parallel current $j_\parallel$, and the potentials $\Phi$ and $A_\parallel$: \newline
+
+\begin{equation}
+	\left\{
+	\begin{aligned}
+		\partial_t n_e &= \frac{1}{e}\nabla \cdot (j_\parallel \mathbf{b}) \\
+		j_\parallel + \frac{\sigma_\parallel m_e}{n_e e^2} \partial_t j_\parallel  &= \sigma_\parallel \left( -\nabla_\parallel \Phi - \partial_t A_\parallel + \frac{T_e}{e} \nabla_\parallel \log(n_e) \right) \\
+		\nabla \cdot \left[ \frac{m_i n_i}{B^2} \partial_t \nabla_\perp \Phi \right] &= \nabla \cdot (j_\parallel \mathbf{b}) \\
+		\Delta_\perp A_\parallel &= -\mu_0 j_\parallel 
+	\end{aligned}
+	\right.
+	\label{eq:VV_fourFieldModel}
+\end{equation}
+
+The computational domain is a 3D slab domain with periodic boundary conditions in all directions. The magnetic field is assumed to be constant in the $\theta-\varphi$ plane. The wavenumbers $k_\psi$, $k_\theta$, and $k_\varphi$ are defined by the respective dimensions of the slab. Parallel and perpendicular wavenumbers express as: \newline
+
+\begin{align}
+	k_\parallel = b_\theta k_\theta + b_\varphi k_\varphi &&& k_\perp = \sqrt{k_\psi^2 + k_\theta^2 + k_\varphi^2 - k_\parallel^2}
+\end{align}
+
+The Alfvén wave speed is given by $v_A = \frac{B_0}{\sqrt{m_u n_e \mu_0}}$ and the electron thermal speed by $v_{th,e} = \sqrt{\frac{e T_e}{m_e}}$. In the zero-resistivity limit, the dispersion relation states that we deal with a complex wave frequency, whose real component is: \newline
+
+\begin{align}
+	\label{eq:VV_dispersionRelation}
+	\omega_0^2 = \frac{v_A^2}{1 + \frac{m_e}{e^2 \mu_0 n_e} k_\perp^2} k_\parallel^2 + \frac{1}{\frac{n_e \mu_0}{T_0 k_\perp^2} + \frac{1}{v_{th,e}^2}} k_\parallel^2  
+\end{align}
+
+From Eq. \ref{eq:VV_dispersionRelation}, we expect a wave in the parallel direction traveling at the Alfvén velocity for small $k_\perp$ and at the thermal electron velocity at high $k_\perp$. In the slab domain, $k_\perp$ is changed by changing the radial dimension of the domain. The results of our numerical simulations perfectly match the predictions by Dudson \cite{Dudson2021} and the numerical results obtained by Stegmeir \emph{et al.} \cite{stegmeir2019} and show the expected transition when $k_\perp$ is varied, Fig. \ref{fig:transitionSLAB}. \newline
+
+\begin{figure}[h]\centering
+	\centering
+	\includegraphics[width=0.7\textwidth]{schemes/transitionAlfvenThermal.png}
+	\caption{Fitted wave frequencies as a function of the perpendicular wave numbers. The lines indicate the theoretical wave frequencies in the electrostatic case with finite electron mass (ES), the electromagnetic case with $m_e = 0$ (EM), and the complete electromagnetic case with electron inertia (ES + EM).}
+	\label{fig:transitionSLAB}
+\end{figure}
+
+

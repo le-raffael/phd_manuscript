@@ -41,3 +41,66 @@ Initially, the particle source causes the density to build up on the core side o
 
 
 \section{Circular geometry}
+
+\subsection{Simulation set-up}
+
+Flat limiter on the low-field side
+
+
+\begin{figure}[H]\centering
+	\centering
+	\includegraphics[width=1\textwidth]{schemes/CIRC_fluctT.jpg}
+	\caption{Snapshots of the electron temperature $T_e$ fluctuations}
+	\label{fig:CIRC_fluctPHI}
+\end{figure}
+
+
+\subsection{Growth rates}
+
+
+\subsubsection{Electron inertia}
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/RMSn_meScan.jpg}
+		\subcaption{RMS of density $n_i$}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/RMST_meScan.jpg}
+		\subcaption{RMS of temperature $T_i$}
+	\end{subfigure}
+	\caption{Evolution of the the perturbation intensity for different values of $m_e$. The electron mass is artificially increased and the 0 factor corresponds effectively to the electrostatic reference}
+	\label{fig:CIRC_meScan}
+\end{figure}
+
+
+
+\subsubsection{Magnetic induction}
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/RMSn_betaScan.jpg}
+		\subcaption{RMS of density $n_i$}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/RMST_betaScan.jpg}
+		\subcaption{RMS of temperature $T_i$}
+	\end{subfigure}
+	\caption{Evolution of the the perturbation intensity for different values of $\beta$. The  is artificially increased and the 0 factor corresponds effectively to the electrostatic with electron inerita. The electron mass for all scenarios is physical (factor 1 in Fig. \ref{fig:CIRC_meScan}).}
+	\label{fig:CIRC_betaScan}
+\end{figure}
+
+
+
+\subsection{Stabilization by flutter}
+
+
+
+
+
+
+

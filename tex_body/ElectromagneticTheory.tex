@@ -113,8 +113,7 @@ The averaged gyromotion of particles is parallel to the magnetic field lines, wi
 	v_E \sim& \epsilon_E v_\parallel & v_{\nabla B} \sim& \epsilon_l v_\parallel & v_c \sim& \epsilon_l v_\parallel & v_p \sim& \epsilon_t v_\parallel
 \end{align}
 
-This leads to the assumption in the Lorentz equation \ref{eq
-} that the perpendicular acceleration is negligible compared to parallel dynamics, such that $m\partial_t v_\perp \approx 0$. The perpendicular direction is assumed to always be in force equilibrium, allowing us to equate the terms $\mathbf{v} \times \mathbf{B}$ and $\mathbf{E}_\perp$. Consequently, the polarization drift can be rewritten as:
+This leads to the assumption in the Lorentz equation \ref{eq:---} that the perpendicular acceleration is negligible compared to parallel dynamics, such that $m\partial_t v_\perp \approx 0$. The perpendicular direction is assumed to always be in force equilibrium, allowing us to equate the terms $\mathbf{v} \times \mathbf{B}$ and $\mathbf{E}_\perp$. Consequently, the polarization drift can be rewritten as:
 
 \begin{equation}
 	\mathbf{v}_p = \frac{m}{qB^2}\mathbf{B} \times \frac{d\mathbf{v}}{dt}
@@ -124,10 +123,10 @@ Unlike other drifts, the polarization drift depends on the variation of the tota
 
 \begin{align}
 	\mathbf{v}_\perp^{(0)} &= \mathbf{v}_E + \mathbf{v}{\nabla B} + \mathbf{v}_c \\
-	\mathbf{v}_\perp^{(1)} &= \mathbf{v}_\perp^{(0)} + \frac{m}{qB^2}\mathbf{B} \times \left(\partial_t + \left(v_\parallel\mathbf{b} + \mathbf{v}_\perp^{(1)}\right) \cdot \nabla\right)\mathbf{v}_\perp^{(0)}
+	\mathbf{v}_\perp^{(1)} &= \mathbf{v}_\perp^{(0)} + \frac{m}{qB^2}\mathbf{B} \times \left(\partial_t + \left(v_\parallel\mathbf{b} + \mathbf{v}_\perp^{(1)}\right) \cdot \nabla\right)\mathbf{v}_\perp^{(0)} \label{eq:edge_vPerpDrifts}
 \end{align}
 
-	In the first order, the evolution of the perpendicular electric field derives from the evolution of the potential gradient $d\mathbf{E}_\perp / dt = -d\nabla_\perp \Phi / dt$. The full electric field is then given by:
+In the first order, the evolution of the perpendicular electric field derives from the evolution of the potential gradient $d\mathbf{E}_\perp / dt = -d\nabla_\perp \Phi / dt$. The full electric field is given by:
 
 \begin{align}
 	\mathbf{E}_\perp &= -\nabla_\perp \Phi &
@@ -135,6 +134,50 @@ Unlike other drifts, the polarization drift depends on the variation of the tota
 \end{align}
 
 where the time variation $\partial_t A_\parallel$ accounts for magnetic induction effects.
+
+
+
+
+
+For the perpendicular velocity, the momentum conservation equation requires several algebraic transformations:
+
+\begin{align}
+	\mathbf{b}\cross\left[\partial_t \left(mn\mathbf{u}\right) + \grad\cdot\left(mn\mathbf{u}\otimes\mathbf{u}\right)\right] =& -\mathbf{b}\cross\grad p_\perp - \mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}} + nq\mathbf{b}\cross\mathbf{E} \nonumber\\ & \qquad + nq\left(\mathbf{b}\cross\mathbf{u}\cross\mathbf{B}\right) + \mathbf{b}\cross\mathbf{R} + \mathbf{b}\cross\mathbf{S}_u \nonumber \\
+	\Leftrightarrow\qquad \qquad \qquad
+	\mathbf{u}_\perp =& \frac{\mathbf{b}\cross\grad p}{qnB} + \frac{\mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}}}{qnB} +  \frac{\mathbf{E}\cross\mathbf{b}}{B} - \frac{\mathbf{b}\cross\left(R+S\right)}{qnB} \nonumber\\ & \qquad + \frac{\mathbf{b}}{qnB} \cross \left(\partial_t \left(mn\mathbf{u}\right) + \grad\cdot\left(mn\mathbf{u}\otimes\mathbf{u}\right)\right)
+\end{align}
+
+The expression for the perpendicular velocity $\mathbf{u}_\perp$ is not explicit as the right-hand side depends on the full velocity vector. However, we can fairly well approximate it with two calculation steps. All terms that do not depend on $u$ are first evaluated to get $\mathbf{u}_\perp^{(0)}$ (and with equation \ref{eq:RelationPerpParallelVelocity} we can also calculate $\mathbf{u}^{(0)}$), and then $\mathbf{u}_\perp^{(1)}$ is calculated by replacing every occurrence of $\mathbf{u}$ by $\mathbf{u}^{(0)}$. The terms $\mathbf{u}^*$, $\mathbf{u}_E$, $\mathbf{u}_{\perp,\Pi}$, $\mathbf{u}_{\perp,S}$ and $\mathbf{u}_{p}$ are respectively called diamagnetic, "E cross B", parallel viscous stress, friction force and polarization drifts.
+
+\begin{align}
+	\mathbf{u}_\perp^{(0)} =& \frac{\mathbf{b}\cross\grad p}{qnB} + \frac{\mathbf{E}\cross\mathbf{b}}{B} = \mathbf{u}^* + \mathbf{u}_E \label{eq:VelPerp0Component} \\	
+	\mathbf{u}_\perp^{(1)} =& \frac{\mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}}(\mathbf{u}^{(0)})}{qnB} - \frac{\mathbf{b}\cross\left(R(\mathbf{u}^{(0)})+S(\mathbf{u}^{(0)})\right)}{qnB} \nonumber\\ & \qquad + \frac{\mathbf{b}}{n\omega_c} \cross \left(\partial_t \left(n\mathbf{u}^{(0)}\right) + \grad\cdot\left(n\mathbf{u}^{(0)}\otimes\mathbf{u}^{(0)}\right)\right) \nonumber \\
+	=& \mathbf{u}_{\perp,\Pi} + \mathbf{u}_{\perp,S} + \mathbf{u}_{p} \label{eq:VelPerp1Component} \\
+	\mathbf{u}_\perp \approx& \mathbf{u}_\perp^{(0)} + \mathbf{u}_\perp^{(1)}
+\end{align}
+
+This simplification holds because the contribution of $\mathbf{u}_\perp^{(1)}$ is small, of the order of $\tau_c / \tau_{ad}$ or $\tau_c / \tau_{coll}$. Next, let us extract the divergence free contribution from the diamagnetic flux $n\mathbf{u}^*$.
+
+\begin{align}
+	\label{eq:definitionDiamagneticDrift}
+	n\mathbf{u}^* =& -\grad \cross \frac{p_\perp\mathbf{B}}{qB^2} + n\tilde{u}^* \nonumber\\
+	& \quad\text{with: } \tilde{u}^* = \frac{2T_\perp\mathbf{B}\cross\grad B}{qB^3} + \frac{T_\perp}{qB^2}\grad\cross\mathbf{B}
+\end{align}
+
+The second term in $\tilde{u}^*$ is usually very small and can be neglected if magnetic fields do not fluctuate. \\
+The last term $u_{p}$ in \autoref{eq:VelPerp1Component} is called the polarization drift. A simple expression for the associated flux can be found through algebraic manipulations and neglecting some small curvature terms.
+
+\begin{align}
+	n\mathbf{u}_{p} =& \partial_t\mathbf{\omega} - \grad\cdot\left(\tilde{u}^{(0)}\otimes\mathbf{\omega}\right) \nonumber \\
+	&\text{with: } \mathbf{\omega} = \frac{m}{qB^2}\left(n\grad_\perp\Phi + \frac{1}{q}\grad_{\perp}\left(p-\frac{\pi_\parallel}{3}\right)\right) - \frac{m}{q^2B^2}S_{u_\perp} \label{eq:definitionSmallOmega}
+\end{align}
+
+The electric potential in the plasma appears here in the variable $\Phi$ and is a new unknown that needs to be solved for.
+
+
+
+
+
 
 The separation of scales allows for fluid-drift models, where the parallel and perpendicular momentum equations are treated independently. Mikhailovskii and Tsypin\cite{mikhailovskii1971transport} first described slow drift dynamics from a theoretical viewpoint in 1971 with $\rho_L = 0$. Hazeltine et al.\cite{hazeltine1985four} extended the framework to include a finite ion Larmor radius. To understand their approach, it is useful to introduce the vorticity $ \boldsymbol{\Omega} = \nabla \times \mathbf{v}$, which measures the local rotation of a fluid element. It is a vector quantity, where the direction indicates the axis of rotation and its magnitude indicates the strength of the rotational motion. As perpendicular phenomena are essentially described by the parallel component of $\boldsymbol{\Omega}$, we only solve for the conservation of $\Omega_\parallel$. Furthermore, assuming that the electric drift dominates the perpendicular direction, we can express:
 
@@ -321,10 +364,12 @@ With respect to the equilibrium field, flutter can be viewed as an additional dr
 
 
 \section{Drift-Alfvén waves}
+\label{sec:edge_DAW}
 
 In this section, we take a more formal approach to the interaction between the three new terms (magnetic induction, electron inertia and flutter) and the well-known resistive drift-wave instabilities. As they all terms appear in Ohm's law, this is the place where they will all compete and modify the non-adiabatic response of the plasma. 
 
 \subsection{Dispersion relation}
+\label{ssec:edge_DAW_dispersionRelation}
 
 Let us consider the same system as in Sec. \ref{ssec:edge_nonAdiabaticResponse} and combine it with the shear Alfvén dynamics from Sec. \ref{ssec:edge_shearAlfvenWaves}. We then have the system: 
 
@@ -385,6 +430,11 @@ with the electron Larmor radius $\rho_{L,e}^2 = m_eT_0/(eB^2)$ and the pressure 
 %	\left[i\rho_{L,e}^2k_\perp^2 \omega + i\beta_0\left(\omega - \omega_*\right)- \frac{\eta_\parallel en_0T_0k_\perp^2}{B^2}\right]\omega^2 - \omega_s^2\left(\omega-\omega_*\right) = 0
 %\end{equation}
 
+
+\subsection{Perturbative solution}
+\label{ssec:edge_DAW_perturbativeSolution}
+
+
 The solution to the dispersion relation takes the form $\omega_{DAW} = \omega_0 +i\gamma$. To obtain a neat expression for the wave phase frequency $\omega_0$ and the growth rate $\gamma$, let us assume that the drift-Alfvén frequency $\omega_{DAW}$ is close to the diamagnetic frequency, with $\delta = \omega_{DAW} - \omega_*$ such that higher orders $\delta^n$ can be ignored. To improve the readability, let us refer to the resistive term as $R = \eta_\parallel en_0T_0/B^2$. We can then express $\delta$: 
 
 \begin{align}
@@ -414,7 +464,9 @@ The resistive terms do not contribute to a change of frequency.
 This discussion is only valid in cases where $\rho_L^2k_\perp^2$ is small and hence $\omega_{DAW}$ is close to the diamagnetic frequency $\omega_*$. This is not necessarily the case everywhere in the edge, and in the next section we consider numerically the raw dispersion relation.
 
 
-\subsection{Discussion of the modal analysis}
+
+\subsection{Electromagnetic mode excitation}
+\label{ssec:edge_DAW_modeExcitation}
 
 The objective of this section is to analyze the impact of electromagnetic terms on drift-wave turbulence within the linearized system. Specifically, we compare the effects of a finite electron mass (EI-inert), electromagnetic induction with electron mass (EM), and electromagnetic induction with both flutter and electron mass (EM-flutter) in comparison to the baseline electrostatic case. The dispersion relation from Eq. \ref{eq:edge_DAWdispersionRelation} is adjusted to each of the four scenarios and solved exactly using the Python library SymPy for symbolic computation. Notably, we use the full dispersion relation without applying the simplifications used in the previous section's discussion.
 

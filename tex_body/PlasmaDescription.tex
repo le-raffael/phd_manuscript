@@ -93,7 +93,7 @@ Substituting this into the first moment equation, we obtain the conservation equ
 Here, $S_u$ represents the momentum source term, and $R$ accounts for friction, both arising from $C_{\text{coll}}$ and $C_{\text{other}}$.
 
 \subsection{Energy Balance (\textit{k} = 2)}
-
+\label{ssec:desc_energyBalance}
 Finally, to solve for the static pressure tensor $\boldsymbol{P}$, we assume isotropic pressure in the plasma, simplifying the pressure tensor to a scalar pressure $p$ such that $\boldsymbol{P} = p \boldsymbol{I}$. This reduces the nine unknowns in $\boldsymbol{P}$ to a single scalar $p$. Given that $p = nT$, the second moment can be expressed as an energy conservation equation. The total energy density $\varepsilon$ is the sum of kinetic and thermal energy in the plasma:
 \begin{equation}
 	\varepsilon = \frac{3}{2} nT + \frac{1}{2} mn \norm{\mathbf{u}}^2
@@ -105,7 +105,7 @@ To derive a conservation equation for $\varepsilon$, we multiply Vlasov's equati
 This simplifies to:
 \begin{equation}
 	\label{eq:SecondMomentTransportEquation}
-	\partial_t \varepsilon + m \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
+	\partial_t \varepsilon + \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
 \end{equation}
 The collisional heat flux $\mathbf{q}$ arises from the fluid closure, replacing all higher-order moments. The term $Q$ represents a collisional heat source, while $R_\varepsilon$ accounts for sources associated with non-Coulombian collisions in $C_{\text{other}}$. Notably, the magnetic field term $\mathbf{u} \times \mathbf{B}$ does not appear in the energy equation, as the torque $\frac{1}{2} u^2 \mathbf{u} \times \mathbf{B} \cdot \nabla_{\mathbf{v}} f$ does not perform work and therefore does not contribute to energy changes. \newline
 
