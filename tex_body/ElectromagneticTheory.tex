@@ -56,8 +56,6 @@ This force acts in the direction of the gradient $\nabla B$, where the magnetic 
 	\mathbf{v}_{\nabla B} = \frac{mv_\perp^2}{2q} \frac{\mathbf{B} \times \nabla B}{B^3}
 \end{equation}
 
-------- TALK ABOUT DIAMAGNETIC DRIFT ---------
-
 The helical configuration of a tokamak causes magnetic field lines to bend. To follow the direction of $\mathbf{B}$, the particle's trajectory is curved, and a centripetal force is exerted on the particle. With the curvature radius $\mathbf{R}_c = \mathbf{b} \cdot \nabla \mathbf{b}$, the force is given by:
 
 \begin{equation}
@@ -70,7 +68,6 @@ This force induces the "curvature" drift $\mathbf{v}_c$:
 	\mathbf{v}_c = \frac{mv_\parallel^2}{q}\frac{\mathbf{B} \times (\mathbf{B} \cdot \nabla \mathbf{B})}{B^4}
 \end{equation}
 
------- STILL NEED THE POLARIZATION DRIFT ----------
 The polarization drift occurs if the electric field in the plasma varies with time. 
 
 \begin{equation}
@@ -113,7 +110,7 @@ The averaged gyromotion of particles is parallel to the magnetic field lines, wi
 	v_E \sim& \epsilon_E v_\parallel & v_{\nabla B} \sim& \epsilon_l v_\parallel & v_c \sim& \epsilon_l v_\parallel & v_p \sim& \epsilon_t v_\parallel
 \end{align}
 
-This leads to the assumption in the Lorentz equation \ref{eq:---} that the perpendicular acceleration is negligible compared to parallel dynamics, such that $m\partial_t v_\perp \approx 0$. The perpendicular direction is assumed to always be in force equilibrium, allowing us to equate the terms $\mathbf{v} \times \mathbf{B}$ and $\mathbf{E}_\perp$. Consequently, the polarization drift can be rewritten as:
+This leads to the assumption in the Lorentz equation \ref{eq:edge_LorentzEquationDecomposition} that the perpendicular acceleration is negligible compared to parallel dynamics, such that $m\partial_t v_\perp \approx 0$. The perpendicular direction is assumed to always be in force equilibrium, allowing us to equate the terms $\mathbf{v} \times \mathbf{B}$ and $\mathbf{E}_\perp$. Consequently, the polarization drift can be rewritten as:
 
 \begin{equation}
 	\mathbf{v}_p = \frac{m}{qB^2}\mathbf{B} \times \frac{d\mathbf{v}}{dt}
@@ -257,32 +254,34 @@ Density and velocity perturbations then travel in the parallel direction at the 
 \subsubsection{Shear Alfvén waves}
 \label{ssec:edge_shearAlfvenWaves}
 
-Density perturbations provoke an electromagnetic response. To this effect, we consider a standard four-field model that couples the electron density $n_e$ with the parallel current density $j_\parallel$ and both potentials $\Phi$ and $A_\parallel$. The governing equations now are: 
+They appear as one introduces electromagnetic induction to the parallel electric field $E_\parallel = -\grad_\parallel \Phi - \partial_t A_\parallel$. The parallel magnetic vector potential in turn is known from the parallel current via Ampère's law.
 
 \begin{align}
 	\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad^2_\perp\Phi\right] &= \grad\cdot(j_\parallel\mathbf{b}) \\
 	\grad^2_\perp A_\parallel &= -\mu_0j_\parallel \\
-	\eta_\parallel j_\parallel + \frac{ m_e}{n_ee^2} \partial_t j_\parallel  &= \left(-\grad_\parallel\Phi - \partial_t A_\parallel + T_e\grad_\parallel\log(n_e)\right) \\
+	\eta_\parallel j_\parallel &= \left(-\grad_\parallel\Phi - \partial_t A_\parallel + T_e\grad_\parallel\log(n_e)\right) \\
 	\partial_t n_e &= \frac{1}{e}\grad\cdot (j_\parallel\mathbf{b}) 
 	\label{eq:fourFieldModel}
 \end{align}
 
-Its complex dispersion relation has a real and an imaginary part indicating the appearance of a decaying wave. 
+It will modify the parallel current, and introduce a new wave dynamics that travel at the Alfvén velocity $v_A = \frac{B}{\sqrt{m_in_i\mu_0}}$. The dispersion relation for the system above is:
 
 \begin{equation}
 	\label{eq:dispersionRelation}
-    \omega_A^2 = \left(\frac{v_A^2}{1 + \frac{m_e}{e^2 \mu_0 n_e} k_\perp^2} + \frac{1}{\frac{n_e \mu_0}{T_0 k_\perp^2} + \frac{1}{v_{th,e}^2}}\right) k_\parallel^2 - \frac{\eta_\parallel^2k_\perp^4}{4\left(\mu_0+\frac{m_e}{e^2n_i}k_\perp^2\right)^2}
+	\omega_A^2 = \left(v_A^2 + \frac{T_0 k_\perp^2}{n_e \mu_0}\right) k_\parallel^2 - \frac{\eta_\parallel^2}{4\mu_0^2}
 \end{equation}
 
-The dispersion relation describes "shear Alfvén waves", according to which perturbations travel along magnetic field lines. In cases with high parallel conductivity, the first term dominates the dispersion relation. We then observe that the relation describes a wave in parallel direction whose velocity is bound by the Alfvén wave speed $v_A = \frac{B}{\sqrt{m_in_i\mu_0}}$ for small $k_\perp$ and by the thermal electron wave speed $v_ {th,e} = \sqrt{\frac{T_e}{m_e}}$ for large $k_\perp$. This is in line with the findings by Dudson et al \cite{Dudson2021} and reflects the need for electron inertia to avoid unphysically large speeds in the upper $k_\perp$ limit.  
+In the zero-resistivity limit, the dispersion relation has a single real solution. It describes shear Alfvén, travelling in parallel direction along magnetic field lines at the Alfvén velocity $v_A$.
+
 
 \subsubsection{Resistive ballooning modes}
 
 Magnetic curvature also plays an important role in the formation of drift waves. The effective gravity force opposes the pressure gradient, leading to inherent plasma instability and the development of resistive ballooning modes \cite{hastie2003drift}. In the vorticity conservation equation, as given in Eq. \ref{eq:edge_vorticityConservation}, the term $ \nabla \cdot \mathbf{v}_\perp $ appears. Both the electric and diamagnetic drifts take the form $ ( \mathbf{B} \times \nabla X)/B^2 $. In a homogeneous magnetic field, as assumed above, the divergence of the drifts vanishes. However, in a curved magnetic field, this term introduces additional coupling between the vorticity and the density and potential gradients. In a realistic tokamak configuration with both poloidal and toroidal field components and a high aspect ratio $ R/a $, poloidal perturbations can be expressed as $ \tilde{X} = \sum_m \tilde{X}_m e^{im\theta} $. A perturbation mode $ m $ in the density or potential is then coupled to the modes $ m-1 $ and $ m+1 $ of the other fields. \newline 
 
-So far we have considered several wave dynamics in the plasma individually, with each their own characteristic frequency. 
----------- WRITE DOWN CHARACTERISTIC VALUES ----------- 
-In reality, all these modes impact the plasma simultaneously. The actual linear behavior is far more complex and combines all frequencies. 
+
+So far we have considered several wave dynamics in the plasma individually, with each their own characteristic frequency.  \\
+---------- WRITE DOWN CHARACTERISTIC VALUES -----------  \\
+In reality, all these modes impact the plasma simultaneously. The actual linear behavior is far more complex and combines all frequencies. \\
 
 Leddy et al. \cite{leddy2015validity} compared the linear behavior of drift-reduced and full-velocity descriptions of plasmas. They found that while the drift reduction suppresses fast wave dynamics, easing timestep constraints and motivating the use of reduced MHD models as introduced in Sec. \ref{ssec:desc_reducedMHD}, the linear behavior of the two approaches only agrees within a limited parameter space, generally including tokamak conditions. However, the agreement is only robust in the edge region, with significant discrepancies appearing in the core, limiting the validity of drift-reduced models in simulation that consider both sides of the separatrix.
 
@@ -340,11 +339,12 @@ The introduction of electromagnetic effects in Soledge3X in form of magnetic ind
 
 It was found on HSX that electron inertia effect might dominate resistivity for the generation of resistive ballooning modes\cite{rafiq2009unified}.
 
+!!!!!!!
+introduce effective mu and beta from Scott
+!!!!!!!
 
 
 \subsection{Electromagnetic flutter}
-
-follow scotts derivation
 
 The magnetic field can be decomposed in equilibrium and fluctuation components:
 
@@ -361,6 +361,18 @@ The fundamental definition \ref{eq:intro_magneticVectorPotential} of the magneti
 The second term contains the plain $A_\parallel$ without its derivative, which might seem counterintuitive from the the definition of the magnetic field. It is needed to maintain $\mathbf{B}$ divergence-free as we assume that the fluctuation is always perpendicular to the equilibrium field. The contribution of this second term to the flutter field is however negligible compared to the first.
 
 With respect to the equilibrium field, flutter can be viewed as an additional drift acting on the plasma. Indeed, a new advection . In reality it is not an actual drift as flutter transport is in fact a deformation of the magnetic field lines and a redirection of the parallel advection. 
+
+
+\section{Comparison to reduced MHD models}
+\label{sec:edge_comparisonMHD}
+
+Introducing electromagnetic effects to the drift-reduced equations results reduces the gap to reduced MHD descriptions of plasma, presented in Sec. \ref{ssec:desc_reducedMHD}. There are however some considerable difference: 
+Instead of the parallel current and magnetic vector potential, the MHD model retains only their toroidal component. The magnetic vector potential there is then self-similar to the poloidal flux function $A_\varphi = \Psi$. \\
+
+With the knowledge of $\Psi$, it is much more convenient to reconstruct the exact poloidal field driven by flutter. MHD codes are directly connected to a Grad-Shafranov solver. \\
+
+Drift-reduced codes are well suited for turbulence in the edge plasma and SOL regions, with an accurate modeling. With MHD codes, it is possible to analyze instabilities in the core plasma, such as tearing or kink modes, and how they lead to the formation of edge localized modes (ELMs). 
+
 
 
 \section{Drift-Alfvén waves}

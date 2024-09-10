@@ -1,0 +1,138 @@
+\chapter{Curvilinear metric operators}
+\label{app:CurvilinearMetric}
+
+
+
+\section{Linear algebra}
+\label{sec:app_linearAlgebra}
+
+The metric coefficients together with the co-/contravariant vectors are useful tools to perform several operations on the curvilinear grid. First of all, the squared Jacobian of the transformation from the cartesian to the curvilinear coordinate systems is equal to the determinant of $g_{ij}$. 
+\begin{align}
+	J = \pdv{(x,y,z)}{(u^\psi, u^\theta, u^\varphi)} = \sqrt{\det\left[g_{ij}\right]} \label{eq:MetricJacobian}
+\end{align}
+The dot product between two vectors $\vec{v}$ and $\vec{w}$ is calculated with the co-/contravariant vectors.
+\begin{align}
+	\vec{v}\cdot\vec{w} = g_{ij}v^iw^j = g^{ij}v_iw_j \label{eq:MetricDotProduct}
+\end{align}
+The co-/contravariant components of the cross product can also be calculated: 
+\begin{align}
+	\begin{cases}
+		(\vec{v} \cross \vec{w})_k = J\epsilon_{ijk}v^iw^j \\
+		(\vec{v} \cross \vec{w})^k = \frac{1}{J}\epsilon_{ijk}v_iw_j
+	\end{cases} \label{eq:MetricCrossProduct}
+\end{align}
+This operations involves the Levi-Civita symbol $\epsilon_{ijk}$ which takes the value $+1$ for all even permutations $\{\psi,\theta,\varphi\}$,$\{\theta,\varphi,\psi\}$ and $\{\varphi,\psi,\theta\}$, the value $-1$ for all odd permutations $\{\varphi,\theta,\psi\}$,$\{\theta,\psi,\varphi\}$ and $\{\psi,\varphi,\theta\}$, and is $0$ for all other cases. \\
+In various formulae such as ..., ... or ... of the SOLEDGE3X model, we need to split a vector into its parallel and perpendicular component with respect to the magnetic field $\vec{B}$.
+\begin{align}
+	\vec{v}_\parallel &= \vec{v}\cdot\vec{b} & \vec{v}_\perp &= -\vec{b}\cross (\vec{b}\cross\vec{v}) \label{eq:MetricParalPerpVecComponents}
+\end{align}
+The vector $\vec{b}$ contains the normalized magnetic field and hence represents a unit vector in parallel direction at each point. In the code only its co- and contravariants are calculated and stored for the entire mesh: 
+
+\begin{align}
+	b_\psi &= \vec{b} \cdot \vec{e}_\psi & b_\theta &= \vec{b} \cdot \vec{e}_\theta & b_\varphi &= \vec{b} \cdot \vec{e}_\varphi \label{eq:MetricCovariantUnitB} \\
+	b^\psi &= \vec{b} \cdot \vec{e}^\psi & b^\theta &= \vec{b} \cdot \vec{e}^\theta & b^\varphi &= \vec{b} \cdot \vec{e}^\varphi \label{eq:MetricContravariantUnitB}
+\end{align} 
+
+
+\section{Centered operators}
+\label{sec:app_centeredOperators}
+
+\subsection{Differentiation}
+The gradient of a scalar field $S(u^\psi, u^\theta, u^\varphi)$ is calculated in terms of the reciprocal basis: 
+\begin{align}
+	\left(\grad{S}\right)_i = \pdv{S}{u^i}\vec{e}^i \label{eq:MetricGradient}
+\end{align}
+In the transport equations, we need to calculate gradients in parallel direction of the field which allows us to express $\vec{\grad}_\parallel$ in terms of the contravariant vector of the unit magnetic field from \autoref{eq:MetricContravariantUnitB}.
+\begin{align}
+	\grad_\parallel S = \pdv{S}{u^i}\vec{b}\cdot\vec{e}^i = \pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi \label{eq:MetricParallelGradient}
+\end{align}
+The terms in $\psi$ are omitted in the above formula since the equilibrium magnetic flux surfaces are located on the $\theta$-$\varphi$ coordinate surface and the vector $\vec{b}$ has therefore a zero value in its radial component. Note that this gradient is a scalar as it always points in $\vec{b}$ direction. \\
+Similarly, a perpendicular gradient can be defined as: 
+\begin{equation*}
+	\vec{\grad}_\perp S = \vec{\grad} S - \left(\grad_\parallel S\right)\vec{b}
+\end{equation*}
+In terms of metric coefficients, it translates to: 
+\begin{align}
+	\label{eq:MetricPerpendicularGradient}
+	\left(\vec{\grad}_\perp S\right)^i =& g^{ij}\left(\grad{S}\right)_j - \left(\grad_\parallel S\right)b^i \nonumber \\
+	=& g^{ij}\pdv{S}{u^j} - \left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right)b^i
+\end{align}
+We have to keep in mind that the above expression leads to the contravariant components of the perpendicular gradient whereas the general expression for the gradient in \autoref{eq:MetricGradient} gives its covariant components. \\
+
+Next, the divergence of a vector $\vec{v}$ is calculated by: 
+\begin{align}
+	\vec{\grad}\cdot\vec{v} = \frac{1}{J}\pdv{(JA^i)}{u^i} \label{eq:MetricDivergence}
+\end{align}
+
+and further the divergence of parallel vector fields $S_\parallel\vec{b}$ comes in handy: 
+\begin{align}
+	\vec{\grad}\cdot \left(S_\parallel\vec{b}\right) = \frac{1}{J}\left[\pdv{\left(J S_\parallel b^\theta\right)}{u^\theta} + \pdv{\left(J S_\parallel b^\varphi\right)}{u^\varphi}\right] \label{eq:MetricDivergenceParallel}
+\end{align}
+
+The gradient and divergence operators can be combined o define a diffusion operator. The parallel Laplacian with some diffusion coefficients $D$ reads in metric terms: 
+\begin{align}
+	\label{eq:MetricParallelDiffusion}
+	\vec{\grad}\cdot\left[D\left(\grad_\parallel S\right)\vec{b}\right] = \frac{1}{J}\left[\pdv{\left(JD \left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right) b^\theta\right)}{u^\theta} + \pdv{\left(JD\left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right) b^\varphi\right)}{u^\varphi}\right]
+\end{align}
+
+Similarly, a perpendicular diffusion operator can be defined: 
+\begin{align}
+	\vec{\grad}\cdot\left[D\vec{\grad}_\perp S\right] =& \vec{\grad}\cdot\left[D\left(\vec{\grad} S - \left(\grad_\parallel S\right)\vec{b}\right)\right] \nonumber \\
+	=& \frac{1}{J}\pdv{}{u^i}\left[JD\left(g^{ij}\pdv{S}{u^j} - \left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right)b^i\right)\right] \nonumber \\
+	=& \frac{1}{J}\left(\pdv{}{u^\psi}\left[JD\left(g^{\psi\psi}\pdv{S}{u^\psi} + g^{\psi\varphi}\pdv{S}{u^\theta} + g^{\psi\theta}\pdv{S}{u^\varphi}\right)\right]      \right.\nonumber \\
+	&+ \pdv{}{u^\theta}\left[JD\left(g^{\theta\psi}\pdv{S}{u^\psi} + \left(g^{\theta\theta} - b^\theta b^\theta\right)\pdv{S}{u^\theta} + \left(g^{\theta\varphi} - b^\varphi b^\theta\right)\pdv{S}{u^\varphi}\right)\right] \nonumber \\
+	&+ \left. \pdv{}{u^\varphi}\left[JD\left(g^{\varphi\psi}\pdv{S}{u^\psi} + \left(g^{\varphi\varphi} - b^\theta b^\varphi\right)\pdv{S}{u^\theta} + \left(g^{\varphi\theta} - b^\varphi b^\varphi\right)\pdv{S}{u^\varphi}\right)\right]\right) \label{eq:MetricPerpendicularDiffusion}
+\end{align}
+
+
+\subsection{Scheme for centered 2D parallel diffusion}
+
+
+\subsection{Scheme for 3D parallel diffusion}
+
+
+
+
+\section{Staggered operators}
+
+
+
+\subsection{Parallel gradient}
+
+In the electromagnetic vorticity equation, a discrete operator is needed to represent the gradient of $A_\parallel \mathbf{b}$ on the staggered grid.
+$$\left[\grad_\parallel X^{col}\right]^{stg}_{[i_\psi,i_\theta, i_\varphi]}$$
+According to \autoref{eq:MetricParallelGradient}, its numerical evaluation is quite straight-forward: 
+\begin{align}
+	\label{eq:NumericalStaggeredParallelGradientStencil}
+	\left[\grad_\parallel X^{col}\right]^{stg}_{[i_\psi,i_\theta, i_\varphi]} =& \frac{1}{2}\left(X_{[i_\psi,i_\theta, i_\varphi]}-X_{[i_\psi,i_\theta-1, i_\varphi]}\right)b_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]}^\theta \nonumber \\ +& 
+	\frac{1}{2}\left(X_{[i_\psi,i_\theta, i_\varphi]}-X_{[i_\psi,i_\theta, i_\varphi-1]}\right)b_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]}^\varphi
+\end{align}
+
+If any of the used $X$ happens to lie inside the boundary, it is eliminated from the stencil. \\
+
+The staggered divergence and parallel gradient stencils already existed in a hidden form in the original SOLEDGE3X implementation as part of the parallel Laplacian operator on collocated fields, which first computes the parallel gradient leading to intermediate staggered results and then applies the divergence operator on these staggered intermediate results.
+
+
+\subsection{Perpendicular Laplacian}
+
+The perpendicular Laplacian can be succinctly written in term of the fluxes in and out of a staggered cell:
+
+\begin{align}
+	\left[\Delta_{\perp}X^{stg}\right]^{stg}_{[i_\psi,i_\theta, i_\varphi]} =& \frac{1}{J_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]}}\left(F^{Y,\psi}_{[i_\psi+\frac{1}{2},i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]} - F^{Y,\psi}_{[i_\psi-\frac{1}{2},i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]}\right. \nonumber \\ 
+	&\left.+ F^{Y,\theta}_{[i_\psi,i_\theta, i_\varphi-\frac{1}{2}]} - F^{Y,\theta}_{[i_\psi,i_\theta-1, i_\varphi-\frac{1}{2}]}+ F^{Y,\varphi}_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi]} - F^{Y,\varphi}_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi-1]}\right) 	\label{eq:NumericalStaggeredPerpDiffStencil}	
+\end{align}
+
+If any of the staggered cell faces touches the domain boundary in any form, the corresponding flux is excluded from the divergence operator. It only remains to calculate the fluxes $F^{Y,i}$. The metric and diffusion coefficients at all faces have already been described and are represented by the term $\xi^{ij}=JD(g^{ij}-b^ib^j)$. We then can express the fluxes as: 
+$$ F^{Y,i} = \xi^{ij}\pdv{X}{u^j} $$
+The remaining gradient must use $X^{stg}$ at staggered points in the domain. If $[ijk]$ stands for any permutation of the staggered indices $[i_\psi,i_\theta-\frac{1}{2},i_\varphi-\frac{1}{2}]$ we always have a flux of the kind:
+\begin{align*}
+	F^{Y,i}_{i-\frac{1}{2},jk} &= \xi^{ii}\left(X^{stg}_{ijk}-X^{stg}_{i-1,jk}\right) \\
+	&+ \frac{1}{4}\xi^{ij}\left(X^{stg}_{i,j+1,k}-X^{stg}_{i,j-1,k}+X^{stg}_{i-1,j+1,k}-X^{stg}_{i-1,j-1,k}\right) \\
+	&+ \frac{1}{4}\xi^{ik}\left(X^{stg}_{i,j,k+1}-X^{stg}_{i,j,k-1}+X^{stg}_{i-1,j,k+1}-X^{stg}_{i-1,j,k-1}\right)
+\end{align*}
+
+If any of the field points $X$ lie in or on the domain boundary, it is not considered in the stencil and the factor $\frac{1}{4}$ is changed to $\frac{1}{3}$.
+
+
+
+

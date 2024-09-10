@@ -1,179 +1,55 @@
-\chapter{Intitulés des doctorats AMU}
-\label{chap:doctorats}
+\chapter{Curvilinear metric operators}
+\label{app:CurvilinearMetric}
 
-		\begin{itemize}
-		\item Discipline
-			\begin{itemize}
-			\item Spécialité
-			\end{itemize}
-		\end{itemize}
-		
-	\addsec*{ED 62 SCIENCES DE LA VIE ET DE LA SANTE}\label{ed-62-sciences-de-la-vie-et-de-la-sante}
+\section{Centered operators}
+\label{sec:app_centeredOperators}
 
-		\begin{itemize}
-		\item Biologie santé
-			\begin{itemize}
-			\item Biochimie structurale
-			\item Génomique et  Bioinformatique
-			\item Biologie du développement
-			\item Immunologie
-			\item Génétique
-			\item Microbiologie
-			\item Biologie végétale
-			\item Neurosciences
-			\item Oncologie
-			\item Maladies infectieuses
-			\item Pathologie vasculaire et nutrition
-			\item Ethique
-			\item Recherche clinique et Santé Publique
-			\item Biotechnologie
-			\end{itemize}
-		\end{itemize}
+\subsection{Differentiation}
+The gradient of a scalar field $S(u^\psi, u^\theta, u^\varphi)$ is calculated in terms of the reciprocal basis: 
+\begin{align}
+	\left(\grad{S}\right)_i = \pdv{S}{u^i}\vec{e}^i \label{eq:MetricGradient}
+\end{align}
+In the transport equations, we need to calculate gradients in parallel direction of the field which allows us to express $\vec{\grad}_\parallel$ in terms of the contravariant vector of the unit magnetic field from \autoref{eq:MetricContravariantUnitB}.
+\begin{align}
+	\grad_\parallel S = \pdv{S}{u^i}\vec{b}\cdot\vec{e}^i = \pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi \label{eq:MetricParallelGradient}
+\end{align}
+The terms in $\psi$ are omitted in the above formula since the equilibrium magnetic flux surfaces are located on the $\theta$-$\varphi$ coordinate surface and the vector $\vec{b}$ has therefore a zero value in its radial component. Note that this gradient is a scalar as it always points in $\vec{b}$ direction. \\
+Similarly, a perpendicular gradient can be defined as: 
+\begin{equation*}
+	\vec{\grad}_\perp S = \vec{\grad} S - \left(\grad_\parallel S\right)\vec{b}
+\end{equation*}
+In terms of metric coefficients, it translates to: 
+\begin{align}
+	\label{eq:MetricPerpendicularGradient}
+	\left(\vec{\grad}_\perp S\right)^i =& g^{ij}\left(\grad{S}\right)_j - \left(\grad_\parallel S\right)b^i \nonumber \\
+	=& g^{ij}\pdv{S}{u^j} - \left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right)b^i
+\end{align}
+We have to keep in mind that the above expression leads to the contravariant components of the perpendicular gradient whereas the general expression for the gradient in \autoref{eq:MetricGradient} gives its covariant components. \\
 
-	\addsec*{ED 67 SCIENCES JURIDIQUES ET POLITIQUES}\label{ed-67-sciences-juridiques-et-politiques}
+Next, the divergence of a vector $\vec{v}$ is calculated by: 
+\begin{align}
+	\vec{\grad}\cdot\vec{v} = \frac{1}{J}\pdv{(JA^i)}{u^i} \label{eq:MetricDivergence}
+\end{align}
 
-		\begin{itemize}
-		\item Droit
-			\begin{itemize}
-			\item Droit Privé
-			\item Droit Public
-			\item Histoire du Droit
-			\end{itemize}
-		\item Science Politique
-		\end{itemize}
+and further the divergence of parallel vector fields $S_\parallel\vec{b}$ comes in handy: 
+\begin{align}
+	\vec{\grad}\cdot \left(S_\parallel\vec{b}\right) = \frac{1}{J}\left[\pdv{\left(J S_\parallel b^\theta\right)}{u^\theta} + \pdv{\left(J S_\parallel b^\varphi\right)}{u^\varphi}\right] \label{eq:MetricDivergenceParallel}
+\end{align}
 
-	\addsec*{ED 184 MATHEMATIQUES ET INFORMATIQUE}\label{ed-184-mathematiques-et-informatique}
+The gradient and divergence operators can be combined o define a diffusion operator. The parallel Laplacian with some diffusion coefficients $D$ reads in metric terms: 
+\begin{align}
+	\label{eq:MetricParallelDiffusion}
+	\vec{\grad}\cdot\left[D\left(\grad_\parallel S\right)\vec{b}\right] = \frac{1}{J}\left[\pdv{\left(JD \left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right) b^\theta\right)}{u^\theta} + \pdv{\left(JD\left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right) b^\varphi\right)}{u^\varphi}\right]
+\end{align}
 
-		\begin{itemize}
-		\item Mathématiques
-		\item Informatique
-		\item Automatique
-		\end{itemize}
+Similarly, a perpendicular diffusion operator can be defined: 
+\begin{align}
+	\vec{\grad}\cdot\left[D\vec{\grad}_\perp S\right] =& \vec{\grad}\cdot\left[D\left(\vec{\grad} S - \left(\grad_\parallel S\right)\vec{b}\right)\right] \nonumber \\
+	=& \frac{1}{J}\pdv{}{u^i}\left[JD\left(g^{ij}\pdv{S}{u^j} - \left(\pdv{S}{u^\theta}b^\theta + \pdv{S}{u^\varphi}b^\varphi\right)b^i\right)\right] \nonumber \\
+	=& \frac{1}{J}\left(\pdv{}{u^\psi}\left[JD\left(g^{\psi\psi}\pdv{S}{u^\psi} + g^{\psi\varphi}\pdv{S}{u^\theta} + g^{\psi\theta}\pdv{S}{u^\varphi}\right)\right]      \right.\nonumber \\
+	&+ \pdv{}{u^\theta}\left[JD\left(g^{\theta\psi}\pdv{S}{u^\psi} + \left(g^{\theta\theta} - b^\theta b^\theta\right)\pdv{S}{u^\theta} + \left(g^{\theta\varphi} - b^\varphi b^\theta\right)\pdv{S}{u^\varphi}\right)\right] \nonumber \\
+	&+ \left. \pdv{}{u^\varphi}\left[JD\left(g^{\varphi\psi}\pdv{S}{u^\psi} + \left(g^{\varphi\varphi} - b^\theta b^\varphi\right)\pdv{S}{u^\theta} + \left(g^{\varphi\theta} - b^\varphi b^\varphi\right)\pdv{S}{u^\varphi}\right)\right]\right) \label{eq:MetricPerpendicularDiffusion}
+\end{align}
 
-	\addsec*{ED 250 SCIENCES CHIMIQUES DE MARSEILLE}\label{ed-250-sciences-chimiques-de-marseille}
 
-		\begin{itemize}
-		\item Sciences Chimiques
-		\end{itemize}
-
-	\addsec*{ED 251 SCIENCES DE L'ENVIRONNEMENT}\label{ed-251-sciences-de-lenvironnement}
-
-		\begin{itemize}
-		\item Sciences de l'Environnement
-			\begin{itemize}
-			\item Anthropologie biologique
-			\item Ecologie
-			\item Géosciences 
-			\item Génie des procédés
-			\item Océanographie
-			\item Chimie 
-			\item Environnement et santé 
-			\end{itemize}
-		\end{itemize}
-
-	\addsec*{ED 352 PHYSIQUE ET SCIENCES DE LA MATIERE}\label{ed-352-physique-et-sciences-de-la-matiere}
-
-		\begin{itemize}
-		\item Physique et Sciences de la Matière 
-			\begin{itemize}
-			\item Astrophysique et Cosmologie
-			\item Biophysique
-			\item Energie, Rayonnement et Plasma
-			\item Instrumentation
-			\item Optique, Photonique et Traitement d'Image
-			\item Physique des Particules et Astroparticules
-			\item Physique Théorique et Mathématique
-			\item Matière Condensée et Nanosciences 
-			\end{itemize}
-		\end{itemize}
-
-	\addsec*{ED 353 SCIENCES POUR L'INGENIEUR: MECANIQUE, PHYSIQUE, MICRO ET NANOELECTRONIQUE}\label{ed-353-sciences-pour-lingenieur-mecanique-physique-micro-et-nanoelectronique}
-
-		\begin{itemize}
-		\item Sciences pour l'Ingénieur
-			\begin{itemize}
-			\item Energétique
-			\item Mécanique et physique des fluides 
-			\item Acoustique
-			\item Mécanique des solides
-			\item Micro et Nanoélectronique
-			\item Génie civil et architecture
-			\item Nucléaire de fission 
-			\item Fusion magnétique
-			\end{itemize}
-		\end{itemize}
-
-	\addsec*{ED 354 LANGUES, LETTRES ET ARTS}\label{ed-354-langues-lettres-et-arts}
-
-		\begin{itemize}
-		\item Etudes anglophones
-		\item Etudes germaniques
-		\item Etudes slaves
-		\item Langues et littératures d'Asie
-			\begin{itemize}
-			\item Chinois
-			\item Vietnamien
-			\item Coréen
-			\end{itemize}
-        	\item Arts
-            		\begin{itemize}
-            		\item Arts plastiques 
-            		\item Sciences de l'art
-            		\item Musique et musicologie
-            		\item Etudes cinématographiques et audiovisuelles
-            		\item Arts de la scène
-            		\item Médiation culturelle des arts
-            		\end{itemize}
-        	\item Pratique et théorie de la création artistique et littéraire
-		\item Langue et Littératures françaises
-		\item Littérature générale et comparée
-		\item Langues, littératures et civilisations romanes 
-			\begin{itemize}
-			\item Etudes hispaniques et latino-américaines
-			\item Etudes italiennes
-			\item Etudes roumaines
-			\end{itemize}
-		\end{itemize}
-
-	\addsec*{ED 355 ESPACES, CULTURES, SOCIETES}\label{ed-355-espaces-cultures-societes}
-
-		\begin{itemize}
-		\item Géographie
-		\item Démographie
-		\item Urbanisme et Aménagement du territoire
-		\item Préhistoire
-		\item Archéologie
-		\item Histoire de l'Art
-		\item Histoire
-		\item Sciences de l'Antiquité
-		\item Mondes arabe, musulman et sémitique
-		\item Etudes romanes
-		\item Sociologie
-		\item Anthropologie
-		\item Architecture
-		\item Cultures et Sociétés d'Asie
-		\end{itemize}
-
-	\addsec*{ED 356 COGNITION, LANGAGE, EDUCATION}\label{ed-356-cognition-langage-education}
-
-		\begin{itemize}
-		\item Philosophie
-		\item Psychologie
-		\item Sciences du Langage
-		\item Sciences de l'Information et de la Communication
-		\item Sciences de l'Education
-		\item Sciences Cognitives
-		\end{itemize}
-
-	\addsec*{ED 372 SCIENCES ECONOMIQUES ET DE GESTION}\label{ed-372-sciences-economiques-et-de-gestion}
-
-		\begin{itemize}
-		\item Sciences de Gestion
-		\item Sciences Economiques
-		\end{itemize}
-
-	\addsec*{ED 463 SCIENCES DU MOUVEMENT HUMAIN}\label{ed-463-sciences-du-mouvement-humain}
-
-		\begin{itemize}
-		\item Sciences du Mouvement Humain 
-		\end{itemize}
+\section{Staggered operators}

@@ -105,7 +105,7 @@ To derive a conservation equation for $\varepsilon$, we multiply Vlasov's equati
 This simplifies to:
 \begin{equation}
 	\label{eq:SecondMomentTransportEquation}
-	\partial_t \varepsilon + \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
+	\partial_t \varepsilon + ´\nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
 \end{equation}
 The collisional heat flux $\mathbf{q}$ arises from the fluid closure, replacing all higher-order moments. The term $Q$ represents a collisional heat source, while $R_\varepsilon$ accounts for sources associated with non-Coulombian collisions in $C_{\text{other}}$. Notably, the magnetic field term $\mathbf{u} \times \mathbf{B}$ does not appear in the energy equation, as the torque $\frac{1}{2} u^2 \mathbf{u} \times \mathbf{B} \cdot \nabla_{\mathbf{v}} f$ does not perform work and therefore does not contribute to energy changes. \newline
 
@@ -164,15 +164,20 @@ In the second simplification for the reduced MHD model, the velocity vector is d
 This projection is consequently applied to all terms in the momentum conservation equation \ref{eq:desc_MHDmomentum}, that can then be solved independently for both velocities. In addition to reducing the number of equations from three to two, it permits to split the slow magnetoacoustic waves, that propagate at sound speed in the parallel directions, from the much slower dynamics in the poloidal plane that consist of electric and diamagnetic drifts (A proper introduction to the various plasma drifts will be given in the next chapter). 
 
 
+
+\subsection{Reduced Ohm's law}
+ 
+!!!!!! 
+Introduce reduced Ohm's law here 
+!!!!!!
+
+
 \section{Fluid closures}
 \label{sec:desc_fluidClosures}
 
 We only considered MHD models up to the second moment. To maintain the validity of the model, we need additional closure terms in the momentum and energy equations. They rely on the fact that plasma collisions dominate higher-order moments. 
 
-\subsection{Spizer-Härm model}
 
-¸
-\subsection{Braginskii and Zhdanov closures}
-
-
-\subsection{Reduced Ohm's law}
+!!!!!!
+Shortly present Braginskii / Zhdanov
+!!!!!!
