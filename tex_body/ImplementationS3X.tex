@@ -422,9 +422,9 @@ With the values for $n_e$ and $T_e$ known at time-step $n+1$, the vorticity equa
 		\label{eq:impl_implicitVorticitySystem}
 	\begin{pmatrix}
 		\nabla \cdot \left[ D_\perp \nabla_\perp \circ \right] + \nabla \cdot \left[ D_\parallel \nabla_\parallel \circ \mathbf{b} \right]  
-		& \frac{\beta_0}{\delta t} \nabla \cdot \left[ D_\parallel \circ \mathbf{b} \right] \\
+		& \frac{\beta_0}{\delta_t} \nabla \cdot \left[ D_\parallel \circ \mathbf{b} \right] \\
 		-D_\parallel \nabla_\parallel \circ &
-		\frac{\beta_0}{\delta t} D_\parallel \circ - \nabla \cdot \left[ \nabla_\perp \circ \right]
+		\frac{\beta_0}{\delta_t} D_\parallel \circ - \nabla \cdot \left[ \nabla_\perp \circ \right]
 	\end{pmatrix}
 	\begin{pmatrix}
 		\Phi^{n+1} \\ A_\parallel^{n+1}
@@ -436,7 +436,7 @@ With the values for $n_e$ and $T_e$ known at time-step $n+1$, the vorticity equa
 	\end{pmatrix}
 \end{align}
 
-with $D_\perp = \frac{m_i n_i}{B^2 \delta_t}$, $D_\parallel = \frac{1}{\eta_\parallel + \mu}$, $D_t = \frac{\mu}{\eta_\parallel + \mu}$, and $\mu = m_e / (n_e \delta_t)$ accounting for electron inertia effects. The parameter $\delta t$ derives from the integration scheme and is equal to the time-step in the case of a first-order implicit Euler scheme. \newline
+with $D_\perp = \frac{m_i n_i}{B^2 \delta_t}$, $D_\parallel = \frac{1}{\eta_\parallel + \mu}$, $D_t = \frac{\mu}{\eta_\parallel + \mu}$, and $\mu = m_e / (n_e \delta_t)$ accounting for electron inertia effects. The parameter $\delta_t$ derives from the integration scheme and is equal to the time-step in the case of a first-order implicit Euler scheme. \newline
 
 Since $\eta_\parallel \propto T_e^{-1.5}$, the parallel resistivity $\eta_\parallel$ is often a small parameter that leads to strong anisotropy between the perpendicular and parallel Laplacian operators. However, the electron inertia term, being implemented in the current solver, acts as an upper limit for the parallel diffusion coefficient, which is expected to improve the matrix conditioning as $\eta_\parallel$ approaches zero. This is in contrast to the original electrostatic model from \cite{Bufferand2021}. \newline
 
@@ -445,7 +445,7 @@ Since $\eta_\parallel \propto T_e^{-1.5}$, the parallel resistivity $\eta_\paral
 \label{ssec:equilibrationBLockMatrices}
 The matrices in the electromagnetic model \autoref{sec:DedimensionalizedElectromagneticModelS3X} can be decomposed in 2x2 or 3x3 block matrices that apply on the respective fields $\Phi$, $A_\parallel$ and/or $j_\parallel$. Apart of the use of dedimensionalized quantities, no effort was made so far to ensure that the blocks are roughly of the same order of the magnitude, which is important for the condition number of the matrix, nor that the matrix is diagonally dominant, which is generally a desirable feature for fast convergence of iterative schemes. \\
 In the following bits, we introduce some column $c_X$ and row $r_X$ scaling factors that are specific to the blocks $X$ of the matrix such that the above conditions are fullfilled as well as possible. To ensure a correct solution, the row scaling factor $r_X$ must be applied to the corresponding entry in the RHS vector and as a matter of fact, in the original vorticity matrix, we already have $r_\Phi = J$ the metrical Jacobian from \autoref{ssec:MetricCurvilinearCoordinates} to remove the effect of different mesh sizes in the domain on the discrete Laplacian operators. The column scaling factors $c_X$ must be taken care of when retrieving the fields from the numerical solution and it is strongly recommended to apply them to the initial guess for the iterative scheme. \\ 
-Some exisiting algorithms optimize the scaling task such as ---cite---. However, they all require an expensive matrix analysis phase that must be repeated regularly since the matrix changes with the progress of the simulation. Therefore, we use the knowledge about the construction of the matrix blocks to define sufficiently good scaling factors. \\
+Some exisiting algorithms optimize the scaling task such as  --- cite ----. However, they all require an expensive matrix analysis phase that must be repeated regularly since the matrix changes with the progress of the simulation. Therefore, we use the knowledge about the construction of the matrix blocks to define sufficiently good scaling factors. An educated row and column scaling can considerably increase the condition number of a matrix\cite{van1969condition}.\\
 
 Due to the large size of the system, it must be resolved using iterative solvers. Note that the two diagonal blocks already have a convenient shape, and the anti-diagonal blocks contain parallel divergence and gradient operators, whose discrete stencils are very similar. Therefore, by scaling both the second column and row with $\sqrt{\delta_t / \beta_0}$, the resulting matrix becomes almost symmetric, which is convenient for most iterative solvers.
 
@@ -465,25 +465,26 @@ For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\par
 
 \subsection{Evaluation of the condition number}
 
-The electromagnetic vorticity system needs to be solved implicitly, and the condition number of the matrix is an important property that essentially defines the speed of convergence of iterative solvers. Extensive research in the past decade\cite{pyzara2011influence, strakos1991linear, drkovsova1995numerical, greenbaum1997numerical}, especially on GMRES and conjugate gradient methods as they are used in SOLEDGE3X, proved that a (very) high condition number results in an increased number of iteration to reach convergence. The condition number of a matrix $M$ is defined as the ratio between the largest and the smallest eigenvalues. 
+The electromagnetic vorticity system needs to be solved implicitly, and the condition number of the matrix is an important property that essentially defines the speed of convergence of iterative solvers. Extensive research in the past decade\cite{pyzara2011influence, strakos1991linear, drkovsova1995numerical, greenbaum1997numerical}, particularly on GMRES and conjugate gradient methods as they are used in SOLEDGE3X, has shown that a high condition number results in an increased number of iterations to reach convergence. The condition number of a matrix $\textbf{M}$ is defined as the ratio between its largest and smallest eigenvalues:
 
 \begin{equation}
 	\label{eq:Impl_defConditionNumber}
-	\kappa\left(\textbf{M}\right) = \frac{\left|\lambda_{max}(\textbf{M})\right|}{\left|\lambda_{min}(\textbf{M})\right|}
+	\kappa\left(\textbf{M}\right) = \frac{\left|\lambda_{\text{max}}(\textbf{M})\right|}{\left|\lambda_{\text{min}}(\textbf{M})\right|}
 \end{equation}
 
-It is therefore of particular interest to investigate to which extent the electromagnetic extension of the system modifies the conditioning of the vorticity system. While there are excellent algorithms to estimate the largest eigenvalue of a matrix, the smallest is very expensive to identify. For the large 3D vorticity system, directly computing the condition number of is not feasible. Instead, let us approach this question analytically. \\
+It is therefore of particular interest to investigate how the electromagnetic extension of the system affects the conditioning of the vorticity system. While there are efficient algorithms to estimate the largest eigenvalue of a matrix, the smallest is much more expensive to compute. For the large 3D vorticity system, directly calculating the condition number is not feasible. Instead, we approach this question analytically. \\
 
-Let us consider a 2D orthonormal system, with perpendicular gradients exclusely in $x$ and parallel gradients in $y$ directions, with $N_x\cross N_y$ discretization points. All fields take some reference value, the timestep size is fixed to $\delta t$ and the time advancement is achieved with the 1st order implicit Euler method. Without a curvilinear grid, the gradient and divergence stencils are identical, and with the row/column scaling from Sec. \ref{ssec:equilibrationBLockMatrices}, The vorticity system can then be expressed as:
+Consider a 2D orthonormal system, with perpendicular gradients exclusively in the $x$ direction and parallel gradients in the $y$ direction, with $N_x \times N_y$ discretization points. All fields are assumed to take some constant reference value, the timestep size is fixed to $\delta_t$, and time advancement is performed using the first-order implicit Euler method. Without a curvilinear grid, the gradient and divergence stencils are identical, and with the row/column scaling from Sec. \ref{ssec:equilibrationBLockMatrices}, the vorticity system can then be expressed as:
+
 
 \begin{equation}
 	\textbf{M} = 
 	\begin{pmatrix}
-		\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel & \gamma \textbf{G}_\parallel \\ -\gamma \textbf{G}_\parallel^T & \sigma \textbf{I} - \xi\textbf{L}_\perp
+		\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel & \gamma \textbf{G}_\parallel \\ -\gamma \textbf{G}_\parallel^T & \sigma \textbf{I} - \gamma^2\textbf{L}_\perp
 	\end{pmatrix}
 \end{equation}
 
-where $\alpha = \frac{m_un_0}{B_0^2\delta t}$, $\sigma = \frac{1}{\eta_\parallel^0 + m_e / (n_0 \delta t)}$, $\gamma = \sqrt{\frac{\delta t }{\beta_0}} $ and $\xi = \frac{\delta t}{\beta_0}$. The stencil matrices $\textbf{L}_\perp$ and $\textbf{L}_\parallel$ describe Laplacians between respectively $x$ and $y$ neighbors and $\textbf{G}_\parallel$ describes the gradient over $y$. They take the shape:
+where $\alpha = \frac{m_in_i}{B^2\delta_t}$, $\sigma = \frac{1}{\eta_\parallel + \frac{m_e}{n_e \delta_t}}$, and $\gamma = \sqrt{\frac{\delta_t }{\beta_0}}$. The stencil matrices $\textbf{L}_\perp$ and $\textbf{L}_\parallel$ describe the Laplacians between the $x$ and $y$ neighbors, respectively, while $\textbf{G}_\parallel$ represents the gradient over $y$. Their matrices take the following forms:
 
 \begin{align}
 	\mathbf{L}_\perp =& \begin{pmatrix}
@@ -508,32 +509,130 @@ where $\alpha = \frac{m_un_0}{B_0^2\delta t}$, $\sigma = \frac{1}{\eta_\parallel
 	\end{pmatrix}_{N_y \times N_y}
 \end{align}
 
-
-To make the system invertible, and avoid an infinite condition number, we assume Dirichlet-0 boundary conditions in perpendicular and periodic BC in parallel direction. It can be seen as a region of closed flux-surface that connects to a region with a very crude sheath-dominated plasma. We can compute the eigenvalues of the two Laplacians and the gradient coupling matrix exactly.
-
-\begin{align}
-	\lambda_{k_x}(\mathbf{L}_\perp) =& 4\sin^2\left(\frac{(k_x+1)\pi}{2N_x}\right)  & \lambda_{k_y}(\mathbf{L}_\parallel) =& 4\sin^2\left(\frac{k_y\pi}{N_y}\right) & \lambda_{k_y}(\mathbf{G}_\parallel) = i\sin^2\left(\frac{k_y\pi}{N_y}\right)
-\end{align}
-
-where $k_x\in[0,N_x-1]$ and $k_y\in[0,N_y-1]$ are indices for all eigenvalues. We observe that both parallel systems have a zero eigenvalue that corresponds to a constant mode. This is because of the periodic boundary conditions along closed flux-surfaces, indicating that the solution can be calculated up to a constant. The perpendicular operators, with fixed boundaries, make the system invertible with a unique solution. Let us now evaluate the extremal eigenvalues of the diagonal blocks of $\mathbf{M}$. For the upper-left block with the sum of Laplacians, it corresponds to the combinations $(k_x,k_y)$ such that $|\lambda_{k_x}|+|\lambda_{k_y}|$ is minimized or maximized.
+In order to make the system invertible and avoid an infinite condition number, we assume Dirichlet-0 boundary conditions in the perpendicular direction and periodic boundary conditions in the parallel direction. This can be viewed as a region of closed flux surfaces connected to a region with a very crude sheath-dominated plasma. We can compute the eigenvalues of the two Laplacians and the gradient coupling matrix exactly.
 
 \begin{align}
-	\lambda_{min}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel) &= \alpha\cdot\frac{\pi^2}{N_x^2} & \lambda_{min}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel) &= 4(\alpha + \sigma)
+	\lambda_{k_x}(\mathbf{L}_\perp) =& 4\sin^2\left(\frac{(k_x+1)\pi}{2N_x}\right)  & \lambda_{k_y}(\mathbf{L}_\parallel) =& 4\sin^2\left(\frac{k_y\pi}{N_y}\right) & \lambda_{k_y}(\mathbf{G}_\parallel) = i\sin\left(\frac{k_y\pi}{N_y}\right)
 \end{align}
 
-For the lower-right block matrix, the identity matrix will shift the eigenvalues of the perpendicular Laplacian by $\sigma$. 
+where $k_x\in[0,N_x-1]$ and $k_y\in[0,N_y-1]$ are indices for all eigenvalues. We observe that both parallel systems have a zero eigenvalue that corresponds to a constant mode, due to the periodic boundary conditions along the closed flux surfaces, indicating that the solution can be determined up to a constant. The perpendicular operators, with fixed boundaries, make the system invertible with a unique solution. 
+
+Let us now evaluate the extremal eigenvalues of the diagonal blocks of $\mathbf{M}$. For the upper-left block, which contains the sum of Laplacians, the eigenvalues correspond to the combinations of $(k_x,k_y)$ such that $|\lambda_{k_x}|+|\lambda_{k_y}|$ is minimized or maximized:
 
 \begin{align}
-	\lambda_{min}(\sigma \textbf{I} - \xi \textbf{L}_\perp) &= \sigma - 4\xi & \lambda_{max}(\sigma \textbf{I} - \xi \textbf{L}_\perp) &= \sigma - \xi\frac{\pi^2}{N_x^2}
+	\label{eq:Impl_EVupperLeftBlock}
+	\lambda_{min}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel) &= \alpha\cdot\frac{\pi^2}{N_x^2} & \lambda_{max}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel) &= 4(\alpha + \sigma)
 \end{align}
 
-For sufficiently large systems, the largest eigenvalue will be of the order of $\sigma$. If $\sigma \gg \xi$, all eigenvalues will be close to $\sigma$ with an excellent matrix condition. If $\sigma < 4\xi$, some eigenvalues become negative and the system loses its positive-definiteness. This can lead to strong instabilities and standard algorithms to solve the system iteratively (e.g. GMRES or BiCGStab) might fail or produce unreliable results, as most are designed for positive-definite matrices. In order for the problem to be well-posed, we must enforce the constraint:
+For the lower-right block matrix, the identity matrix will shift the eigenvalues of the perpendicular Laplacian by $\sigma$:
+
+\begin{align}
+	\label{eq:Impl_EVlowerRightBlock}
+	\lambda_{min}(\sigma \textbf{I} - \gamma^2 \textbf{L}_\perp) &= \sigma - 4\gamma^2 & \lambda_{max}(\sigma \textbf{I} - \gamma^2 \textbf{L}_\perp) &= \sigma - \gamma^2\frac{\pi^2}{N_x^2}
+\end{align}
+
+For sufficiently large systems, the largest eigenvalue will be on the order of $\sigma$. If $\sigma \gg \gamma^2$, all eigenvalues will be close to $\sigma$, resulting in an excellent matrix condition. However, if $\sigma < 4\gamma^2$, some eigenvalues may become negative, causing the system to lose its positive-definiteness. This can lead to strong instabilities, and standard iterative solvers (e.g., GMRES or BiCGStab) may fail or produce unreliable results, as these methods are generally designed for positive-definite matrices. To ensure that the problem remains well-posed, we must enforce the constraint:
 
 \begin{equation}
 	\label{eq:Impl_conditionPositiveDefinite}
-	\eta_\parallel^0 + \frac{m_e}{n_0 \delta t} < \frac{\beta_0}{\delta t}
+	\frac{1}{4}\beta_0 > \delta_t\eta_\parallel + \frac{m_e}{n_e} 
 \end{equation}
 
-We now have all extremal eigenvalues along the block diagonal. For the combined matrix $\mathbf{M}$, the gradient coupling plays an essential role 
+This condition states that $\beta_0$ cannot be too small for the system to remain solvable. Assuming this lower condition on $\beta_0$ holds with a sufficient margin, the minimum and maximum eigenvalues in Eq. \ref{eq:Impl_EVlowerRightBlock} are simply $\lambda_{min} = \lambda_{max} = \sigma$. \\
+
+We now have all extremal eigenvalues along the block diagonal. For the combined matrix $\mathbf{M}$, the gradient coupling plays a crucial role. If the coupling is small, the eigenvalues of $\mathbf{M}$ are given by the union of the eigenvalues of the diagonal blocks. The condition number of $\mathbf{M}$ is then the ratio of the overall maximum and minimum eigenvalues of the block matrices. Since $\gamma$ is certainly smaller than $\sigma$, we should investigate the impact of the coupling in more detail. The matrix $\mathbf{M}$ can be transformed into a block diagonal form by applying the Schur complement $\mathbf{S}$ on the lower-left block.
+
+
+\begin{align}
+	\textbf{M} = \begin{pmatrix}
+		\textbf{A} & \textbf{B} \\ -\textbf{B}^T & \textbf{C} 
+	\end{pmatrix} &= \begin{pmatrix}
+		\textbf{I} & 0 \\ -\textbf{B}^T\textbf{A}^{-1} & \textbf{I}
+	\end{pmatrix}\begin{pmatrix}
+		\textbf{A} & 0 \\ 0 & \textbf{S}
+	\end{pmatrix}\begin{pmatrix}
+		\textbf{I} & \textbf{A}^{-1}\textbf{B} \\ 0 & \textbf{I}
+	\end{pmatrix} & \text{with: } 
+	\textbf{S} = \textbf{D} + \textbf{B}^T \textbf{A}^{-1}\textbf{B}
+\end{align}
+
+
+The block diagonal matrix is multiplied by both a lower and an upper diagonal matrix. Since they are invertible and all diagonal elements are equal to 1, the block diagonal matrix is quasi-similar to $\textbf{M}$\cite{gallier2010schur}, thereby preserving its eigenvalues. Calculating the eigenvalues of the block diagonal matrix gives us then a good approximation for the actual eigenvalues of $\textbf{M}$. We now need to estimate the eigenvalues of the Schur complement. Given that $\textbf{A}$ is Laplacian-based, the eigenvalues of $\textbf{A}^{-1}$ are the reciprocals of the eigenvalues of $\textbf{A}$, as shown in Eq. \ref{eq:Impl_EVupperLeftBlock}. The matrix is sandwiched between the gradient operator and its transpose, and together they behave like a parallel Laplacian with the scaling factor $\gamma^2$. We can first estimate:
+
+\begin{align}
+	\lambda_{min}(\textbf{B}^T \textbf{A}^{-1}\textbf{B}) &= \frac{\gamma^2\lambda_{min}(L_\parallel)}{\lambda_{max}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel)} = 0 \\ 
+	\lambda_{max}(\textbf{B}^T \textbf{A}^{-1}\textbf{B}) &= \frac{\gamma^2\lambda_{max}(L_\parallel)}{\lambda_{min}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel)} = \frac{4\gamma^2N_x^2}{\alpha\pi^2}
+\end{align}
+
+By combining this result with the eigenvalues of $\sigma \textbf{I} - \gamma^2 \textbf{L}_\perp$ from Eq. \ref{eq:Impl_EVlowerRightBlock}, we can estimate the extremal eigenvalues of the Schur complement:
+
+\begin{align}
+	\label{eq:Impl_EVschurComplement}
+	\lambda_{min}(\textbf{S}) &= \sigma  & 
+	\lambda_{max}(\textbf{S}) &= \sigma + \frac{4\gamma^2N_x^2}{\alpha\pi^2}
+\end{align}
+
+Everything is now in place to address the eigenvalues of $\mathbf{M}$ with the two block diagonals $\textbf{A}$ and $\textbf{S}$. Recall the assumption $\sigma \gg \gamma^2$ from Eq. \ref{eq:Impl_conditionPositiveDefinite}, thus the double-Laplacian system in Eq. \ref{eq:Impl_EVupperLeftBlock} defines the minimum eigenvalue of $\textbf{M}$. Considering that $\alpha \sim 1/\delta_t$ in the dimensionless equations and $\gamma^2 \sim \delta_t / \beta_0$ is large, we can reasonably expect $\gamma^2 \gg \alpha$. The maximum eigenvalue of $\textbf{M}$ arises from the Schur complement in Eq. \ref{eq:Impl_EVschurComplement}. Therefore, the condition number of $\textbf{M}$ can be estimated as:
+
+\begin{equation}
+	\label{eq:Impl_conditionNumberM}
+	\kappa(\textbf{M}) \approx \frac{\sigma N_x^2}{\alpha\pi^2} + \frac{4\gamma^2N_x^4}{\alpha^2\pi^4}
+\end{equation}
+
+or in terms of dimensionless reference values:
+
+\begin{equation}
+	\label{eq:Impl_conditionNumberElectromagneticVorticitySystem}
+	\boxed{
+		\kappa(\textbf{M}) \approx \frac{ B^2\delta_t N_\perp^2}{m_in_i\pi^2} \cdot \frac{1}{\eta_\parallel + \frac{m_e}{n_e \delta_t}} + \frac{4\delta_t^3 B^4 N_\perp^4}{\beta_0m_i^2n_i^2\pi^4}
+	}
+\end{equation}
+
+In the case of the system with electron inertia, but without electromagnetic induction, the analysis becomes much simpler as only the double Laplacian block matrix constitutes the system. Its condition number is given by the eigenvalues in Eq. \ref{eq:Impl_EVupperLeftBlock}:
+
+\begin{equation}
+	\label{eq:Impl_conditionNumberM_electronInertia}
+	\kappa(\textbf{A}) = \frac{4\sigma N_x^2}{\alpha\pi^2} + \frac{4 N_x^2}{\pi^2}
+\end{equation}
+
+and is primarily determined by the first term. It can be written as:
+
+\begin{equation}
+	\label{eq:Impl_conditionNumberElectrnInertiaVorticitySystem}
+	\boxed{
+		\kappa(\textbf{A}) \approx \frac{ B^2\delta_t N_\perp^2}{m_in_i\pi^2} \cdot \frac{1}{\eta_\parallel + \frac{m_e}{n_e \delta_t}}
+	}
+\end{equation}
+
+From these expressions for the condition number, we observe a degradation as the electric resistivity approaches zero, aligning with the difficulties faced by the original electrostatic implementation in higher-power scenarios. The finite electron mass acts as a lower bound for $\eta_\parallel$, which is expected to significantly aid iterative solvers in such scenarios. Magnetic induction introduces the second term in Eq. \ref{eq:Impl_conditionNumberElectromagneticVorticitySystem}, and will always deteriorate the matrix conditioning. However, it is inversely proportional to $\beta_0$, such that the deterioration is limited as the pressure ratio increases. Numerically, electromagnetic effects should only be considered in simulation scenarios where $\beta_0$ is sufficiently large. This point is further emphasized by the condition in Eq. \ref{eq:Impl_conditionPositiveDefinite}, which imposes a lower limit on $\beta_0$ to ensure a positive-definite matrix—an essential property for most iterative solvers. In Fig. \ref{fig:Impl_conditionNumber}, we illustrate how the condition number changes with $\eta_\parallel$, $\delta_t$, and $N_\perp$ for both electrostatic and electromagnetic systems, with and without electron inertia. 
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.30\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/conditionNumber_eta.jpg}
+		\subcaption{Parallel electric \\ resistivity $\eta_\parallel$}
+		\label{fig:Impl_conditionNumber_eta}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.30\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/conditionNumber_dt.jpg}
+		\subcaption{Timestep size $\delta_t$}
+		\label{fig:Impl_conditionNumber_dt}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.30\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/conditionNumber_Nperp.jpg}
+		\subcaption{Perpendicular \\ resolution $N_\perp$}
+		\label{fig:Impl_conditionNumber_Nperp}
+	\end{subfigure}
+	\caption{Impact of different parameters on the condition number. Plasma parameters are taken as constant: $B=1$, $m_i = 2$, $n_e = n_i = 2$, $m_e = 5.5\cdot 10^{-4}$, $\beta_0 = 10^{-3}$, $\eta_\parallel = 10^{-6}$, $\delta_t = 1$ and $N_\perp = 100$. The parameters $\beta_0$ and $n_e$ are deliberately chosen large to ensure the validity of the positive-definiteness condition \ref{eq:Impl_conditionPositiveDefinite}. Black curves correspond to the electrostatic system, and red curves to the electromagnetic matrices, with full lines indicating electron inertia and dashed lines representing $m_e = 0$.}
+	\label{fig:Impl_conditionNumber}
+\end{figure}
+
+Overall, electromagnetic models exhibit a higher condition number. In particular, at larger timestep sizes or higher perpendicular resolutions, $\kappa$ increases significantly due to the third and fourth exponents in the second term of Eq. \ref{eq:Impl_conditionNumberElectromagneticVorticitySystem}. However, electron inertia positively affects the condition number. This is especially evident as $\eta_\parallel$ approaches zero in Fig. \ref{fig:Impl_conditionNumber_eta}, where neglecting the electron mass results in a sharp increase in $\kappa$, while electron inertia allows for a stable, low $\kappa$. Similarly, for low timestep sizes and resolutions, $m_e$ improves the system, such that for lower ranges, the electromagnetic system with inertia performs better than the electrostatic system without inertia.
+
+ 
+
 
 
