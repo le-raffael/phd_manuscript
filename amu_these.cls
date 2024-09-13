@@ -20,12 +20,13 @@
 
 %%% extensions minimales
 \RequirePackage[utf8]{inputenc}				%% encodage du texte
-\RequirePackage[T2A]{fontenc}			%% encodage des fontes
+\RequirePackage[T1,T2A]{fontenc}			%% encodage des fontes
 %\RequirePackage{lmodern}					%% polices latines (désactivés)
-\RequirePackage{fourier}					%% polices Adobe Utopia (activés)
+\RequirePackage{fourier}					%% fourier polices Adobe Utopia (activés)
 \RequirePackage[main=english,french,russian]{babel}	%% typographie (français par défaut)
 \RequirePackage[babel]{csquotes}			%% guillemets typographiques
 \MakeAutoQuote{«}{»}						%% espacement automatique des guillemets
+\newcommand{\cyrillic}[1]{{\fontencoding{T2A}\fontfamily{Arial}\selectfont #1}}
 
 %%% typographie et mise en page
 \RequirePackage{scrhack}					%% macros personnalisées (KOMA-Script)

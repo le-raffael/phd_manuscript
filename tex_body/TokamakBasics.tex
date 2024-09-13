@@ -173,7 +173,7 @@ They are completed by poloidal field coils (light purple), placed outside the ma
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{schemes/ITER_2.jpg}
+	\includegraphics[width=0.6\textwidth]{schemes/ITER_2.jpg}
 	\caption{Cutaway of the ITER tokamak (source: ITER Organization)}
 	\label{fig:1_ITER}
 \end{figure}
@@ -210,7 +210,7 @@ Another important parameter of the magnetic configuration is its triangularity. 
 
 \section{Interaction between particles}
 \label{sec:intro_particlesInteration}
-So far we have seen how particles are confined in magnetic field lines. It gives only a partial picture of the physical processes that occur in a tokamak. A plasma contains positively and negatively charged particles at high energetic levels and they will inevitably interact between themselves. In Sec. \ref{ssec:intro_DebyeShielding} we look at how electrons and ions organize to form a state of quasi-neutrality, in Sec. \ref{sec:intro_collisions} we dive into the mechanisms that drive particle collisions and in Sec. \ref{ssec:intro_resistiveEffects} we conclude how collisions translate into resistive effects.
+So far we have seen how particles are confined in magnetic field lines. It gives only a partial picture of the physical processes that occur in a tokamak. A plasma contains positively and negatively charged particles at high energetic levels and they will inevitably interact between themselves. In Sec. \ref{ssec:intro_DebyeShielding} we look at how electrons and ions organize to form a state of quasi-neutrality, in Sec. \ref{sec:intro_collisions} we dive into the mechanisms that drive particle collisions and in Sec. \ref{ssec:intro_macroscopicEffectsPlasma} we conclude how collisions translate into resistive effects.
 
 \subsection{Debye shielding}
 \label{ssec:intro_DebyeShielding}
@@ -344,24 +344,47 @@ It is worth noting that $\tau_c$ is proportional to $T^{3/2}/n$ and $\lambda_c$ 
 
 
 \subsection{Macroscopic effects of plasma collisions}
+\label{ssec:intro_macroscopicEffectsPlasma}
 
-!!!!!!!!!!!
+As particles collide, energy is transferred from faster-moving to slower-moving particles, which, at a macroscopic scale, corresponds to heat conduction. Spitzer and Härm developed a model for plasmas in a near-equilibrium state\cite{SpitzerResistivity}, where deviations from the Maxwellian particle distribution due to the temperature gradient is small. The heat flux is then inversely proportional to the temperature gradient:
 
-Spitzer-Härm model: \\
+\begin{equation}
+	q = -\kappa_{SH} \grad T
+\end{equation}
 
-Shortly state viscosity, heat resistivity and electric resistivity ! 
+In a weakly collisional regime, the thermal conductivity $\kappa_{SH}$ then corresponds to the rate at which energy is transported and is proportional to its speed $v_{th}$ and the distance transported before the next collision $\lambda_c$. From the previous discussion on collisions, $\kappa_{SH}$ then depends on the electron temperature $T_e$ taken to the exponent $5/2$:
 
-!!!!!!!!!!!
+\begin{equation}
+	\kappa_{SH} \propto \frac{T_e^{5/2}}{Z \ln \Lambda}
+\end{equation}
 
+In a similar fashion, weak collisionality results in viscous effects. Alike energy, momentum is transferred from fast to slow particles, whereby velocity gradients are reduced over time. The particle flow is overall smoothened and becomes more uniform. The resultant viscous force
+
+\begin{equation}
+	F = \nu_{SH}\grad v
+\end{equation}
+
+depends on the velocity gradient. The same reasoning as for the conductivity holds for the viscosity and we can express:
+
+\begin{equation}
+	\nu_{SH} \propto \frac{T_e^{5/2}}{Z^4 \ln \Lambda}
+\end{equation}
+
+Finally, collisions scatter electrons, with the effect to impend the current flow. This translates into electric resistivity $\eta_{SH}$, which is directly proportional to the collision frequency $\omega_c$. We then have:
+
+\begin{equation}
+	\eta_{SH}\propto\frac{Z \ln \Lambda}{T_e^{3/2}}
+\end{equation}
+
+Plasma resistivity is essential to understand current flow and Ohmic heating. As the plasma heats up, collisions are less frequent, and it becomes a more efficient conductor. Characteristic times for heat conductivity and resistivity are of the order of the electron-ion collision time $\tau_c$ at around $10^{-5}$s while viscosity occur on the the much slower scale of the ion-ion collision time, which reaches up to a few milliseconds. 
 
 
 
 \section{Scrape-Off-Layer}
 \label{sec:intro_SOL}
 
-!!!!!!
-Add Intro 
-!!!!!!
+As presented in Sec. \ref{ssec:intro_limitedDivertedConfig}, the magnetic configuration in tokamaks can be split in two main regions: the core with closed magnetic field lines and the the scrape-off-layer (SOL) with open field lines. The properties of the latter are important to describe the plasma and to design a nuclear fusion device. Where magnetic field lines penetrate the material wall, the sheath, described in Sec. \ref{sec:intro_sheath}, strongly alters the physical properties of the plasma. It is followed by a discussion in Sec. \ref{ssec:intro_heatExhaust} on the particle and heat fluxes at the wall and an introduction to the impact of SOL physics on plasma confinement. 
+
 
 
 \subsection{Fundamental sheath physics}
@@ -387,9 +410,20 @@ and a heat flux:
 with the sheath transmission coefficient $\gamma$. As the sheath is not collisional, these coefficients have to be determined from kinetic theory\cite{Stangeby_2000}. For hydrogen plasma, it is common to take the values $\gamma_i = 2.5$ for ions and $\gamma_e = 4.5$ for electrons.
 
 
+\subsection{Problematic of heat exhaust}
+\label{ssec:intro_heatExhaust}
+An important part of the heat produced in a tokamak, whether it originates from external heating or from the fusion reaction, is evacuated by hot plasma particles. Cross-field transport allows confined particles from the hot core to cross the separatrix. As they enter the SOL, they follow the magnetic field lines until they impact the divertor on the thin target band. This region is extremely critical as large amounts of power are directed on a fairly small area. It is projected for ITER that heat loads at the targets are very close to material limits\cite{gunn2017surface}. The peak heat flux $q_{peak}$ could reach values over $10MW/m^2$. For a safe tokamak operation, it is essential to well understand and predict heat fluxes on the strike points. An important metric to take into the consideration is the heat flux o power fall-off width $\lambda_q$. It describes the spread of the heat flux on the divertor targets, and a larger value allows to spread the power exhaust on a larger area. It allows to describe the heat flux at a distance $r$ from the target:
+
+\begin{equation}
+	q(r) =  q_{peak}e^{-\frac{r}{\lambda_q}}
+\end{equation}
+
+Eich et al.\cite{eich2013scaling} developed a scaling law to estimate $\lambda_q$ for H-mode operation based on machine parameters. It states that the width is inversely proportional to the toroidal magnetic field $\lambda_q\propto B_\varphi^{-0.8}$, meaning that larger machines with stronger coils will also have a thinner target line. 
+
 
 
 \subsection{Confinement characteristics}
+\label{eq:intro_confinement}
 An important metric for the confinement quality is the ratio $\beta$ of plasma pressure over magnetic pressure.
 \begin{equation}
 	\label{eq:PlasmaBeta}
@@ -399,15 +433,9 @@ There is a concurrent dynamic between thermodynamic and magnetic pressures: the 
 
 It is possible to distinguish between two operational regimes: L-mode and H-mode. The (L)ow-confinement mode is the standard operational mode. The plasma loses much of its energy to the wall with a consequent short confinement time. In 1982, the (H)igh-confinement mode was first observed on ASDEX in Germany and subsequently thoroughly investigated\cite{asdex1989h}. Its key feature is a strong reduction of turbulence around the separatrix, which reduces particle transport from the core to the SOL. As a consequence, temperature and density gradients steepen, forming a "pedestal" and creating a transport barrier. 
 
-\subsection{Problematic of heat exhaust}
 
-An important part of the heat produced in a tokamak, whether it originates from external heating or from the fusion reaction, is evacuated by hot plasma particles. Cross-field transport allows confined particles from the hot core to cross the separatrix. As they enter the SOL, they follow the magnetic field lines until they impact the divertor on the thin target band. This region is extremely critical as large amounts of power are directed on a fairly small area. It is projected for ITER that heat loads at the targets are very close to material limits\cite{gunn2017surface}. The peak heat flux $q_{peak}$ could reach values over $10MW/m^2$. For a safe tokamak operation, it is essential to well understand and predict heat fluxes on the strike points. An important metric to take into the consideration is the heat flux o power fall-off width $\lambda_q$. It describes the spread of the heat flux on the divertor targets, and a larger value allows to spread the power exhaust on a larger area. It allows to describe the heat flux at a distance $r$ from the target:
 
-\begin{equation}
-	q(r) =  q_{peak}e^{-\frac{r}{\lambda_q}}
-\end{equation}
 
-Eich et al.\cite{eich2013scaling} developed a scaling law to estimate $\lambda_q$ for H-mode operation based on machine parameters. It states that the width is inversely proportional to the toroidal magnetic field $\lambda_q\propto B_\varphi^{-0.8}$, meaning that larger machines with stronger coils will also have a thinner target line. 
 
 
 
