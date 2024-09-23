@@ -283,48 +283,48 @@ In \autoref{eq:electromagneticSLAB_overdampedDecayRate} and \autoref{eq:electrom
  
 As in the electrostatic case from the previous section, the just described system is not invertible and $\Phi$ is defined up to a constant. Grounding the potential in one single point is however not a suitable solution here because it deteriorates the condition number of the vorticity matrix past solvability. Instead two other approaches will be followed to check if simulations can reproduce the expected physical behaviour. 
 
-\subsubsection{Grounded line}
-One approach is to set the potential not in one but in several points to a fixed value. The potential in the remaining domain then distributes according to this value and the whole system becomes solvable. Numerically, this is achieved by replacing the row of the matrix corresponding to the grounded point by a single 1 on the diagonal and the matching term in the RHS vector by the desired value for $\Phi$. This operation is equal to enforcing Dirichlet boundary conditions in radial direction if $\Phi$ is grounded at all points with index $i_\psi^G$. 
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.45\textwidth}
-		\centering
-		\includegraphics[width=.98\textwidth]{schemes/44_APara.png}
-		\subcaption{$A_\parallel(\psi,\theta)$ at the timestep 440\\ \ }
-		\label{fig:electromagneticSLAB_initialProfile_A}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.45\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/excitedSLAB_2D_timeplot_A.png}
-		\subcaption{Time evolution of $A_\parallel(t)$ in the lower left corner of the domain}
-		\label{fig:electromagneticSLAB_evolution_A}
-	\end{subfigure}
-	\caption{Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points. All point at the radial center with $i_\psi^G$ are grounded.}
-	\label{fig:electromagneticGroundedSLAB_system}
-\end{figure}
-
-In the simulations with a grounded line, the initial wave solution has been applied to the vorticity field $\Omega$ to prevent steep gradients and instabilities if it was done on $\Phi$ directly. Very soon, the two potentials $\Phi$ and $A_\parallel$ respond to this initial excitation and a wave profile appears as depicted in \autoref{fig:electromagneticSLAB_initialProfile_A}. The line of grounded points in the middle of the domain however breaks the wave which then smoothly lines up with the equilibrium point $\Phi_0 = 0V$ and $A_{\parallel,0} = 0Tm$ around the grounded line. At this point it may be emphasized that only the electric potential $\Phi$ is grounded, but as both potential fields are strongly coupled the grounded line affects $A_\parallel$ equally. We thus have a wave that is guided between two poloidal grounded lines (remember that the domain is periodic in radial direction) so by construction the system cannot account for radial dynamics. If we consider a point that is furthest away from the grounded line (e.g. any point on the domain boundary in the example above) we might still be able to observe some expected physical behaviour. At first glance, if we track $A_\parallel$ in one point over time as in \autoref{fig:electromagneticSLAB_evolution_A}, a decaying oscillation appears which is in line with the here dominant underdamped regime. 	
-
-First we investigate the underdamped scenario by opposing simulation results to the expected damping rates $\lambda$ and frequencies $\omega_0$. As for the previous electromagnetic we fit the four free parameters in \autoref{eq:electromagneticSLAB_underdampedSolution} to simulation data with a nonlinear least squares method. With 1000 sample points we get a high fitting fidelity with a relative standard deviation of the order of $10^{-9}$ and the difference if the fit is performed on $\Phi$ or $A_\parallel$ has about the same magnitude. 
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.45\textwidth}
-		\centering
-		\includegraphics[width=.98\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_para_fixed.png}
-		\subcaption{Poloidal mode fixed to $k_\parallel = $}
-		\label{fig:electromagneticSLAB_errorGrounded_kPara_fixed}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.45\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_perp_fixed.png}
-		\subcaption{Radial mode fixed to $k_\perp = 100m^{-1}$}
-		\label{fig:electromagneticSLAB_errorGrounded_kPerp_fixed}
-	\end{subfigure}
-	\caption{Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$ with respect to the expected values in a grounded electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points.}
-	\label{fig:electromagneticSLAB_errorGrounded}
-\end{figure}
+%\subsubsection{Grounded line}
+%One approach is to set the potential not in one but in several points to a fixed value. The potential in the remaining domain then distributes according to this value and the whole system becomes solvable. Numerically, this is achieved by replacing the row of the matrix corresponding to the grounded point by a single 1 on the diagonal and the matching term in the RHS vector by the desired value for $\Phi$. This operation is equal to enforcing Dirichlet boundary conditions in radial direction if $\Phi$ is grounded at all points with index $i_\psi^G$. 
+%
+%\begin{figure}[H]
+%	\centering
+%	\begin{subfigure}[b]{0.45\textwidth}
+%		\centering
+%		\includegraphics[width=.98\textwidth]{schemes/44_APara.png}
+%		\subcaption{$A_\parallel(\psi,\theta)$ at the timestep 440\\ \ }
+%		\label{fig:electromagneticSLAB_initialProfile_A}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.45\textwidth}
+%		\centering
+%		\includegraphics[width=1\textwidth]{schemes/excitedSLAB_2D_timeplot_A.png}
+%		\subcaption{Time evolution of $A_\parallel(t)$ in the lower left corner of the domain}
+%		\label{fig:electromagneticSLAB_evolution_A}
+%	\end{subfigure}
+%	\caption{Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points. All point at the radial center with $i_\psi^G$ are grounded.}
+%	\label{fig:electromagneticGroundedSLAB_system}
+%\end{figure}
+%
+%In the simulations with a grounded line, the initial wave solution has been applied to the vorticity field $\Omega$ to prevent steep gradients and instabilities if it was done on $\Phi$ directly. Very soon, the two potentials $\Phi$ and $A_\parallel$ respond to this initial excitation and a wave profile appears as depicted in \autoref{fig:electromagneticSLAB_initialProfile_A}. The line of grounded points in the middle of the domain however breaks the wave which then smoothly lines up with the equilibrium point $\Phi_0 = 0V$ and $A_{\parallel,0} = 0Tm$ around the grounded line. At this point it may be emphasized that only the electric potential $\Phi$ is grounded, but as both potential fields are strongly coupled the grounded line affects $A_\parallel$ equally. We thus have a wave that is guided between two poloidal grounded lines (remember that the domain is periodic in radial direction) so by construction the system cannot account for radial dynamics. If we consider a point that is furthest away from the grounded line (e.g. any point on the domain boundary in the example above) we might still be able to observe some expected physical behaviour. At first glance, if we track $A_\parallel$ in one point over time as in \autoref{fig:electromagneticSLAB_evolution_A}, a decaying oscillation appears which is in line with the here dominant underdamped regime. 	
+%
+%First we investigate the underdamped scenario by opposing simulation results to the expected damping rates $\lambda$ and frequencies $\omega_0$. As for the previous electromagnetic we fit the four free parameters in \autoref{eq:electromagneticSLAB_underdampedSolution} to simulation data with a nonlinear least squares method. With 1000 sample points we get a high fitting fidelity with a relative standard deviation of the order of $10^{-9}$ and the difference if the fit is performed on $\Phi$ or $A_\parallel$ has about the same magnitude. 
+%
+%\begin{figure}[H]
+%	\centering
+%	\begin{subfigure}[b]{0.45\textwidth}
+%		\centering
+%		\includegraphics[width=.98\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_para_fixed.png}
+%		\subcaption{Poloidal mode fixed to $k_\parallel = $}
+%		\label{fig:electromagneticSLAB_errorGrounded_kPara_fixed}
+%	\end{subfigure}
+%	\begin{subfigure}[b]{0.45\textwidth}
+%		\centering
+%		\includegraphics[width=1\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_perp_fixed.png}
+%		\subcaption{Radial mode fixed to $k_\perp = 100m^{-1}$}
+%		\label{fig:electromagneticSLAB_errorGrounded_kPerp_fixed}
+%	\end{subfigure}
+%	\caption{Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$ with respect to the expected values in a grounded electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points.}
+%	\label{fig:electromagneticSLAB_errorGrounded}
+%\end{figure}
 
 
 

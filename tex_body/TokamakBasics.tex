@@ -7,9 +7,10 @@ A deuterium plasma is an ionized gas comprising positively charged ions ($D^+$) 
 
 \section{Particles in a magnetized plasma}
 \label{sec:intro_particlesInPlasma}
-This first section is dedicated to elucidate the fundamental working principle of tokamaks. Before all, we must understand how charged particles behave when exposed to strong magnetic fields (in Sec. \ref{ssec:intro_magneticConfinement}) and how this knowledge allows us to design a magnetic "cage", in which particles are trapped, or confined (in Sec. \ref{ssec:intro_tokamakConfiguration}). The governing equations of this magnetic configuration are given in Sec. \ref{sec:intro_GradShafranov} and Sec. \ref{ssec:intro_limitedDivertedConfig} introduces and compares limited and diverted configurations.
 
-\subsection{Magnetic confinement}
+This first section is dedicated to elucidate the fundamental working principle of tokamaks. Before all, we must understand how charged particles behave when exposed to strong magnetic fields (in Sec. \ref{ssec:intro_magneticConfinement}) and how they experience drifts in perpendicular direction (in Sec. \ref{ssec:edge_plasmaDrifts}). This knowledge allows us to design a magnetic "cage", in which particles are trapped, or confined (in Sec. \ref{ssec:intro_tokamakConfiguration}). The governing equations of this magnetic configuration are given in Sec. \ref{sec:intro_GradShafranov} and Sec. \ref{ssec:intro_limitedDivertedConfig} introduces and compares limited and diverted configurations.
+
+\subsection{Gyromotion of a single particle}
 \label{ssec:intro_magneticConfinement}
 To understand how charged plasma particles can be confined on a magnetic field line, we consider the simplest example of a single particle with charge \( q \) in a homogeneous, unidirectional magnetic field \(\textbf{B}\) with directional unit vector \(\textbf{b}\). The amplitude of the magnetic field is then $B$ such that $\mathbf{B} = B\mathbf{b}$. Solely the magnetic component of Lorentz's force acts on a particle with mass \( m \) and charge \( q \), leading to the following equation for its velocity \(\textbf{v}\):
 
@@ -46,6 +47,85 @@ For a non-homogeneous field, Eq. \ref{eq:gyromotion_LorentzForce} does not neces
 	\label{eq:intro_adiabaticCondition}
 	\rho_L \ll \frac{B}{\norm{\grad B}}
 \end{equation}
+
+
+\subsection{Plasma drifts}
+\label{ssec:intro_plasmaDrifts}
+
+Plasma drifts refer to the movement of charged particles under the influence of electric and magnetic fields. These drifts do not account for the primary motion along the guiding center, as described in Section \ref{ssec:intro_magneticConfinement}. To study drift velocities, it is convenient to decompose every vector quantity into an average parallel component and a fluctuating perpendicular component, such that $\mathbf{X} = X_\parallel\mathbf{b} + \mathbf{X_\perp}$. We then express the Lorentz force equation as:
+
+\begin{equation}
+	\label{eq:edge_LorentzEquationDecomposition}
+	m\partial_t\left(v_\parallel\mathbf{b} + \mathbf{v}_\perp\right) = q\left[E_\parallel\mathbf{b} + \mathbf{E}_\perp + \left(v_\parallel\mathbf{b} + \mathbf{v}_\perp\right) \times \mathbf{B}\right]
+\end{equation}
+
+Focusing on the particle's acceleration in the perpendicular direction, we derive the equation of motion:
+
+\begin{equation}
+	\label{eq:edge_EcrossBdrift}
+	m\partial_t \mathbf{v}_\perp = q\left[\mathbf{E} + \left(\mathbf{v}_\perp \times \mathbf{B}\right)\right]
+\end{equation}
+
+In steady-state conditions, the electric force compensates the Lorentz force, leading to the electric drift $\mathbf{v}_E$, commonly referred to as the "E cross B" or simply "ExB" drift:
+
+\begin{equation}
+	\mathbf{v}_E = \frac{\mathbf{E}_\perp \times \mathbf{B}}{B^2}
+\end{equation}
+
+This velocity applies uniformly to all particles at all times, as it depends only on the electric and magnetic fields in place. Since neither the mass nor the charge contributes to $\mathbf{v}_E$, both electrons and ions move in the same direction at the same speed, and under the quasi-neutrality assumption, no current is generated.
+
+For the next drift, we consider the gyromotion of a particle in a non-uniform magnetic field. Under the adiabatic condition from Eq. \ref{eq:intro_adiabaticCondition}, the magnetic moment $\mu$ of the gyrating particle is conserved along its trajectory:
+
+\begin{equation}
+	\mu = \frac{m\norm{\mathbf{v}_\perp}^2}{2B}
+\end{equation}
+
+This moment leads to a potential $U = -\mu B$, which exerts a force on the particle:
+
+\begin{equation}
+	F_{\nabla B} = -\nabla U = \frac{mv_\perp^2}{2B}\nabla B
+\end{equation}
+
+This force acts in the direction of the gradient $\nabla B$, where the magnetic field strength is lower, allowing the particle to reduce its potential energy. This results in the "grad B" drift:
+
+\begin{equation}
+	\mathbf{v}_{\nabla B} = \frac{mv_\perp^2}{2q} \frac{\mathbf{B} \times \nabla B}{B^3}
+\end{equation}
+
+The helical configuration of a tokamak causes magnetic field lines to bend. To follow the direction of $\mathbf{B}$, the particle's trajectory is curved, and a centripetal force is exerted on the particle. With the curvature radius $\mathbf{R}_c = \mathbf{b} \cdot \nabla \mathbf{b}$, the force is given by:
+
+\begin{equation}
+	\mathbf{F}_c = \frac{mv_\parallel^2}{R_c}\mathbf{R}_c = -mv_\parallel^2\frac{\mathbf{B} \cdot \nabla \mathbf{B}}{B^2}
+\end{equation}
+
+This force induces the "curvature" drift $\mathbf{v}_c$:
+
+\begin{equation}
+	\mathbf{v}_c = \frac{mv_\parallel^2}{q}\frac{\mathbf{B} \times (\mathbf{B} \cdot \nabla \mathbf{B})}{B^4}
+\end{equation}
+
+The polarization drift occurs if the electric field in the plasma varies with time. 
+
+\begin{equation}
+	\mathbf{v}_p = \frac{m}{qB^2}\frac{d\mathbf{E}}{dt}
+\end{equation}
+
+Note that the directions of "grad B", curvature or polarization drifts depend on the particle's charge, causing electrons and ions to move in opposite directions and generating an effective current. The total perpendicular velocity acting on a confined particle is the sum of all these drifts:
+
+\begin{equation}
+	\mathbf{v}_d = \mathbf{v}_E + \mathbf{v}_{\nabla B} + \mathbf{v}_c + \mathbf{v}_p
+\end{equation}
+
+In fact, any force perpendicular to the magnetic field will cause a drift:
+
+\begin{equation}
+	\mathbf{v}_F = \frac{\mathbf{B}\cross\mathbf{F}_\perp}{qB^2}
+\end{equation}
+
+All other eventual forces, such as magnetic or gravitational forces, play a subordinate role in the plasma edge and are usually not considered in fluid models. Drift velocities are always orientated in perpendicular direction to then magnetic fields. They do not interfere with (the averaged) parallel fluxes, at a magnitude of $v_{th}$, and are primarily responsible for cross-field fluxes.
+
+
+
 
 
 \subsection{Tokamak configuration}
