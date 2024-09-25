@@ -8,7 +8,7 @@ A deuterium plasma is an ionized gas comprising positively charged ions ($D^+$) 
 \section{Particles in a magnetized plasma}
 \label{sec:intro_particlesInPlasma}
 
-This first section is dedicated to elucidate the fundamental working principle of tokamaks. Before all, we must understand how charged particles behave when exposed to strong magnetic fields (in Sec. \ref{ssec:intro_magneticConfinement}) and how they experience drifts in perpendicular direction (in Sec. \ref{ssec:edge_plasmaDrifts}). This knowledge allows us to design a magnetic "cage", in which particles are trapped, or confined (in Sec. \ref{ssec:intro_tokamakConfiguration}). The governing equations of this magnetic configuration are given in Sec. \ref{sec:intro_GradShafranov} and Sec. \ref{ssec:intro_limitedDivertedConfig} introduces and compares limited and diverted configurations.
+This first section describes the fundamental working principle of plasma confined in a tokamaks. Before all, we must understand how charged particles behave when exposed to strong magnetic fields (in Sec. \ref{ssec:intro_magneticConfinement}) and how they experience drifts in perpendicular direction (in Sec. \ref{ssec:edge_plasmaDrifts}). This knowledge allows us to design a magnetic "cage", in which particles are trapped, or confined (in Sec. \ref{ssec:intro_tokamakConfiguration}). The governing equations of this magnetic configuration are given in Sec. \ref{sec:intro_GradShafranov} and Sec. \ref{ssec:intro_limitedDivertedConfig} introduces and compares limited and diverted configurations.
 
 \subsection{Gyromotion of a single particle}
 \label{ssec:intro_magneticConfinement}
@@ -152,9 +152,10 @@ The fundamental principle of a tokamak lies in its magnetic configuration, which
 	\label{fig:1_magneticConfigurationTorus}
 \end{figure}
 
-The helical configuration of a magnetic field line in a tokamak ensures that tracing its path remains within the same toroidal surface, ultimately returning to the initial point and forming a closed field line. The ensemble of all such field lines constitutes what is termed a "closed magnetic flux surface." These flux surfaces are radially concentric, and the principle of magnetic confinement is to trap plasma particles within these flux surfaces.\newline
+The helical configuration of a magnetic field line in a tokamak ensures that tracing its path remains within the same toroidal surface, ultimately returning to the initial point and forming a closed field line. The ensemble of all such field lines constitutes what is termed a "closed magnetic flux surface." These flux surfaces are radially concentric, and the principle of magnetic confinement is to trap plasma particles within these flux surfaces.  \\
 
-At first glance, the toroidal field appears sufficient to close magnetic field lines. However, internal and external perturbations can cause twisting of the magnetic field lines, potentially leading to disruptions and total loss of plasma confinement. This phenomenon is known as kink instabilities. To suppress them, the poloidal field introduces magnetic shear to the configuration, with field lines circling around the minor radius of the torus. The ratio of toroidal to poloidal rotations of the field lines is known as the safety factor \( q = \frac{aB_\varphi}{RB_p} \). In a cylindrical approximation, the Kruskal-Shafranov limit \cite{shafranov1956stability, kruskal1958instability} states that kink instabilities are suppressed for \( q > 1 \). However, the safety factor cannot be too large either, as other instabilities such as tearing \cite{furth1973tearing} or resistive wall \cite{fitzpatrick2002simple} modes might appear and deteriorate plasma confinement. \\
+At first glance, the toroidal field appears sufficient to close magnetic field lines. However, plasma drifts inevitably add a dynamic perpendicular to the motion parallel to the magnetic field. Internal and external perturbations can cause twisting of the magnetic field lines, potentially leading to disruptions and total loss of plasma confinement. This phenomenon is known as kink instabilities. To suppress them, the poloidal field introduces magnetic shear to the configuration, with field lines circling around the minor radius of the torus. The ratio of toroidal to poloidal rotations of the field lines is known as the safety factor \( q = \frac{aB_\varphi}{RB_p} \). In a cylindrical approximation, the Kruskal-Shafranov limit \cite{shafranov1956stability, kruskal1958instability} states that kink instabilities are suppressed for \( q > 1 \). However, the safety factor cannot be too large either, as other instabilities such as tearing \cite{furth1973tearing} or resistive wall \cite{fitzpatrick2002simple} modes might appear and deteriorate plasma confinement. \\
+
 
 
 \subsection{Grad-Shafranov equilibrium}
@@ -240,14 +241,26 @@ The plasma pressure causes the magnetic axis to shift outward in a phenomenon kn
 	\Delta \approx \frac{2\mu_0 p}{B_p}\frac{a^2}{R_0}
 \end{equation}
 
-The two scenarios presented in Fig. \ref{fig:1_PsiFlux} differ by their major radius. As the Grad-Shafranov shift is inversely proportional to $R_0$, we expect that the larger curvature in the case \ref{fig:GS_PSI_R_0_5} $R_0 = 0.5$m induces a larger shift, which is precisely what is observed.
+The two scenarios presented in Fig. \ref{fig:1_PsiFlux} differ by their major radius. As the Grad-Shafranov shift is inversely proportional to $R_0$, we expect that the larger curvature in the case \ref{fig:GS_PSI_R_0_5} $R_0 = 0.5$m induces a larger shift, which is precisely what is observed. \\
+
+An important metric in this context is the ratio $\beta$ of plasma pressure over magnetic pressure.
+
+\begin{equation}
+	\label{eq:PlasmaBeta}
+	\beta = \frac{p}{p_{mag}} = \frac{neT}{B^2/2\mu_0}
+\end{equation}
+
+There is a concurrent dynamic between thermodynamic and magnetic pressures: the former exerts an expansive force on the plasma, while the latter seeks to confine the plasma particles within their magnetic flux surfaces. A lower value of $\beta$ is generally desired for a more effective plasma confinement, but requires strong magnetic fields. However, generating such intense magnetic fields entails considerable costs and technical challenges. $\beta$ typically takes values between 1\% and 5\% in present large tokamaks. \\
+
+It is possible to distinguish between two operational regimes: L-mode and H-mode. The (L)ow-confinement mode is the standard operational mode. The plasma loses much of its energy to the wall with a consequent short confinement time. In 1982, the (H)igh-confinement mode was first observed on ASDEX in Germany and subsequently thoroughly investigated\cite{asdex1989h}. Its key feature is a strong reduction of turbulence around the separatrix, which reduces particle transport from the core to the SOL. As a consequence, temperature and density gradients steepen, forming a "pedestal" and creating a transport barrier. 
+
 
 
 
 \subsection{Realisation of magnetic configurations}
 \label{ssec:intro_limitedDivertedConfig}
 
-The magnetic tokamak configuration in a tokamak is controlled by a set of coils. An example of the technical realisation in the ITER tokamak is shown in Fig. \ref{1_ITER}. The fundamental configuration discussed before, is created by the toroidal field coils encircling the plasma chamber, appear in orange on the scheme. As it  from the name, they drive the toroidal magnetic field $B_\varphi$. The poloidal field, necessary for the helical path of confined plasma particles, is driven by a strong toroidal current, itself induced by the central solenoid (central column with yellow ends). 
+The magnetic tokamak configuration in a tokamak is controlled by a set of coils. An example of the technical realisation in the ITER tokamak is shown in Fig. \ref{fig:1_ITER}. The fundamental configuration discussed before, is created by the toroidal field coils encircling the plasma chamber, appear in orange on the scheme. As it  from the name, they drive the toroidal magnetic field $B_\varphi$. The poloidal field is driven by a strong toroidal current, itself induced by the central solenoid (central column with yellow ends). 
 
 They are completed by poloidal field coils (light purple), placed outside the main plasma chamber and distributed along the height of the tokamak. They generate a poloidal magnetic field that wraps around the plasma with the minor radius, perpendicular to the toroidal field. By adjusting the current, it is possible to control the vertical position, elongation, and triangularity of the plasma. For example, increasing the current in certain poloidal coils can elongate the plasma, giving it an oval cross-section, or induce triangularity by pulling the plasma boundary inward at the top and bottom. 
 
@@ -258,9 +271,9 @@ They are completed by poloidal field coils (light purple), placed outside the ma
 	\label{fig:1_ITER}
 \end{figure}
 
-The limited configuration is one of the simpler magnetic configurations in a tokamak. In this setup, the plasma is in direct contact with material components which act as a limiter (see Fig. \ref{fig:WEST_limited}). The confined plasma boundary is given by the last closed flux surface, tangential to the wall in one point. Such a configuration suffers from significant power loads on the limiters, resulting in high erosion rates and potential contamination of the plasma with impurities. The confinement is generally lower in this configuration.
+The limited configuration is one of the simpler magnetic configurations in a tokamak. In this setup, the plasma is in direct contact with material components which act as a limiter (see Fig. \ref{fig:WEST_limited}). It effectively splits the domain in a confined core region with closed field lines and the Scrape-Off-Layer (SOL), that extends to the wall and where field lines are open, e.g. they cross the wall. The confined plasma boundary is given by the last closed flux surface, tangential to the wall in one point. Such a configuration suffers from significant power loads on the limiters, resulting in high erosion rates and potential contamination of the plasma with impurities. The confinement is generally lower in this configuration. 
 
-A diverted configuration, as depicted in Fig. \ref{fig:WEST_diverted}, improves the situation by a lot. The poloidal field coils shape the magnetic field lines in a fashion that they do not intersect with solid surfaces within the main plasma chamber but are instead directed to a separate region called the divertor. The last closed flux surface is then called "separatrix" and never touches the tokamak wall. It effectively splits the domain in a confined core region with closed field lines and the Scrape-Off-Layer (SOL), that extends to the wall and where field lines are open, e.g. they cross the wall. The poloidal magnetic field contains now a singularity, the "X-point", and the area where the he divertor plate intecepts the continuation of the separatrix is called the "target line". The divertor handles the exhaust of heat and particles from the plasma and this configuration tends to improve overall plasma confinement and reduce impurity levels.
+A diverted configuration, as depicted in Fig. \ref{fig:WEST_diverted}, improves the situation by a lot. The poloidal field coils shape the magnetic field lines in a fashion that they do not intersect with solid surfaces within the main plasma chamber but are instead directed to a separate region called the divertor. The last closed flux surface is then called "separatrix" and never touches the tokamak wall. The poloidal magnetic field contains now a singularity, the "X-point", and the area where the he divertor plate intecepts the continuation of the separatrix is called the "target line". The divertor handles the exhaust of heat and particles from the plasma and this configuration tends to improve overall plasma confinement and reduce impurity levels.
 
 \begin{figure}[H]
 	\centering
@@ -282,7 +295,7 @@ A diverted configuration, as depicted in Fig. \ref{fig:WEST_diverted}, improves 
 
 
 
-More exotic configurations are also feasible. In the double-null configuration, there are two divertor regions, typically located above and below the main plasma body. It splits heat loads on both divertor targets and can improve symmetry in power and particle exhaust. This symmetry helps in balancing the plasma dynamics and stabilizing the plasma, particularly with respect to vertical displacement events (VDEs), which are large-scale instabilities that can occur in tokamaks. Similarly, the X-point can be a higher-order singularity and split in more than four branches, spreading the heat load in several branches\cite{ryutov2008magnetic}. Such "snowflake" divertors can be achieved with an additional set of poloidal field coils in proximity to the divertor.
+More exotic configurations are also feasible. In the double-null configuration, there are two divertor regions, typically located above and below the main plasma body. It splits heat loads on both divertor targets and can improve symmetry in power and particle exhaust. This symmetry helps in balancing the plasma dynamics and stabilizing the plasma, particularly with respect to vertical displacement events (VDEs), which are large-scale instabilities that can occur in tokamaks. Similarly, the X-point can be a higher-order singularity and split in more than four branches, spreading the heat load in several branches\cite{ryutov2008magnetic}. Such "snowflake" divertors can be achieved with an additional set of poloidal field coils in proximity to the divertor. Such configurations are still subject to active research in the perspective to optimize the plasma confinement and better control the heat exhaust. \\
 
 Another important parameter of the magnetic configuration is its triangularity. It refers to the shaping of the plasma cross-section, where the plasma boundary is not circular but has an elongated shape with triangular indentations. The degree of triangularity $\delta$ measures the extent of the indentation relative to the plasma’s minor radius. High triangularity configurations can enhance plasma stability and confinement, in particular in the edge region, by allowing for higher pressure gradients.
 
@@ -499,19 +512,6 @@ An important part of the heat produced in a tokamak, whether it originates from 
 \end{equation}
 
 Eich et al.\cite{eich2013scaling} developed a scaling law to estimate $\lambda_q$ for H-mode operation based on machine parameters. It states that the width is inversely proportional to the toroidal magnetic field $\lambda_q\propto B_\varphi^{-0.8}$, meaning that larger machines with stronger coils will also have a thinner target line. 
-
-
-
-\subsection{Confinement characteristics}
-\label{eq:intro_confinement}
-An important metric for the confinement quality is the ratio $\beta$ of plasma pressure over magnetic pressure.
-\begin{equation}
-	\label{eq:PlasmaBeta}
-	\beta = \frac{p}{p_{mag}} = \frac{neT}{B^2/2\mu_0}
-\end{equation}
-There is a concurrent dynamic between thermodynamic and magnetic pressures: the former exerts an expansive force on the plasma, while the latter seeks to confine the plasma particles within their magnetic flux surfaces. A lower value of $\beta$ is generally desired for a more effective plasma confinement, but requires strong magnetic fields. However, generating such intense magnetic fields entails considerable costs and technical challenges. $\beta$ typically takes values between 1\% and 5\% in present large tokamaks. 
-
-It is possible to distinguish between two operational regimes: L-mode and H-mode. The (L)ow-confinement mode is the standard operational mode. The plasma loses much of its energy to the wall with a consequent short confinement time. In 1982, the (H)igh-confinement mode was first observed on ASDEX in Germany and subsequently thoroughly investigated\cite{asdex1989h}. Its key feature is a strong reduction of turbulence around the separatrix, which reduces particle transport from the core to the SOL. As a consequence, temperature and density gradients steepen, forming a "pedestal" and creating a transport barrier. 
 
 
 

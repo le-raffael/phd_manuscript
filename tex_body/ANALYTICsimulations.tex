@@ -1,4 +1,84 @@
-\chapter{Electromagnetic simulations on analytic geometries}
+\chapter{Electromagnetic simulations on limited geometries}
+\label{chap:analSimulations}
+
+\section{Electromagnetic mode excitation}
+\label{sec:anal_DAW_modeExcitation}
+
+As an introduction to simulations with SOLEDGE3X, let us consider the linear behavior of drift-Alfvén waves again. To put later simulation results in perspective, we analyze the impact of electromagnetic terms on drift-wave turbulence within a linearized system. Specifically, we compare the effects of a finite electron mass (EI-inert), electromagnetic induction with electron mass (EM), and electromagnetic induction with both flutter and electron mass (EM-flutter) in comparison to the baseline electrostatic case. The dispersion relation from Eq. \ref{eq:edge_DAWdispersionRelation} is adjusted to each of the four scenarios and solved exactly using the Python library SymPy for symbolic computation. Notably, we use the full dispersion relation without applying the simplifications used when we introduced the linear behavior of the drift-Alfvén system in \autoref{ssec:edge_DAW_dispersionRelation}. 
+
+Given the coupled nature system, there are several complex solutions for $\omega$ for each scenario, where each corresponds to a different mode. In Fig. \ref{fig:anal_modalBehavior}, the real and imaginary components of all modes are plotted as functions of the perpendicular wave number $k_\perp$, with typical parameters for a mid-sized tokamak. The real component $\omega_R$ represents the wave phase frequency, while the imaginary component $\gamma$ describes the growth or damping rate of each mode. A positive $\gamma$ indicates an unstable mode with exponential growth, whereas a negative $\gamma$ corresponds to a stable mode that is damped over time.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
+		\subcaption{Electrostatic system}
+		\label{fig:anal_modesES}
+	\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+	\ContinuedFloat
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/modes_ES-inert.jpg}
+		\subcaption{Electrostatic system with electron inertia}
+		\label{fig:anal_modesEI}
+	\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+	\ContinuedFloat
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/modes_EM.jpg}
+		%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
+		\subcaption{Electromagnetic system}
+		\label{fig:anal_modesEM}
+	\end{subfigure}
+\end{figure}
+\begin{figure}[H]
+	\ContinuedFloat
+	\centering
+	\begin{subfigure}[t]{0.85\textwidth}
+		\centering
+		%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
+		\includegraphics[width=1\textwidth]{schemes/modes_EM-flutter.jpg}
+		\subcaption{Electromagnetic system with flutter}
+		\label{fig:anal_modesFlutter}
+	\end{subfigure}
+	\caption{Dependency on the perpendicular wavenumber $k_\perp$ of the real and imaginary parts of the all solutions $\omega$ to the dispersion relation \ref{eq:anal_DAWdispersionRelation}. Except for $k_\perp$, all other values derive from: $B = 1$T, $n = 2\cdot10^{19}$m$^{-3}$, $T = 100$eV, $\lambda_p = 0.1$m and $k_\parallel = 0.6$m$^{-1}$. On a pair of graphs, a given color represents the same mode. In the left plots for $\Re{\omega}$, characteristic frequencies of the system are shown for reference ("--" diamagnetic $\omega_*$,"$\cdots$" electron sound $\omega_{s,e}$, "-$\cdot$-" Alfvén $\omega_A$).} 
+	\label{fig:anal_modalBehavior}
+\end{figure}
+
+In the green curve, we observe the characteristic drift-wave frequency, which initially follows the diamagnetic frequency $\omega_*$ in the lower $k_\perp$ limit and reaches its maximum at $k_\perp \rho_L = 1$, before declining again. When the electron inertia term is introduced, a new mode emerges, starting at a significantly higher frequency before stabilizing at the electron sound frequency $\omega_{s,e} = v_{th,e} k_\parallel$. The introduction of electromagnetic terms governs the behavior of the new modes in the lower $k_\perp$ limit, which are then bounded by the shear Alfvén phase velocity. Qualitatively, the phase frequencies exhibit similar characteristics with or without flutter, with the primary difference being a more pronounced separation between the two modes as they transition from $\omega_A$ to $\omega_{s,e}$ in the pure induction. Overall, the characteristic frequencies of the electromagnetic modes are several orders of magnitude higher than the drift-wave frequency.
+
+Looking at the growth rates associated with the modes, we first observe that drift waves are unstable with strong positive growth rates where the frequency is maximal, consistent with the earlier discussion about drift-wave instabilities. On the other hand, electromagnetic (and electron inertial) modes are very stable, showing strong negative $\gamma$. If one intends to study the growth and propagation of turbulent structures and their global impact, Alfvénic modes will only marginally contribute. It is hence possible to avoid the numerical costs involved with the high-frequency modes without much loss of accuracy.
+
+It is more important to consider the effects of electromagnetic contributions on the drift-wave mode. For this purpose, Fig. \ref{fig:anal_comparisonDW} compares the real and imaginary parts of the drift-wave modes in the three electromagnetic scenarios with those in the electrostatic scenario.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/comparison_DW_real.png}
+		\subcaption{Real component}
+		\label{fig:anal_comparisonDWreal}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/comparison_DW_imag.png}
+		\subcaption{Imaginary component}
+		\label{fig:anal_comparisonDWimag}
+	\end{subfigure}
+	\caption{Relative difference of drift-wave frequency in the electromagnetic scenarios to the reference electrostatic case.} 
+	\label{fig:anal_comparisonDW}
+\end{figure}
+
+The real part is altered by the electromagnetic additions, but the change of phase frequency will only have a minor impact on production cases. On the other hand, the growth rate increases with electron inertia and even more with electromagnetic induction. Electromagnetic flutter on the other largely mitigates the instabilities, and can even reduce the growth rate observed in electrostatic drift waves.
+
+
 
 \section{Slab configurations}
 \subsection{Analysis of a plasma blob}

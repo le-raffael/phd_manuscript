@@ -1,4 +1,4 @@
-\chapter{Electromagnetic effects in the SOLEDGE3X framework}
+\chapter{The SOLEDGE3X electromagnetic model}
 \label{chap:SOLEDGE3X_framework}
 
 In the previous chapter, we laid the foundations of drift-reduced models for edge plasma. The project SOLEDGE3X was born with the merge of the 3D turbulence code TOKAM3X\cite{tamain2016tokam3x} and the 2D transport code SolEdge2D\cite{Bufferand_2015}. It stands as a comprehensive multi-species 2D/3D fluid solver to investigate transport and turbulence at the plasma edge up to the first wall, with a particular focus on modeling plasma-wall interactions. This has allowed successful investigations of numerous facets of edge plasma dynamics, such as turbulence\cite{Bufferand_2021} impurity transport\cite{Ciraolo2021} or ITER first-wall fluxes\cite{Rivals2022}. Until now, however, the model has been limited to electrostatic turbulence, with only fluctuations in the electric potential, determined by the non-adiabatic response to density fluctuations, being taken into account. \\
@@ -67,7 +67,7 @@ where the reference plasma parameter $\beta_0$ is the ratio between reference pl
 
 $A_\parallel^{0(1)}$ and $A_\parallel^{0(2)}$ are about four orders of magnitude away in the edge. From a numerical point of view, we need both relations, so an occurrence of the parameter $\beta_0$ is inevitable in the dimensionless formulation of the system. The first option, based on Ampère's law, is chosen for the implementation. In the continuation of this chapter, all relations are expressed with the dimensionless fields.
 
-\section{Transport equations}
+\section{Conservation equations}
 \label{sec:S3X_TransportEquations}
 
 For simulations of the SOL in SOLEDGE3X, the three fluid moments in Eqs. \ref{eq:ZeroMomentTransportEquation}, \ref{eq:FirstMomentTransportEquation} and \ref{eq:SecondMomentTransportEquation} are used for the ion density and momentum conservation, electron and ion energy conservation, and vorticity conservation equations. In the drift-reduced formulation, to compute the different drifts that compose the velocity $\mathbf{u}$, it is convenient to decompose it into a parallel component $u_\parallel$ along the magnetic field lines $\mathbf{b}$ and orthogonal $\mathbf{u}_\perp$ components. This relationship is given by:
@@ -394,7 +394,7 @@ These equations use Ohm's law without the electron inertia term previously intro
 
 
 \subsection{Electromagnetic Flutter}
-
+\label{ssec:S3X_flutter}
 Due to the strong anisotropy in tokamaks, most edge turbulence codes rely on alignment to the magnetic equilibrium (see discussion in Ref.\cite{SCHWANDER_2024}). However, in the electromagnetic model, small perturbations of $\mathbf{B}_{eq}$ can exist and are driven by fluctuations of $A_\parallel$ such as $\tilde{\mathbf{B}} = \nabla \times (\tilde{A_\parallel} \mathbf{b})$. Therefore, these fluctuations of $A_\parallel$ have to be estimated and $A_\parallel$ cannot be used directly. Indeed, the diamagnetic current induced by the evolution of the full plasma pressure is balanced by a stationary background parallel current, the Pfirsch-Schlüter current, which induces a stationary part of significant amplitude in $A_\parallel$ through Ampere's law (Eq. \ref{eq:S3X_AmpereLaw}). This latter is denoted $A_{\parallel,0}$, and corresponds to the Grad-Shafranov shift due to Pfirsch-Schlüter currents that are accounted for in the parallel current. This shift $A_{\parallel,0}$ is obviously accounted for in $B_{eq}$, and therefore it has to be subtracted from $A_\parallel$ in nonlinear parallel operators. This is done in this work by simply removing the toroidal average as proposed by Ref.\cite{giacomin2022gbs} in the GBS code: \newline
 
 \begin{equation}
@@ -430,7 +430,7 @@ Notwithstanding the smallness of the flutter field, it is important to maintain 
 	&= 0
 \end{align}
 
-The equilibrium field is externally provided such that it is divergence free, so $\grad\cdot B\mathbf{b}_{eq} = 0$. We further used the vector calculus identities on second-order derivatives $\grad\cross\grad X = 0$ and $\grad\cdot\left(\grad\cross\mathbf{X}\right)$. It further proves the importance of the second (small) term in the definition of $\mathbf{\tilde{b}}$ (with $\grad\cross\mathbf{b}_{eq}$), as without it, the flutter field would not be divergence-free.
+The equilibrium field is externally provided such that it is divergence free, so $\grad\cdot B\mathbf{b}_{eq} = 0$. We further used the vector calculus identities on second-order derivatives $\grad\cross\grad X = 0$ and $\grad\cdot\left(\grad\cross\mathbf{X}\right)$. It further proves the importance of the second (small) term in the definition of $\mathbf{\tilde{b}}$ (with $\grad\cross\mathbf{b}_{eq}$), as without it, the flutter field would not be divergence-free. On the other hand, this term is problematic with respect to gauge-fixing. The field $A_\parallel$ appears directly in the equation without derivative. This is in contradiction with gauge theory, which says that the electromagnetic vector potential is defined up to a constant. This problem appears at all because we do not take the entire vector potential $\textbf{A}$, but only its projection on the parallel equilibrium direction. 
 
 
 \subsection{Formulation of the electromagnetic vorticity system}

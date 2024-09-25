@@ -1,5 +1,6 @@
 \chapter{Numerical Implementation}
 
+
 \section{Geometrical consideration}
 
 \subsection{Coordinate system}
@@ -89,6 +90,7 @@ It may be noted that the matrices formed by the indices $i,j\in\{\theta,\psi,\va
 
 
 \section{The staggered mesh}
+
 
 In order to benefit from the first-order parallel derivative that separates the $A_\parallel$ and $j_\parallel$ from the other plasma fields $\Phi$, $n_e$, and $T_e$ (Eqs. \ref{eq:MagneticPotential} and \ref{eq:VorticityEquation}), these two variables are defined on a toroidally $\varphi$ and poloidally $\theta$ staggered grid. They are calculated at cell edges in the parallel direction and can be directly matched to the fluxes entering and leaving the collocated cells. One of the major benefits is to minimize numerical diffusion and preserve turbulent structures, following findings in FVM simulations for fluid mechanics \cite{meier1999comparison}. In the radial $\psi$ direction, we keep the collocated position as the only parallel gradient in $\psi$ comes from the flutter term, which in nature is much smaller than the equilibrium field. If the mesh were also staggered in $\psi$, we would face strong numerical radial diffusion of parallel fluxes, defying the motivation of a staggered grid for $A_\parallel$ and $j_\parallel$. \newline
 
@@ -307,9 +309,6 @@ Let us consider a staggered cell over the regular mesh, depicted in red in Fig. 
 \end{figure}
 
 
-
-
-
 \subsection{Discretization around the X-point}
 \label{ssec:DiscretizationXPt}
 
@@ -336,74 +335,17 @@ The staggered grid has direct implications on the estimation of fluxes around me
 
 
 
-\section{Implicit-explicit solving procedure}
+
+\section{Time discretization}
 
 The model uses an explicit time discretization for the advection terms and an implicit one for the diffusive terms. In turbulence simulations, we limit ourselves to timescales slower than the cyclotronic frequency $\omega_C$. This applies to all advection phenomena, as well as to friction, pressure, and energy source terms, which can then comfortably be solved explicitly in time. \newline
 
-However, ionization/recombination processes, resistive and viscous effects from the Spitzer-Härm model, and electron inertia involve much faster dynamics that would massively constrain the allowed timestep size. Therefore, these terms are solved implicitly. To reduce numerical complexity, they can be decoupled and solved sequentially for the density, the parallel velocity, the temperature, and finally the potentials. 
+However, ionization/recombination processes, resistive and viscous effects from the Spitzer-Härm model at collisional scales, electron inertia and Alfvén dynamics involve much faster dynamics then the ion cyclotronic time that would massively constrain the allowed timestep size. Therefore, all terms involving these effects are solved implicitly. To reduce numerical complexity, they can be decoupled and solved sequentially for the density, the parallel velocity, the temperature, and finally the vorticity system on the potentials. \\
 
-\subsection{Time discretization schemes}
-
-
-\subsubsection{Explicit Runge-Kutta solver}
-
-
-\subsubsection{Implicit-explicit VSIMEX solver}
-
-The time discretization is based on a variable stepsize implicit-explicit scheme (VSIMEX) \cite{wang2008variable}, associating explicit time discretization for the advection terms and an implicit one for the diffusive terms. In turbulence simulations, we limit ourselves to timescales slower than the cyclotronic frequency $\omega_C$. This applies to all advection phenomena, as well as to friction, pressure, and energy source terms, which can then comfortably be solved explicitly in time. \newline
-
+The time discretization is based on a variable stepsize implicit-explicit scheme (VSIMEX) \cite{wang2008variable}, associating explicit time discretization for the advection terms and an implicit one for the diffusive terms. In turbulence simulations, we limit ourselves to timescales slower than the cyclotronic frequency $\omega_C$. This applies to all advection phenomena, as well as to friction, pressure, and energy source terms, which can then comfortably be solved explicitly in time. \\
 
 This multi-step method is implemented for orders 1 to 3, and the timestep is updated such that fluxes and velocities in the simulation domain match a targeted CFL value. \newline
 
-
-
-\subsection{Initialization at Restart}
-\subsubsection{Electron Inertia}
-Use the steady-state Ohm's law from the exisiting profile in $\Phi$.
-
-\subsubsection{Parallel Magnetic Vector Potential}
-Solve for the steady-state Ampère's law with the now available profile in $\j_\parallel$. Creation of a new solver class for this purpose.
-
-
-\subsection{}
-
-
-\subsubsection{Finite volumes with flutter}
-
-The spatial discretization is based on a second-order conservative finite-volume scheme associated with a 3rd-order WENO reconstruction and Donat, Marquina fluxes for a modified Riemann solver for the advection terms to handle both shocks and complicated smooth solution structures \cite{tamain2016tokam3x, Bufferand2021}. \newline
-Each of the In this structure, flutter is treated equivalent to drift velocities. 
-
-
-
-\subsubsection{Parallel diffusion operator with flutter}
-\label{ssec:3DGunter}
-
-In the magnetostatic setting, the parallel diffusion operator on $v_i$ and $T_\alpha$ can be solved independently on each flux surface in a 2D system on the $\theta - \varphi$ plane. The scheme developed by Günter et al. \cite{gunter2005} has proven well-suited to solve the 2D parallel Laplacian equations with minimized numerical spread for highly anisotropic problems. For an operator of the type $\nabla \cdot (\kappa \nabla_\parallel \circ \mathbf{b} )$, parallel gradients are first calculated in cell corners with finite differences and then used in the fluxes across each cell face to get the divergence. The corners where gradients are calculated are shown in Figure \ref{fig:Gunter2D}. This scheme is particularly effective if the poloidal and toroidal components $b^\theta$ and $b^\varphi$ of the contravariant magnetic unit vector in the curvilinear metric have similar magnitudes. This is usually enforced through careful mesh generation. \newline
-
-However, with flutter (Sec. \ref{sec:flutter}), magnetic flux surfaces are no longer aligned to the $\theta - \varphi$ plane because of the new radial component $b^\psi$. As a consequence, all independent 2D problems across flux surfaces are now coupled into a single 3D problem. For the parallel diffusion solver, a first approach would be to extend the above scheme by calculating gradients in the 3D corners of our cells. However, the new component $b^\psi$ is a pure fluctuation, which is therefore expected to be much smaller than $b^\theta$ or $b^\varphi$ and can even vanish locally. This results in significant spurious numerical diffusion in the radial direction of equilibrium gradients. To prevent this diffusion, and still properly capture radial flutter gradients, only crossed derivatives $b^\theta b^\psi$ and $b^\varphi b^\psi$ as well as the principal radial diffusion $b^\psi b^\psi$ use gradients evaluated at 3D corners, while the equilibrium diffusion remains aligned to the $\theta - \varphi$ plane. Examples of the gradients used in this new scheme are shown in Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. The new discretization stencil then corresponds exactly to the equilibrium 2D stencil in the limit $b^\psi=0$. \newline
-
-\begin{figure}[!h]\centering
-	\begin{subfigure}[t]{0.32\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{schemes/Gunter2D.png}
-		\caption{ Gradients for the $\theta$-flux without flutter}
-		\label{fig:Gunter2D} 
-	\end{subfigure}
-	\begin{subfigure}[t]{0.32\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{schemes/Gunter3D_theta.png}
-		\caption{ Gradients for the $\theta$-flux with flutter}
-		\label{fig:Gunter3D_theta} 
-	\end{subfigure}
-	\begin{subfigure}[t]{0.32\textwidth}
-		\centering
-		\includegraphics[width=\textwidth]{schemes/Gunter3D_psi.png}
-		\caption{ Gradients for the $\psi$-flux with flutter}
-		\label{fig:GunterD_psi}
-	\end{subfigure}
-	\caption{Sketches showing the calculation of gradients for the parallel diffusion scheme. It shows the position where the different gradients are calculated that are relevant for a flux across the cell face with a solid line. Green and red arrows symbolize gradients in the equilibrium and in the radial direction, respectively.}
-	\label{fig:GunterStencils_flutter}
-\end{figure}
 
 
 
@@ -411,6 +353,7 @@ However, with flutter (Sec. \ref{sec:flutter}), magnetic flux surfaces are no lo
 
 
 \section{Electromagnetic vorticity system}
+
 
 The newly introduced fields $j_\parallel$ and $A_\parallel$ are solved implicitly along with the electric potential $\Phi$. As we face a coupled system that connects all points in the domain, direct solvers such as PASTIX are not suitable, especially for fine 3D meshes. We instead prefer to use iterative solvers available in the the PETSc or HYPRE libraries. For the original vorticity system, the Stabilized version of the Biconjugate Gradient method (BiCGStab) along with the Geometric Algebraic Multigrid (GAMG) preconditionner proved to be very efficient and it is desirable to use them on the new systems. This section describes some special numerical features in the construction of the system to facilitate the convergence of the above iterative scheme. \autoref{ssec:equilibrationBLockMatrices} introduces specific row and column scaling to equilibrate the blocks in the new system and \autoref{ssec:StaggeredFieldsMatrix} describes how to handle staggered fields to be compatible with the iterative scheme.
 
@@ -452,14 +395,8 @@ Due to the large size of the system, it must be resolved using iterative solvers
 
 \subsubsection{Staggered Fields in the Matrix}
 \label{ssec:StaggeredFieldsMatrix}
+
 The GAMG multigrid solves the system on different coarser levels by restricting the matrix and the RHS vector and then interpolates the solution back to the finer levels. In the new system, two consecutive entries belong to different fields, which makes the whole restriction-interpolation task obsolete from the very first level since neither the solution nor the matrix entries are similar between neighbours. In general, PETSc takes care of multiple fields in a coupled system if one defines a block size (in our case either 2 or 3) that indicates GAMG how to match corresponding entries.vim  However, as seen in \autoref{ssec:SpatialDiscretization}, the fields $A_\parallel$ and $j_\parallel$ are defined on a staggered grid in poloidal and toroidal directions as opposed to the collocated field for $\Phi$. For the system it means that at each wall in negative directions (at the left target and for non-axisymmetric geometries), a line and column for $\Phi$ exists but not for the two other fields. This in turn is problematic for GAMG as the blocks are globally defined and two different fields would again end up together and the total system size might even not be a multiple of the blocksize (2 resp. 3), which at all prevents the initialization of the preconditioner. \\
-
-
-\subsection{Treatment of flutter}
-
-\subsubsection{Parallel diffusion on $\Phi$}
-For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the position of the green gradients in Fig. \ref{fig:GunterStencils_flutter}. \newline
-
 
 
 
@@ -631,6 +568,67 @@ From these expressions for the condition number, we observe a degradation as the
 \end{figure}
 
 Overall, electromagnetic models exhibit a higher condition number. In particular, at larger timestep sizes or higher perpendicular resolutions, $\kappa$ increases significantly due to the third and fourth exponents in the second term of Eq. \ref{eq:Impl_conditionNumberElectromagneticVorticitySystem}. However, electron inertia positively affects the condition number. This is especially evident as $\eta_\parallel$ approaches zero in Fig. \ref{fig:Impl_conditionNumber_eta}, where neglecting the electron mass results in a sharp increase in $\kappa$, while electron inertia allows for a stable, low $\kappa$. Similarly, for low timestep sizes and resolutions, $m_e$ improves the system, such that for lower ranges, the electromagnetic system with inertia performs better than the electrostatic system without inertia.
+
+
+
+
+
+\section{Numerical treatment of flutter}
+
+In our perturbative approach, flutter introduces a radial component to the magnetic field. As the meshing remains aligned to the equilibrium field, the unit magnetic field has now an additional non-zero contravariant component $b^\psi$ in the curvilinear metric. We must hence extend all parallel operators in the code to consider it. Flutter also has a poloidal and a (small) toroidal component, but these are much less problematic to treat as they can be added to the equilibrium components:
+
+\begin{align}
+	b^\theta &= b_{eq}^\theta + \tilde{b}^\theta & b^\varphi &= b_{eq}^\varphi + \tilde{b}^\varphi
+\end{align}
+
+and the code proceeds as usual. \\ 
+
+In this section, we describe how the radial magnetic field has been included in all parallel operators, namely in the advection scheme, the implicit diffusion problems on viscosity and heat and, crucially, the electromagnetic vorticity system.
+
+
+\subsection{Finite volumes with flutter}
+
+The spatial discretization is based on a second-order conservative finite-volume scheme associated with a 3rd-order WENO reconstruction and Donat, Marquina fluxes for a modified Riemann solver for the advection terms to handle both shocks and complicated smooth solution structures \cite{tamain2016tokam3x, Bufferand2021}. \newline
+Each of the In this structure, flutter is treated equivalent to drift velocities. 
+
+
+
+\subsection{Parallel diffusion operator with flutter}
+\label{ssec:3DGunter}
+
+In the magnetostatic setting, the parallel diffusion operator on $v_i$ and $T_\alpha$ can be solved independently on each flux surface in a 2D system on the $\theta - \varphi$ plane. The scheme developed by Günter et al. \cite{gunter2005} has proven well-suited to solve the 2D parallel Laplacian equations with minimized numerical spread for highly anisotropic problems. For an operator of the type $\nabla \cdot (\kappa \nabla_\parallel \circ \mathbf{b} )$, parallel gradients are first calculated in cell corners with finite differences and then used in the fluxes across each cell face to get the divergence. The corners where gradients are calculated are shown in Figure \ref{fig:Gunter2D}. This scheme is particularly effective if the poloidal and toroidal components $b^\theta$ and $b^\varphi$ of the contravariant magnetic unit vector in the curvilinear metric have similar magnitudes. This is usually enforced through careful mesh generation. \\
+
+However, with flutter (Sec. \ref{ssec:S3X_flutter}), magnetic flux surfaces are no longer aligned to the $\theta - \varphi$ plane because of the new radial component $b^\psi$. As a consequence, all independent 2D problems across flux surfaces are now coupled into a single 3D problem. For the parallel diffusion solver, a first approach would be to extend the above scheme by calculating gradients in the 3D corners of our cells. However, the new component $b^\psi$ is a pure fluctuation, which is therefore expected to be much smaller than $b^\theta$ or $b^\varphi$ and can even vanish locally. This results in significant spurious numerical diffusion in the radial direction of equilibrium gradients. To prevent this diffusion, and still properly capture radial flutter gradients, only crossed derivatives $b^\theta b^\psi$ and $b^\varphi b^\psi$ as well as the principal radial diffusion $b^\psi b^\psi$ use gradients evaluated at 3D corners, while the equilibrium diffusion remains aligned to the $\theta - \varphi$ plane. Examples of the gradients used in this new scheme are shown in Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. The new discretization stencil then corresponds exactly to the equilibrium 2D stencil in the limit $b^\psi=0$. \newline
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{schemes/Gunter2D.png}
+		\caption{ Gradients for the $\theta$-flux without flutter}
+		\label{fig:Gunter2D} 
+	\end{subfigure}
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{schemes/Gunter3D_theta.png}
+		\caption{ Gradients for the $\theta$-flux with flutter}
+		\label{fig:Gunter3D_theta} 
+	\end{subfigure}
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{schemes/Gunter3D_psi.png}
+		\caption{ Gradients for the $\psi$-flux with flutter}
+		\label{fig:GunterD_psi}
+	\end{subfigure}
+	\caption{Sketches showing the calculation of gradients for the parallel diffusion scheme. It shows the position where the different gradients are calculated that are relevant for a flux across the cell face with a solid line. Green and red arrows symbolize gradients in the equilibrium and in the radial direction, respectively.}
+	\label{fig:GunterStencils_flutter}
+\end{figure}
+
+
+
+\subsection{Parallel diffusion on $\Phi$}
+
+For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the position of the green gradients in Fig. \ref{fig:GunterStencils_flutter}.
+
 
  
 

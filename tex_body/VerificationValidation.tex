@@ -2,7 +2,7 @@
 \section{Verification by the Method of manufactured solutions}
 To ensure the correctness of the newly implemented system with the magnetic vector potential $A_\parallel$, a test model has been set up with the method of manufactured solutions (MMS) \cite{ManufacturedSolution}. This allows to directly compare the numerical and analytic solutions and therefore validate the implementation and verify the order of convergence of the numerical operators. 
 
-\subsection{Test system}
+\subsection{Test set-up}
 The MMS test model is a fraction of a torus with a circular cross-section with an inner radius of 0.48m, an outer radius of 2.72m and a simulated plasma edge width of 0.64m. An example of the 3D mesh geometry is shown in \autoref{fig:MMSModelScheme}. To test the information exchange between zones in the model topology from \autoref{ssec:SpatialDiscretization}, each coordinate direction is split in two zones totaling to 8 zones.
 
 \begin{figure}[H]
@@ -41,7 +41,7 @@ $$ g_{ij} = \vec{e}_i\cdot\vec{e}_j
 	1 & 0 & 0 \\ 0 & \psi^2 & 0 \\ 0 & 0 & R^2
 \end{bmatrix} \qquad \text{and} \qquad J = \sqrt{\det[g_{ij}]} = \psi R$$
  
-As generally required by S3X, the magnetic field is axisymmetric and thus does not depend on the toroidal coordinate $\varphi$. By construction, it only has a poloidal and a toroidal component but no radial component, which are given in \autoref{eq:MMSMagneticField}.
+As generally required in SOLEDGE3X, the magnetic field is axisymmetric and thus does not depend on the toroidal coordinate $\varphi$. By construction, it only has a poloidal and a toroidal component but no radial component, which are given in \autoref{eq:MMSMagneticField}.
 
 \begin{equation}
 	\label{eq:MMSMagneticField}
@@ -52,9 +52,9 @@ As generally required by S3X, the magnetic field is axisymmetric and thus does n
 \end{equation}
 
 The magnetic field parameters are chosen such that the ratio of toroidal over poloidal magnetic field strength is $aR_0B_0/\Psi_0 = 12$. 
-Tests have been performed on various mesh geometries in the scope of S3X from a perfectly regular grid with equally spaced cells in all coordinate directions to the distorted mesh depicted above. As the program can be either executed in a 2D or 3D mode with adapted stencils and geometry calculations, MMS tests have been developed for both scenarios.
+Tests have been performed on various mesh geometries in the scope of SOLEDGE3X from a perfectly regular grid with equally spaced cells in all coordinate directions to the distorted mesh depicted above. As the program can be either executed in a 2D or 3D mode with adapted stencils and geometry calculations, MMS tests have been developed for both scenarios.
 
-\subsection{Analytic solution}
+\subsection{Electromagnetic vorticity equation}
 
 We are interested in the vorticity system on the electric potential $\Phi$ and the parallel magnetic vector potential $A_\parallel$. We postulate that their analytic form is: 
 \begin{align}
@@ -67,7 +67,7 @@ A similar expression is chosen for the densities $n_{i/e}$ and temperatures $T_{
 
 \begin{align}
 	&\begin{cases}
-		\partial_t\vec{\grad}\cdot\left(\frac{m_in_i}{B^2}\vec{\grad}_\perp\Phi\right) + \vec{\grad}\cdot\sigma_\parallel \left(\grad_\parallel\Phi\vec{b}+\partial_t A_\parallel\right) &= \partial_t \Omega_\pi + \vec{\grad}\cdot\sigma_\parallel\left( + \frac{T_e}{e}\grad_\parallel \log(n_e)\vec{b} + \frac{1.71}{e}\grad_\parallel T_e\vec{b}\right)  - S^{MMS}_\Phi \\
+		\partial_t\vec{\grad}\cdot\left(\frac{m_in_i}{B^2}\vec{\grad}_\perp\Phi\right) + \vec{\grad}\cdot\sigma_\parallel \left(\grad_\parallel\Phi+\partial_t A_\parallel\right)\vec{b} &= \partial_t \Omega_\pi + \vec{\grad}\cdot\sigma_\parallel\left( + T_e\grad_\parallel \log(n_e) + 1.71\grad_\parallel T_e\right)\vec{b} - S^{MMS}_\Phi \\
 		\qquad \vec{\grad}\cdot\left(\vec{\grad}_\perp A_\parallel\vec{b}\right) - \mu_0 \sigma_\parallel \left( \grad_\parallel \Phi + \partial_t A_\parallel\right)&= -\mu_0 \sigma_\parallel \left(\frac{T_e}{e}\grad_\parallel \log(n_e) + \frac{1.71}{e}\grad_\parallel T_e\right) - S^{MMS}_{A_\parallel}
 	\end{cases} \nonumber \\
 	&\Omega_\pi = \vec{\grad}\cdot\left(\frac{m_i}{Z_iB^2}\vec{\grad}_\perp[nT]\right)
@@ -77,16 +77,8 @@ A similar expression is chosen for the densities $n_{i/e}$ and temperatures $T_{
 The main difference to the original system of equations in \autoref{eq:vorticityEquation_electromagnetic} are the MMS source terms $S^{MMS}_\Phi$ and $S^{MMS}_{A_\parallel}$. They contain the analytic evaluation of all other time-independant terms in the respective line of the equation. The derivatives on curvilinear coordinates can be calculated analytically with the metric theory discussed in \autoref{ssec:MetricCurvilinearCoordinates}. Boundary conditions are enforced by a penalty method on the boundary cell layer where the two quantities are set to their analytic expression. The MMS system is initialized with the analytic expressions for $\Phi$ and $A_\parallel$ in \autoref{eq:MMSAnalyticFormPhiAPara} and uniquely the vorticity equation is solved for one timestep. We are in a steady state, so the numerical solution after the first timestep should be equal to the initial state. \\
 One drawback of a steady state system is that time derivatives are always assumed to vanish and terms such as $\Omega_\pi$, the perpendicular Laplacian of $\Phi$ or the divergence of $A_\parallel$ are not confronted to their analytic form. To catch these terms, we add the vorticity $\Omega$ to the MMS system and include it in the subsequent analysis. It is initialized with its analytic form:
 $$ \Omega = \Omega_\pi + \vec{\grad}\cdot\left(\frac{m_in_i}{B^2}\vec{\grad}_\perp\Phi\right) + \vec{\grad}\cdot\sigma_\parallel A_\parallel $$
-and then calculated numerically after the first timestep. This allows to compare a numerical and an analytic form of the vorticity and hence all terms in \autoref{eq:MMSTestSystem}.
+and then calculated numerically after the first timestep. This allows to compare a numerical and an analytic form of the vorticity and hence all terms in \autoref{eq:MMSTestSystem}. The relative $L_2$ for the 2D and 3D implementations of the vorticity system are shown in Fig. \ref{fig:MMSTorturedVortAParaConvergence}. The dashed line indicates the ideal slope of second order convergence, and we observe that the errors decrease with a close match to the expected convergence as the resolution increases. This verifies the correct implementation of the vorticity equation in the SOLEDGE3X framework. 
 
-\subsection{Order of convergence}
-- \\
-- \\
-- \\
-Describe \\
-- \\
-- \\
-- \\
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
@@ -101,15 +93,46 @@ Describe \\
 		\subcaption{3D system}
 		\label{fig:MMSTorturedVortAPara3DConvergence}
 	\end{subfigure}
-	\caption{Relative error between the initial plasma and the solution after one timestep. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$ (resp. $N_{tot}^{2D} = 4\cdot X^2$). The dashed lines indicate the slope of the ideal 2nd order convergence}
+	\caption{Relative error between the initial plasma and the solution after one timestep for the electromagnetic vorticity system. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$ (resp. $N_{tot}^{2D} = 4\cdot X^2$). The dashed lines indicate the slope of the ideal 2nd order convergence}
 	\label{fig:MMSTorturedVortAParaConvergence}
 \end{figure}
-- \\
-- \\
-this beautiful graph \\ - \\ - \\ Thanks.
 
 
-\section{Linear Analysis}
+\subsection{Parallel heat diffusion with flutter}
+
+A second row of tests affects is dedicated to the correct implementation of the radial magnetic field that originates from flutter. The most critical new code component in that regard are the implicit parallel diffusion equations for heat and viscosity. For that purpose, we consider the heat diffusion equation for electrons and ions:
+
+
+To the equilibrium field we add a radial component, which, in line with the realistic occurrence in the model, fluctuates around 0. 
+
+\begin{equation}
+		B_\psi =  = 0.1 B_0 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}})
+\end{equation}
+
+
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaSystem_grid2_2D.png}
+		\subcaption{2D system}
+		\label{fig:MMSTorturedFlutterDiffPara2DConvergence}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaSystem_grid2_3D.png}
+		\subcaption{3D system}
+		\label{fig:MMSTorturedFlutterDiffPara3DConvergence}
+	\end{subfigure}
+	\caption{Relative error between the initial plasma and the solution after one timestep for the parallel heat diffusion system with flutter. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$ (resp. $N_{tot}^{2D} = 4\cdot X^2$). The dashed lines indicate the slope of the ideal 2nd order convergence}
+	\label{fig:MMSTorturedFlutterDiffParaConvergence}
+\end{figure}
+
+
+
+
+\section{Validation on linear systems}
 
 .... 
 \subsection{Pure advection}

@@ -1,13 +1,16 @@
 \chapter{Description of Plasmas}
 \label{chap:PlasmaSimulations}
 
+
+The difficulty in obtaining global experimental measurements in tokamaks requires complementary numerical simulations. Currently, these numerical data are essential to complement experimental measurements and support their interpretation. In the longer term, they will be used to make predictions and support the design of ITER experiments. Self-consistent simulations of the plasma edge are challenged by a complex geometry and the variety of involved scales. The magnetic equilibrium exhibits both open and closed magnetic field lines, breaking the toroidal symmetry. Turbulent fluctuations typically have sizes on the order of the ion gyroradius $\rho_\alpha$ ($\ge 0.4\, \text{mm}$) \cite{hennequin2004} in the perpendicular direction to the magnetic field lines, and compete with phenomena occurring along them on the order of the parallel connection length $\propto q_s R_0$ (where $q_s$ is the safety factor, and $R_0$ the tokamak major radius), which can extend up to 100 meters. \\
+
 This chapter presents the different approaches to describe plasma self-consistently. In a first section \ref{sec:desc_modelHierarchy}, we explain the steps how the Lorentz force can be successively rewritten in a kinetic equation, and as conservation equations on mean plasma quantities. We extend the discussion in Sec. \ref{sec:edge_driftWaves} to drift-reduced fluid models that are commonly used for turbulent plasma simulations of the tokamak edge. Finally, we analyze in Sec. \ref{sec:edge_DAW} from a theoretical point of view the impact of electromagnetic effects on drift-wave turbulence in our models. 
 
 
 \section{A hierarchy of models}
 \label{sec:desc_modelHierarchy}
 
-Plasmas can be modeled using various sets of equations that trade off between accuracy and computational feasibility. Generally, more accurate models are prohibitively expensive and are beyond the capabilities of current high-performance computing (HPC) infrastructure when applied to large systems. In this chapter, we introduce the major approaches that are used nowadays, with a special care to highlight how they are connected and where they differ. The most comprehensive approach in Sec. \ref{sec:desc_directDesciption} rely on plasma particles themselves or their statistical distribution. From there, the Chapman-Enskog expansion in Sec. \ref{sec:desc_fluidMoments} allows to express conservation equations on averaged plasma quantities and lay the foundations for fluid models. Finally, MHD models in Sec. \ref{sec:desc_MHD} offer a framework to combine those conservation equations with the evolution of electromagnetic properties of the plasma. 
+Plasmas can be modeled using various sets of equations that trade off between accuracy and computational feasibility. Generally, more accurate models are prohibitively expensive and are beyond the capabilities of current high-performance computing (HPC) infrastructure when applied to large systems. Depending on the scientific objective, high-fidelity models will accurately capture physical processes while reduced models complement this with full-scale simulations at relevant time scales. In this chapter, we introduce the major approaches that are used nowadays, with a special care to highlight how they are connected and where they differ. The most comprehensive approach in Sec. \ref{sec:desc_directDesciption} rely on plasma particles themselves or their statistical distribution. From there, the Chapman-Enskog expansion in Sec. \ref{sec:desc_fluidMoments} allows to express conservation equations on averaged plasma quantities and lay the foundations for fluid models. Finally, MHD models in Sec. \ref{sec:desc_MHD} offer a framework to combine those conservation equations with the evolution of electromagnetic properties of the plasma. 
 
 \subsection{Direct description of Plasma Particles}
 \label{sec:desc_directDesciption}
@@ -33,13 +36,18 @@ As a further abstraction, an ensemble of particles can be described statisticall
 	\pdv{f}{t} + \mathbf{v} \cdot \nabla_{\mathbf{x}} f + \frac{\mathbf{F}}{m} \cdot \nabla_{\mathbf{v}} f = C_{\text{coll}} + C_{\text{other}}
 \end{equation}
 where $C_{\text{coll}}$ represents the collision operator, handling Coulomb collisions as introduced in Sec. \ref{sec:intro_collisions}, and $C_{\text{other}}$ includes additional source terms. Substituting the force vector $\mathbf{F}$ with the Lorentz force (Eq. \ref{eq:desc_particle}) yields the Vlasov equation. \newline
+
 To achieve sufficient accuracy, approximately $N_x = 10^9$ spatial discretization points and $N_\sigma = 10^6$ points for the distribution function are required. Considering that both position and velocity have three components each, this results in $6 \cdot 10^{15}$ degrees of freedom—significantly fewer than in the particle description. \newline
+
 Further simplification is achieved through the gyrokinetic approach. While particles in a plasma predominantly follow magnetic field lines, their motion forms a helical trajectory characterized by the Larmor frequency and radius:
+
 \begin{equation}
 	\omega_L = \frac{qB}{m} \qquad\qquad l_L = \frac{mv_\perp}{qB}
 \end{equation}
-This allows the elimination of one degree of freedom in the distribution function, as the velocity can be described by its parallel component $v_\parallel$ along the magnetic field line and its perpendicular component $v_\perp$. This simplification is valid only when the Larmor frequency and radius are much smaller than any characteristic frequency or length in the system, which is typically true in the core of the tokamak but not in the scrape-off layer (SOL), where the gyrokinetic approach is less suitable.
 
+This allows the elimination of one degree of freedom in the distribution function, as the velocity can be described by its parallel component $v_\parallel$ along the magnetic field line and its perpendicular component $v_\perp$. This simplification is valid only when the Larmor frequency and radius are much smaller than any characteristic frequency or length in the system, which is typically true in the core of the tokamak but not in the scrape-off layer (SOL), where the gyrokinetic approach is less suitable. \\
+
+Gyrokinetic models are particularly useful to study transport barriers and turbulence driven by ion and electron temperature gradients (ITG/ETG) or trapped electron mode (TEM) instabilities and typically use full-\textit{f} turbulence models. The code GYSELA\cite{grandgirard2007global,grandgirard20165d} follows a semi-Lagrangian method to study core turbulence, zonal flows an neoclassical transport and is capable of relatively long simulated plasma times. Plasma-wall interactions and kinetic neutrals make XGC\cite{hager2022} particularly well-suited for edge and SOL turbulence. It allowed for comprehensive divertor heat exhaust studies\cite{chang2017gyrokinetic} and is capable of complex 3D magnetic configurations found in stellarators\cite{cole2019verification}. The Eulerian code GENE-X\cite{goerler2011global,michels2021gene} is ideal for full-\textit{f} electromagnetic simulations of turbulence at multiple scale in the core-edge region. 
 
 
 \subsection{Three Fluid Moments of the Kinetic Equation}
@@ -69,7 +77,7 @@ where $\mathbf{u}$ is the fluid velocity and $m$ the particle mass. This framewo
 
 
 
-\subsubsection{Mass Balance (\textit{k} = 0)}
+\subsubsection{Mass conservation (\textit{k} = 0)}
 
 Starting from Eq. \ref{eq:BoltzmannEquationKineticDescription}, the mass balance equation for the unknowns $n$ and $\mathbf{u}$ is derived as follows:
 \begin{equation}
@@ -78,7 +86,7 @@ Starting from Eq. \ref{eq:BoltzmannEquationKineticDescription}, the mass balance
 \end{equation}
 This equation provides one relation but involves four unknowns, necessitating additional equations to fully describe the system. The term $S_n$ accounts for particle sources arising from non-elastic collisions in $C_{\text{other}}$, such as ionization or recombination processes.
 
-\subsubsection{Momentum Balance (\textit{k} = 1)}
+\subsubsection{Momentum conservation (\textit{k} = 1)}
 
 For the first moment equation, we multiply the Boltzmann equation \ref{eq:BoltzmannEquationKineticDescription} by $\mathbf{v}$ and integrate over the velocity space, yielding:
 \begin{equation}
@@ -99,7 +107,7 @@ Substituting this into the first moment equation, we obtain the conservation equ
 \end{equation}
 Here, $S_u$ represents the momentum source term, and $R$ accounts for friction, both arising from $C_{\text{coll}}$ and $C_{\text{other}}$.
 
-\subsubsection{Energy Balance (\textit{k} = 2)}
+\subsubsection{Energy conservation (\textit{k} = 2)}
 \label{ssec:desc_energyBalance}
 Finally, to solve for the static pressure tensor $\boldsymbol{P}$, we assume isotropic pressure in the plasma, simplifying the pressure tensor to a scalar pressure $p$ such that $\boldsymbol{P} = p \boldsymbol{I}$. This reduces the nine unknowns in $\boldsymbol{P}$ to a single scalar $p$. Given that $p = nT$, the second moment can be expressed as an energy conservation equation. The total energy density $\varepsilon$ is the sum of kinetic and thermal energy in the plasma:
 \begin{equation}
@@ -148,9 +156,6 @@ The terms enclosed in boxes represent the additional terms required for extendin
 Fast waves, in particular, pose challenges for numerical modeling as they require very small timesteps and implicit methods to be accurately resolved. The full MHD model introduces two additional dispersive waves into the system.
 
 
-
-
-
 \subsubsection{Reduced MHD model}
 \label{ssec:desc_reducedMHD}
 To eliminate the fast magnetoacoustic waves and to reduce the size of the system, physicists often resort to reduced MHD models. Instead of solving for all components of $\mathbf{B}$, we decompose the magnetic field into the the polodial flux $\Psi$ and the toroidal field function $F$ as in Eq. \ref{eq:intro_BeqMagneticFluxes}. The toroidal field $B_\varphi$ and $F$ are imposed, so we only remain with the unknown scalar $\Psi$ to replace the three unknowns of $\mathbf{B}$. As a reminder from Sec. \ref{sec:intro_GradShafranov}, $\Psi$ is equivalent to the toroidal component $A_\varphi$ of the magnetic vector potential and uniquely defines the poloidal field $B_p$. Consequently, Ampère's law \ref{eq:desc_MHDamperelaw} reduces to: 
@@ -168,7 +173,9 @@ In the second simplification for the reduced MHD model, the velocity vector is d
 	u_\parallel &= \mathbf{B}\cdot\mathbf{u} \\
 \end{align}
 
-This projection is consequently applied to all terms in the momentum conservation equation \ref{eq:desc_MHDmomentum}, that can then be solved independently for both velocities. In addition to reducing the number of equations from three to two, it permits to split the slow magnetoacoustic waves, that propagate at sound speed in the parallel directions, from the much slower dynamics in the poloidal plane that consist of electric and diamagnetic drifts (A proper introduction to the various plasma drifts will be given in the next chapter). 
+This projection is consequently applied to all terms in the momentum conservation equation \ref{eq:desc_MHDmomentum}, that can then be solved independently for both velocities. In addition to reducing the number of equations from three to two, it permits to split the slow magnetoacoustic waves, that propagate at sound speed in the parallel directions, from the much slower dynamics in the poloidal plane that consist of electric and diamagnetic drifts. \\
+
+The JOREK code\cite{huysmans2007mhd,hoelzl2021jorek} for example is a fully implicit simulation framework that includes several levels of MHD reduction. It works on diverted magnetic configuration and considers advanced SOL physics. It is mainly used to study the dynamics, cycles and control of edge-localized modes (ELMs), as well as disruptions in form of thermal and current quenches. 
 
 
 \subsubsection{Fluid closures}
@@ -206,10 +213,8 @@ The coefficient $\delta_\alpha$ describes the thermal diffusion of particles dri
 \section{Drift-reduced models for plasma turbulence}
 \label{sec:edge_driftWaves}
 
-The difficulty in obtaining global experimental measurements in tokamaks requires complementary numerical simulations. Currently, these numerical data are essential to complement experimental measurements and support their interpretation. In the longer term, they will be used to make predictions and support the design of ITER experiments. Self-consistent simulations of the plasma edge are challenged by a complex geometry and the variety of involved scales. The magnetic equilibrium exhibits both open and closed magnetic field lines, breaking the toroidal symmetry. Turbulent fluctuations typically have sizes on the order of the ion gyroradius $\rho_\alpha$ ($\ge 0.4\, \text{mm}$) \cite{hennequin2004} in the perpendicular direction to the magnetic field lines, and compete with phenomena occurring along them on the order of the parallel connection length $\propto q_s R_0$ (where $q_s$ is the safety factor, and $R_0$ the tokamak major radius), which can extend up to 100 meters. \\
 
-
-In this context, kinetic models based on the particle distribution function \cite{DifPradalier_2009, Charidakos_2018} are still limited to fundamental studies because of their very high numerical cost in a (5) 6-dimensional phase space. Thus, when realistic configurations are considered, reduced-dimension (2D/3D) fluid models remain the only feasible option for studying transport and turbulence at the edge of the plasma, although they are only rigorously valid in collisional regimes. A wide range of models have been derived in the literature and implemented in state-of-the-art codes \cite{DUDSON_2009, giacomin2022gbs, stegmeir2019} (see also an exhaustive presentation in the recent review by Schwander et al. \cite{SCHWANDER_2024}). The basic assumption they share is that the turbulence is characteristically low frequency and long wavelength in nature, leading to a strong scale separation between the parallel and perpendicular directions to the magnetic field. Therefore, the plasma fluid motion perpendicular to the magnetic field can be described explicitly by the so-called velocity drifts given by the quasi-static balance between Lorentz force, pressure gradient, and electromotive force due to magnetic and electric field inhomogeneities. \\
+Kinetic models based on the particle distribution function \cite{DifPradalier_2009, Charidakos_2018} are still limited to fundamental studies because of their very high numerical cost in a (5) 6-dimensional phase space. Thus, when realistic configurations are considered, reduced-dimension (2D/3D) fluid models remain the only feasible option for studying transport and turbulence at the edge of the plasma, although they are only rigorously valid in collisional regimes. A wide range of models have been derived in the literature and implemented in state-of-the-art codes \cite{DUDSON_2009, giacomin2022gbs, stegmeir2019} (see also an exhaustive presentation in the recent review by Schwander et al. \cite{SCHWANDER_2024}). The basic assumption they share is that the turbulence is characteristically low frequency and long wavelength in nature, leading to a strong scale separation between the parallel and perpendicular directions to the magnetic field. Therefore, the plasma fluid motion perpendicular to the magnetic field can be described explicitly by the so-called velocity drifts given by the quasi-static balance between Lorentz force, pressure gradient, and electromotive force due to magnetic and electric field inhomogeneities. \\
 
 We first explain in Sec. \ref{ssec:edge_driftOrdering} how drifts allow to formulate the drift-ordering assumption, which is at the root of fluid models. The section is concluded in \ref{ssec:edge_linearDriftWaves} with an overview onver the instabilities caught by the model. 
 
@@ -418,7 +423,7 @@ Leddy et al. \cite{leddy2015validity} compared the linear behavior of drift-redu
 
 Numerous studies have demonstrated the electromagnetic effects on edge dynamics, both on blob dynamics in simple geometries \cite{lee2015, Stepanenko_2020}, and on turbulence and transport properties in real tokamak geometries \cite{zhu2023, zholobenko_2024}. Their impact increases with $\beta$ and can become crucial, particularly when approaching the L-H transition or in large machines like ITER operating in the high confinement mode (H-mode)\cite{zholobenko_2024}. In these electromagnetic models, magnetic fluctuations are explicitly determined by Ampère's and Ohm’s laws \cite{DUDSON_2009, Ricci_2012, dudson2015, stegmeir2019, giacomin2022gbs, zhang2024}. Thus, electron inertia is retained, and magnetic effects occur both through magnetic induction and flutter. 
 
-Magnetic induction is captured by the time derivative of the parallel vector potential $A_\parallel$, which is principally a linear phenomenon, with the Coulomb gauge $E_\parallel = - \grad_\parallel \Phi - \partial_t A_\parallel$, such that fluctuations in the electrostatic potential induce magnetic fluctuations. Magnetic flutter\cite{callen_1977}, on the other hand, refers to additional transport by magnetic fluctuations appearing through the perturbed parallel gradient such as $A_\parallel = (\boldsymbol{b} + \boldsymbol{\tilde{B}}/B) \cdot \nabla$ (where $\boldsymbol{b}$ is the equilibrium magnetic field unit vector and $\boldsymbol{\tilde{B}} = \nabla \times (\tilde{A}_\parallel \boldsymbol{b})$), involving purely nonlinear phenomena. However, up to very recently, most studies did not discuss these effects \cite{DUDSON_2009}, their implementation being motivated by improving numerical stability when using explicit time solvers \cite{stegmeir2019, giacomin2022gbs}. 
+Magnetic induction is captured by the time derivative of the parallel vector potential $A_\parallel$, which is principally a linear phenomenon, with the Coulomb gauge $E_\parallel = - \grad_\parallel \Phi - \partial_t A_\parallel$, such that fluctuations in the electrostatic potential induce magnetic fluctuations. Magnetic flutter\cite{callen_1977}, on the other hand, refers to additional transport by magnetic fluctuations appearing through the perturbed parallel gradient such as $A_\parallel = (\boldsymbol{b} + \boldsymbol{\tilde{B}}/B) \cdot \nabla$ (where $\boldsymbol{b}$ is the equilibrium magnetic field unit vector and $\boldsymbol{\tilde{B}} = \nabla \times (\tilde{A}_\parallel \boldsymbol{b})$), involving purely nonlinear phenomena. However, up to very recently, most studies did not discuss these effects, as pure electrostatic simulations are very difficult to achieve with their explicit time solvers \cite{stegmeir2019, giacomin2022gbs} and the consequent high constraints on the timestep size. \\
 
 
 One particular interaction we want to study is the impact of electromagnetic effects on edge plasma turbulence. Shear Alfvén waves have already been introduced above, however they travel at much higher speeds than drift waves. In this section, we focus more on drift-Alfvén waves, which appear with the presence of a magnetic induction term in the non-adiabatic response. We then discuss the nonlinear impact of fluctuations of the magnetic equilibrium on the plasma.
@@ -599,85 +604,8 @@ it is interesting to discuss how the electromagnetic terms modify the characteri
 
 The resistive terms do not contribute to a change of frequency. 
 
-This discussion is only valid in cases where $\rho_L^2k_\perp^2$ is small and hence $\omega_{DAW}$ is close to the diamagnetic frequency $\omega_*$. This is not necessarily the case everywhere in the edge, and in the next section we consider numerically the raw dispersion relation.
+This discussion is only valid in cases where $\rho_L^2k_\perp^2$ is small and hence $\omega_{DAW}$ is close to the diamagnetic frequency $\omega_*$. 
 
 
-
-\subsubsection{Electromagnetic mode excitation}
-\label{ssec:edge_DAW_modeExcitation}
-
-The objective of this section is to analyze the impact of electromagnetic terms on drift-wave turbulence within the linearized system. Specifically, we compare the effects of a finite electron mass (EI-inert), electromagnetic induction with electron mass (EM), and electromagnetic induction with both flutter and electron mass (EM-flutter) in comparison to the baseline electrostatic case. The dispersion relation from Eq. \ref{eq:edge_DAWdispersionRelation} is adjusted to each of the four scenarios and solved exactly using the Python library SymPy for symbolic computation. Notably, we use the full dispersion relation without applying the simplifications used in the previous section's discussion.
-
-Given the coupled nature system, there are several complex solutions for $\omega$ for each scenario, where each corresponds to a different mode. In Fig. \ref{fig:edge_modalBehavior}, the real and imaginary components of all modes are plotted as functions of the perpendicular wave number $k_\perp$, with typical parameters for a mid-sized tokamak. The real component $\omega_R$ represents the wave phase frequency, while the imaginary component $\gamma$ describes the growth or damping rate of each mode. A positive $\gamma$ indicates an unstable mode with exponential growth, whereas a negative $\gamma$ corresponds to a stable mode that is damped over time.
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[t]{0.85\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
-		\subcaption{Electrostatic system}
-		\label{fig:edge_modesES}
-	\end{subfigure}
-\end{figure}
-\begin{figure}[H]
-	\ContinuedFloat
-	\centering
-	\begin{subfigure}[t]{0.85\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/modes_ES-inert.jpg}
-		\subcaption{Electrostatic system with electron inertia}
-		\label{fig:edge_modesEI}
-	\end{subfigure}
-\end{figure}
-\begin{figure}[H]
-	\ContinuedFloat
-	\centering
-	\begin{subfigure}[t]{0.85\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/modes_EM.jpg}
-		%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
-		\subcaption{Electromagnetic system}
-		\label{fig:edge_modesEM}
-	\end{subfigure}
-\end{figure}
-\begin{figure}[H]
-	\ContinuedFloat
-	\centering
-	\begin{subfigure}[t]{0.85\textwidth}
-		\centering
-		%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
-		\includegraphics[width=1\textwidth]{schemes/modes_EM-flutter.jpg}
-		\subcaption{Electromagnetic system with flutter}
-		\label{fig:edge_modesFlutter}
-	\end{subfigure}
-	\caption{Dependency on the perpendicular wavenumber $k_\perp$ of the real and imaginary parts of the all solutions $\omega$ to the dispersion relation \ref{eq:edge_DAWdispersionRelation}. Except for $k_\perp$, all other values derive from: $B = 1$T, $n = 2\cdot10^{19}$m$^{-3}$, $T = 100$eV, $\lambda_p = 0.1$m and $k_\parallel = 0.6$m$^{-1}$. On a pair of graphs, a given color represents the same mode. In the left plots for $\Re{\omega}$, characteristic frequencies of the system are shown for reference ("--" diamagnetic $\omega_*$,"$\cdots$" electron sound $\omega_{s,e}$, "-$\cdot$-" Alfvén $\omega_A$).} 
-	\label{fig:edge_modalBehavior}
-\end{figure}
-
-In the green curve, we observe the characteristic drift-wave frequency, which initially follows the diamagnetic frequency $\omega_*$ in the lower $k_\perp$ limit and reaches its maximum at $k_\perp \rho_L = 1$, before declining again. When the electron inertia term is introduced, a new mode emerges, starting at a significantly higher frequency before stabilizing at the electron sound frequency $\omega_{s,e} = v_{th,e} k_\parallel$. The introduction of electromagnetic terms governs the behavior of the new modes in the lower $k_\perp$ limit, which are then bounded by the shear Alfvén phase velocity. Qualitatively, the phase frequencies exhibit similar characteristics with or without flutter, with the primary difference being a more pronounced separation between the two modes as they transition from $\omega_A$ to $\omega_{s,e}$ in the pure induction. Overall, the characteristic frequencies of the electromagnetic modes are several orders of magnitude higher than the drift-wave frequency.
-
-Looking at the growth rates associated with the modes, we first observe that drift waves are unstable with strong positive growth rates where the frequency is maximal, consistent with the earlier discussion about drift-wave instabilities. On the other hand, electromagnetic (and electron inertial) modes are very stable, showing strong negative $\gamma$. If one intends to study the growth and propagation of turbulent structures and their global impact, Alfvénic modes will only marginally contribute. It is hence possible to avoid the numerical costs involved with the high-frequency modes without much loss of accuracy.
-
-It is more important to consider the effects of electromagnetic contributions on the drift-wave mode. For this purpose, Fig. \ref{fig:edge_comparisonDW} compares the real and imaginary parts of the drift-wave modes in the three electromagnetic scenarios with those in the electrostatic scenario.
-
-\begin{figure}[H]
-	\centering
-	\begin{subfigure}[t]{0.45\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/comparison_DW_real.png}
-		\subcaption{Real component}
-		\label{fig:edge_comparisonDWreal}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.45\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/comparison_DW_imag.png}
-		\subcaption{Imaginary component}
-		\label{fig:edge_comparisonDWimag}
-	\end{subfigure}
-	\caption{Relative difference of drift-wave frequency in the electromagnetic scenarios to the reference electrostatic case.} 
-	\label{fig:edge_comparisonDW}
-\end{figure}
-
-The real part is altered by the electromagnetic additions, but the change of phase frequency will only have a minor impact on production cases. On the other hand, the growth rate increases with electron inertia and even more with electromagnetic induction. Electromagnetic flutter on the other largely mitigates the instabilities, and can even reduce the growth rate observed in electrostatic drift waves.
 
 
