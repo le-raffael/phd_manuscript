@@ -3,7 +3,7 @@
 To ensure the correctness of the newly implemented system with the magnetic vector potential $A_\parallel$, a test model has been set up with the method of manufactured solutions (MMS) \cite{ManufacturedSolution}. This allows to directly compare the numerical and analytic solutions and therefore validate the implementation and verify the order of convergence of the numerical operators. 
 
 \subsection{Test set-up}
-The MMS test model is a fraction of a torus with a circular cross-section with an inner radius of 0.48m, an outer radius of 2.72m and a simulated plasma edge width of 0.64m. An example of the 3D mesh geometry is shown in \autoref{fig:MMSModelScheme}. To test the information exchange between zones in the model topology from \autoref{ssec:SpatialDiscretization}, each coordinate direction is split in two zones totaling to 8 zones.
+The MMS test model is a fraction of a torus with a circular cross-section with an inner radius of 0.48m, an outer radius of 2.72m and a simulated plasma edge width of 0.64m. An example of the 3D mesh geometry is shown in Fig. \ref{fig:MMSModelScheme}. To test the information exchange between zones in the model topology from Sec. \ref{ssec:impl_meshDecomposition}, each coordinate direction is split in two zones totaling to 8 zones.
 
 \begin{figure}[H]
 	\centering
@@ -26,22 +26,22 @@ The MMS test model is a fraction of a torus with a circular cross-section with a
 In the MMS geometry, $\psi$ denotes the radius of the tube and $R$ the radius of the entire torus. If $aR_0=1.6$ is the distance of the tube center to the torus center, we have:
 $$  R = aR_0 + \psi\cdot\cos(\theta) $$
 Together with the poloidal coordinate $\theta\in[0,2\pi]$ and the toroidal coordinate $\varphi\in[0,2\pi/N_{div}]$ where $1/N_{div}$ is the considered fraction of the torus, each point in the domain is uniquely described by the curvilinear coordinates $[\psi,\theta,\varphi]$. 
-We can define some $\vec{P} = [X,Y,Z]^T$ in a cartesian basis of the 3D domain:
+We can define some $\mathbf{P} = [X,Y,Z]^T$ in a cartesian basis of the 3D domain:
 
 \begin{align*}
 	X &= R\cos(\varphi) &  Y &= \psi\cdot\sin(\theta)  &  Z &= R\sin(\varphi)
 \end{align*} 
-In this setting, the basis vectors of the curvilinear coordinates from \autoref{ssec:MetricCurvilinearCoordinates} can be calculated analytically. The covariant basis vectors are:
+In this setting, the basis vectors of the curvilinear coordinates from Sec. \ref{ssec:MetricCurvilinearCoordinates} can be calculated analytically. The covariant basis vectors are:
 \begin{align*}
-	\vec{e}_\psi &= \pdv{\vec{P}}{\psi} = \begin{bmatrix} \cos(\theta)\cos(\varphi) \\ \sin(\theta) \\ \cos(\theta)\sin(\varphi) \end{bmatrix} & \vec{e}_\theta &= \pdv{\vec{P}}{\theta} = \begin{bmatrix} -\psi\sin(\theta)\cos(\varphi) \\ \psi\cos(\theta) \\ -\psi\sin(\theta)\sin(\varphi) \end{bmatrix} & \vec{e}_\varphi &= \pdv{\vec{P}}{\varphi} = \begin{bmatrix} -Z \\ 0 \\ X \end{bmatrix}
+	\mathbf{e}_\psi &= \pdv{\mathbf{P}}{\psi} = \begin{bmatrix} \cos(\theta)\cos(\varphi) \\ \sin(\theta) \\ \cos(\theta)\sin(\varphi) \end{bmatrix} & \mathbf{e}_\theta &= \pdv{\mathbf{P}}{\theta} = \begin{bmatrix} -\psi\sin(\theta)\cos(\varphi) \\ \psi\cos(\theta) \\ -\psi\sin(\theta)\sin(\varphi) \end{bmatrix} & \mathbf{e}_\varphi &= \pdv{\mathbf{P}}{\varphi} = \begin{bmatrix} -Z \\ 0 \\ X \end{bmatrix}
 \end{align*}
 We can further calculate the metric coefficients:
-$$ g_{ij} = \vec{e}_i\cdot\vec{e}_j
+$$ g_{ij} = \mathbf{e}_i\cdot\mathbf{e}_j
 = \begin{bmatrix}
 	1 & 0 & 0 \\ 0 & \psi^2 & 0 \\ 0 & 0 & R^2
 \end{bmatrix} \qquad \text{and} \qquad J = \sqrt{\det[g_{ij}]} = \psi R$$
  
-As generally required in SOLEDGE3X, the magnetic field is axisymmetric and thus does not depend on the toroidal coordinate $\varphi$. By construction, it only has a poloidal and a toroidal component but no radial component, which are given in \autoref{eq:MMSMagneticField}.
+As generally required in SOLEDGE3X, the magnetic field is axisymmetric and thus does not depend on the toroidal coordinate $\varphi$. By construction, it only has a poloidal and a toroidal component but no radial component, which are given in Eq. \ref{eq:MMSMagneticField}.
 
 \begin{equation}
 	\label{eq:MMSMagneticField}
@@ -51,45 +51,64 @@ As generally required in SOLEDGE3X, the magnetic field is axisymmetric and thus 
 	\end{cases}
 \end{equation}
 
-The magnetic field parameters are chosen such that the ratio of toroidal over poloidal magnetic field strength is $aR_0B_0/\Psi_0 = 12$. 
-Tests have been performed on various mesh geometries in the scope of SOLEDGE3X from a perfectly regular grid with equally spaced cells in all coordinate directions to the distorted mesh depicted above. As the program can be either executed in a 2D or 3D mode with adapted stencils and geometry calculations, MMS tests have been developed for both scenarios.
+The magnetic field parameters are chosen such that the ratio of toroidal over poloidal magnetic field strength is $aR_0B_0/\Psi_0 = 12$. The conserved fields $n$, $\gamma$ and $T$ are pre-defined to sinusoidal functions on the grid for electrons and one ion species. 
+
+\begin{align}
+	n_\alpha &= 1  + 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}}) \\
+	\gamma_\alpha &= 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}}) \\
+	T_\alpha &= 1  + 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}})
+\end{align}
+
+Tests have been performed on various mesh geometries in the scope of SOLEDGE3X from a perfectly regular grid with equally spaced cells in all coordinate directions to the distorted mesh depicted above. As the program can be either executed in a 2D or 3D mode with adapted stencils and geometry calculations, MMS tests have been developed for both scenarios. \\
+
 
 \subsection{Electromagnetic vorticity equation}
 
-We are interested in the vorticity system on the electric potential $\Phi$ and the parallel magnetic vector potential $A_\parallel$. We postulate that their analytic form is: 
+We are interested in the vorticity system on the electric potential $\Phi$ and the parallel magnetic vector potential $A_\parallel$. As free variables, they are set to a similar expression as the conserved fields: 
 \begin{align}
-	\Phi =& \Phi_0 \left(1 + 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}}) \right) \\
-	A_\parallel =& A_{\parallel,0} \left(1 + 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}}) \right)
+	\Phi =& 1 + 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}}) \\
+	A_\parallel =& 1 + 0.1 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}})
 	\label{eq:MMSAnalyticFormPhiAPara}
 \end{align}
 
-A similar expression is chosen for the densities $n_{i/e}$ and temperatures $T_{i/e}$ that also contribute to the vorticity equation. The entire form of the test equation is:
+The vorticity $\Omega$ and the parallel current $j_\parallel$ depend on the free fields and are initialized according to their definitions, where the derivatives on curvilinear coordinates can be calculated analytically with the metric theory discussed in Sec. \ref{ssec:MetricCurvilinearCoordinates} using Maple. 
 
 \begin{align}
-	&\begin{cases}
-		\partial_t\vec{\grad}\cdot\left(\frac{m_in_i}{B^2}\vec{\grad}_\perp\Phi\right) + \vec{\grad}\cdot\sigma_\parallel \left(\grad_\parallel\Phi+\partial_t A_\parallel\right)\vec{b} &= \partial_t \Omega_\pi + \vec{\grad}\cdot\sigma_\parallel\left( + T_e\grad_\parallel \log(n_e) + 1.71\grad_\parallel T_e\right)\vec{b} - S^{MMS}_\Phi \\
-		\qquad \vec{\grad}\cdot\left(\vec{\grad}_\perp A_\parallel\vec{b}\right) - \mu_0 \sigma_\parallel \left( \grad_\parallel \Phi + \partial_t A_\parallel\right)&= -\mu_0 \sigma_\parallel \left(\frac{T_e}{e}\grad_\parallel \log(n_e) + \frac{1.71}{e}\grad_\parallel T_e\right) - S^{MMS}_{A_\parallel}
-	\end{cases} \nonumber \\
-	&\Omega_\pi = \vec{\grad}\cdot\left(\frac{m_i}{Z_iB^2}\vec{\grad}_\perp[nT]\right)
-	\label{eq:MMSTestSystem}
+	\Omega =& \grad\cdot\left(\frac{m_i}{Z_iB^2}\grad_\perp[nT] + \frac{m_in_i}{B^2}\grad_\perp\Phi\right) \\ 
+	j_\parallel =& \sigma_\parallel \left(-\grad_\parallel\Phi + T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e\right)
 \end{align}
 
-The main difference to the original system of equations in \autoref{eq:vorticityEquation_electromagnetic} are the MMS source terms $S^{MMS}_\Phi$ and $S^{MMS}_{A_\parallel}$. They contain the analytic evaluation of all other time-independant terms in the respective line of the equation. The derivatives on curvilinear coordinates can be calculated analytically with the metric theory discussed in \autoref{ssec:MetricCurvilinearCoordinates}. Boundary conditions are enforced by a penalty method on the boundary cell layer where the two quantities are set to their analytic expression. The MMS system is initialized with the analytic expressions for $\Phi$ and $A_\parallel$ in \autoref{eq:MMSAnalyticFormPhiAPara} and uniquely the vorticity equation is solved for one timestep. We are in a steady state, so the numerical solution after the first timestep should be equal to the initial state. \\
-One drawback of a steady state system is that time derivatives are always assumed to vanish and terms such as $\Omega_\pi$, the perpendicular Laplacian of $\Phi$ or the divergence of $A_\parallel$ are not confronted to their analytic form. To catch these terms, we add the vorticity $\Omega$ to the MMS system and include it in the subsequent analysis. It is initialized with its analytic form:
-$$ \Omega = \Omega_\pi + \vec{\grad}\cdot\left(\frac{m_in_i}{B^2}\vec{\grad}_\perp\Phi\right) + \vec{\grad}\cdot\sigma_\parallel A_\parallel $$
-and then calculated numerically after the first timestep. This allows to compare a numerical and an analytic form of the vorticity and hence all terms in \autoref{eq:MMSTestSystem}. The relative $L_2$ for the 2D and 3D implementations of the vorticity system are shown in Fig. \ref{fig:MMSTorturedVortAParaConvergence}. The dashed line indicates the ideal slope of second order convergence, and we observe that the errors decrease with a close match to the expected convergence as the resolution increases. This verifies the correct implementation of the vorticity equation in the SOLEDGE3X framework. 
+Let us consider a slightly simplified version of the electromagnetic system in Eq. \ref{eq:S3X_vorticityEquation_FullElectromagnetic} without additional currents from the charge balance, advection terms of $j_\parallel$ or anomalous parallel diffusion. As the domain is fully periodic in parallel direction and no sheath boundaries are present to fix the potential, Dirichlet boundary conditions force the fields $\Phi$ and $A_\parallel$ to their initial values at the two radial boundaries and the system becomes uniquely solvable. 
+
+\begin{equation}
+	\begin{cases}
+		\partial_t\Omega + \grad\cdot\sigma_\parallel \left(\grad_\parallel\Phi + \beta_0\partial_t A_\parallel + \frac{m_e}{n_e}\partial_t j_\parallel\right)\mathbf{b} &= \grad\cdot\sigma_\parallel\left(T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e\right)\mathbf{b} + S^{MMS}_\Phi \\
+		\grad\cdot\left(\grad_\perp A_\parallel\mathbf{b}\right) - \sigma_\parallel \left( \grad_\parallel \Phi + \beta_0\partial_t A_\parallel + \frac{m_e}{n_e}\partial_t j_\parallel\right)&= -\sigma_\parallel\left(T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e\right) + S^{MMS}_{A_\parallel}
+	\end{cases}
+	\label{eq:MMSTestSystem}
+\end{equation}
+
+The MMS source terms $S^{MMS}_\Phi$ and $S^{MMS}_{A_\parallel}$ contain the analytic value of all time-independent terms in the respective line of the equation. The vorticity equation is then solved for one timestep, and if the implementation is correct, the system should maintain a steady state. One drawback of a steady state system is that time derivatives are always assumed to vanish and terms such as the perpendicular Laplacian of $\Phi$, $j_\parallel$ or the divergence of $A_\parallel$ are not confronted to their analytic form in the source term $S^{MMS}$. To catch these terms, it is important to consider the full expression of the vorticity $\Omega$ as its initial value contains the analytic terms. \\
+
+The system is run for exactly one timestep where only the discretization error modifies the values of the fields. This allows to compare a numerical and an analytic form of the vorticity and confront all terms in Eq. \ref{eq:MMSTestSystem} to their expected values. To measure the error, we calculate the root mean square error $\epsilon_d$ of the solution $X$ to the initial, analytic field $X_{ana}$:
+
+\begin{equation}
+	\epsilon_d = \sqrt{\frac{1}{N}\sum\left(X-X_{ana}\right)^2}
+\end{equation}
+
+where we sum the residual for each point in the domain excluding the imposed Dirichlet boundaries. To quantify the discretization error, we run the same simulation on increasingly high spatial resolutions and compare the error to the coarsest case. Second order stencils were used in the implementation, so we expect that the error reduces by a factor 4 when the resolution is doubled in a direction. The errors for the 2D and 3D implementations of the vorticity system are shown in Fig. \ref{fig:MMSTorturedVortAParaConvergence}. The dashed line indicates the ideal slope of second order convergence, and we observe that the errors decrease with a close match to the expected convergence as the resolution increases. This verifies the correct implementation of the vorticity equation in the SOLEDGE3X framework. 
 
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaSystem_grid2_2D.png}
+		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaJParaSystem_grid1_2D.png}
 		\subcaption{2D system}
 		\label{fig:MMSTorturedVortAPara2DConvergence}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
-		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaSystem_grid2_3D.png}
+		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaJParaSystem_grid2_3D.png}
 		\subcaption{3D system}
 		\label{fig:MMSTorturedVortAPara3DConvergence}
 	\end{subfigure}
@@ -100,32 +119,25 @@ and then calculated numerically after the first timestep. This allows to compare
 
 \subsection{Parallel heat diffusion with flutter}
 
-A second row of tests affects is dedicated to the correct implementation of the radial magnetic field that originates from flutter. The most critical new code component in that regard are the implicit parallel diffusion equations for heat and viscosity. For that purpose, we consider the heat diffusion equation for electrons and ions:
+A second row of tests affects is dedicated to the correct implementation of the radial magnetic field that originates from flutter. The most critical new code component in that regard are the implicit parallel diffusion equations for heat and viscosity. For that purpose, we consider a very reduced energy conservation equation for electrons and ions, that effectively only remains with the parallel heat conduction from the Spitzer-Härm model. 
 
+\begin{align}
+	\partial_t \left( \frac{3}{2} n_e T_e                                          \right) &= \vec{\nabla}\cdot\left(\kappa_0 T_e^{5/2} \nabla_\parallel T_e \vec{b}\right) + S_{T_e}^{MMS} \\
+	\partial_t \left( \frac{3}{2} n_i T_i + \frac{1}{2} \frac{m_i}{n_i} \gamma_i^2 \right) &= \vec{\nabla}\cdot\left(\kappa_0 T_i^{5/2} \nabla_\parallel T_i \vec{b}\right) + S_{T_i}^{MMS} 
+\end{align}
 
-To the equilibrium field we add a radial component, which, in line with the realistic occurrence in the model, fluctuates around 0. 
+The simulation set-up follows the same model as for the test on the vorticity equation as the sources are calculated analytically to maintain a steady-state and radial Dirichlet boundaries are imposed. The main novelty here is the addition of a radial component in the magnetic field, whose contravariant form is given by:
 
 \begin{equation}
-		B_\psi =  = 0.1 B_0 \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}})
+	b^\psi =\frac{ 0.01}{B_{eq}} \cos(\theta)\cos(\frac{\varphi}{N_{div}})\sin(2\pi \frac{\psi-\psi_{min}}{\psi_{max} - \psi_{min}})
 \end{equation}
 
-
+To be as realistic as possible with the real flutter, it is scaled by the magnitude of the equilibrium field (and not the total field) and takes both positive and negative values to adequately address the fluctuating nature of flutter. It allows to test the new 3D parallel diffusion operator from Sec. \ref{ssec:impl_3DGunter} and challenges it to the crucial case where $b^\psi$ tends to zero. The simulation was only run on the 3D MMS mesh, as it is the only effectively relevant use case. The root mean square error is shown in Fig. \ref{fig:MMSTorturedFlutterDiffParaConvergence} for both temperatures, and we can still observe a satisfying agreement with the expected second order convergence.
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaSystem_grid2_2D.png}
-		\subcaption{2D system}
-		\label{fig:MMSTorturedFlutterDiffPara2DConvergence}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/err_rel_vortAParaSystem_grid2_3D.png}
-		\subcaption{3D system}
-		\label{fig:MMSTorturedFlutterDiffPara3DConvergence}
-	\end{subfigure}
-	\caption{Relative error between the initial plasma and the solution after one timestep for the parallel heat diffusion system with flutter. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$ (resp. $N_{tot}^{2D} = 4\cdot X^2$). The dashed lines indicate the slope of the ideal 2nd order convergence}
+	\includegraphics[width=0.6\textwidth]{schemes/err_rel_paradif_Brad_grid2_3D.png}
+	\caption{Relative error between the initial plasma and the solution after one timestep for the parallel 3D heat diffusion system with flutter. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$. The dashed lines indicate the slope of the ideal 2nd order convergence}
 	\label{fig:MMSTorturedFlutterDiffParaConvergence}
 \end{figure}
 
@@ -140,19 +152,19 @@ A first step to verify the correct physical behaviour of the simulation would be
 For this objective we set up a simplistic plasma model on a rectangular 2D SLAB topology. Periodic boundary conditions in all directions allow to properly observe wave propagation without any inference at the domain boundaries. In an isothermal hydrogen plasma without source terms and drifts, the governing equations then simplify to:
 
 \begin{align}
-	\partial_t n_i + \vec{\grad}\cdot\left(n_i\vec{u}_i\right) &= 0 \label{eq:AdvectionLinearAnalysis_ionMass} \\
+	\partial_t n_i + \grad\cdot\left(n_i\mathbf{u}_i\right) &= 0 \label{eq:AdvectionLinearAnalysis_ionMass} \\
 	n_e &= n_i \label{eq:AdvectionLinearAnalysis_quasiNeutrality} \\
-	\partial_t \left(m_in_iu_\parallel\right) + \vec{\grad}\cdot\left(m_in_iu_\parallel u_i\right) &= -2T_e\vec{\grad}_\parallel n_e \label{eq:AdvectionLinearAnalysis_parallelMomentumBalance}
+	\partial_t \left(m_in_iu_\parallel\right) + \grad\cdot\left(m_in_iu_\parallel u_i\right) &= -2T_e\grad_\parallel n_e \label{eq:AdvectionLinearAnalysis_parallelMomentumBalance}
 \end{align}
 
-In this simple plasma, only the density and the velocity evolve over time and depend on each other. The electric potential $\Phi$ can also be computed and observed, but it does not interfere with the system because the parallel electric field in the momentum balance \autoref{eq:AdvectionLinearAnalysis_parallelMomentumBalance} is calculated from the electron pressure gradient $E_\parallel = (\vec{\grad}_\parallel p_e + R_e) / n_e$. \\
+In this simple plasma, only the density and the velocity evolve over time and depend on each other. The electric potential $\Phi$ can also be computed and observed, but it does not interfere with the system because the parallel electric field in the momentum balance Eq. \ref{eq:AdvectionLinearAnalysis_parallelMomentumBalance} is calculated from the electron pressure gradient $E_\parallel = (\grad_\parallel p_e + R_e) / n_e$. \\
 
 To perform the linear analysis of the system, we assume that field variables such as the velocity or density respect some Fourier solution as sum of several wave modes with respective amplitudes $\tilde{X}_{\omega,k_\perp,k_\parallel}$:
 \begin{equation}
 	 X = \bar{X} + \hat{X} = X_0 + \sum\tilde{X}_{\omega,k_\perp,k_\parallel}e^{i(-\omega t + k_\perp \psi + k_\parallel \theta)} \label{eq:FourierModeSolution}
 \end{equation}
 
-Electron and ion density are identical because of the quasi-neutrality assumption in \autoref{eq:AdvectionLinearAnalysis_quasiNeutrality}. Since we do not consider any drifts the radial component $u_\psi$ of the velocity vector vanishes. Further, the mean density is $\bar{n}=n_0$ while the mean velocity $\bar{u}_\theta$ is zero. Because we are only interested in a first order approximation of the solution, we neglect all higher-order mixed fluctuating terms. Thus, \autoref{eq:AdvectionLinearAnalysis_ionMass} and \autoref{eq:AdvectionLinearAnalysis_parallelMomentumBalance} transform to:
+Electron and ion density are identical because of the quasi-neutrality assumption in Eq. \ref{eq:AdvectionLinearAnalysis_quasiNeutrality}. Since we do not consider any drifts the radial component $u_\psi$ of the velocity vector vanishes. Further, the mean density is $\bar{n}=n_0$ while the mean velocity $\bar{u}_\theta$ is zero. Because we are only interested in a first order approximation of the solution, we neglect all higher-order mixed fluctuating terms. Thus, Eq. \ref{eq:AdvectionLinearAnalysis_ionMass} and Eq. \ref{eq:AdvectionLinearAnalysis_parallelMomentumBalance} transform to:
 
 \begin{align*}
 	&&-i\omega\hat{n} + i\bar{n}k_\parallel\hat{u}_\theta + i\bar{u}_\theta k_\parallel\hat{n} &= 0 &\Leftrightarrow&& \hat{u}_\theta &= \frac{\omega}{n_0k_\parallel}\hat{n} \\
@@ -165,7 +177,7 @@ Both are combined to obtain a dispersion relation for the frequency $\omega$:
 	&\Leftrightarrow&& \omega &= \pm\sqrt{\frac{2T}{m}}k_\parallel \label{eq:AdvectionLinearAnalysis_dispersionRelation}
 \end{align}
 
-It is apparent that both solutions for $\omega$ are real therefore non-decaying waves traveling with the speed of sound $c_s = \sqrt{2T/m}$ appear. The perpendicular wave mode does not contribute to the equation so a 1D system along the poloidal axis is sufficient to simulate the behaviour. Both the electron and the ion density are initialized with one sinusoidal perturbation and \autoref{fig:AdvectionSLAB_densityEvolution} shows their evolution. The electron velocity in \autoref{fig:AdvectionSLAB_velocityEvolution} responds to this initial excitation with a shifted standing wave with same frequency. 
+It is apparent that both solutions for $\omega$ are real therefore non-decaying waves traveling with the speed of sound $c_s = \sqrt{2T/m}$ appear. The perpendicular wave mode does not contribute to the equation so a 1D system along the poloidal axis is sufficient to simulate the behaviour. Both the electron and the ion density are initialized with one sinusoidal perturbation and Fig. \ref{fig:AdvectionSLAB_densityEvolution} shows their evolution. The electron velocity in Fig. \ref{fig:AdvectionSLAB_velocityEvolution} responds to this initial excitation with a shifted standing wave with same frequency. 
 
 \begin{figure}[H]
 	\centering
@@ -191,7 +203,7 @@ It is apparent that both solutions for $\omega$ are real therefore non-decaying 
 	\label{fig:AdvectionSLAB}
 \end{figure}
 
-The system is initialized with one wavemode along the "poloidal" length of $L=100$m so the wavenumber here is $k_\parallel = 2\pi / L \approx 0.0628$. The plasma temperature is kept constant at $T = 100$eV and the mass of a deuterium atom equals to $m_i \approx 3.34\cdot 10^{-27}$kg, so we can expect a system frequency of $\omega\approx 978$Hz from the dispersion relation in \autoref{eq:AdvectionLinearAnalysis_dispersionRelation}. This corresponds precisely to the main frequency peak in \autoref{fig:AdvectionSLAB_FFT} and thus acoustic waves appear in the system as expected. The smaller peaks at higher frequency modes are however not physical and are likely due to numerical noise as their appearance highly depends on the spatial and temporal resolution and their intensity increases for longer simulations. 
+The system is initialized with one wavemode along the "poloidal" length of $L=100$m so the wavenumber here is $k_\parallel = 2\pi / L \approx 0.0628$. The plasma temperature is kept constant at $T = 100$eV and the mass of a deuterium atom equals to $m_i \approx 3.34\cdot 10^{-27}$kg, so we can expect a system frequency of $\omega\approx 978$Hz from the dispersion relation in Eq. \ref{eq:AdvectionLinearAnalysis_dispersionRelation}. This corresponds precisely to the main frequency peak in Fig. \ref{fig:AdvectionSLAB_FFT} and thus acoustic waves appear in the system as expected. The smaller peaks at higher frequency modes are however not physical and are likely due to numerical noise as their appearance highly depends on the spatial and temporal resolution and their intensity increases for longer simulations. 
 
 
 \subsection{Electrostatic case}
@@ -238,7 +250,7 @@ The time integration of this system can only be performed by solving the implici
 	\label{fig:electrostaticSLAB}
 \end{figure}
 
-The uniform decay can be clearly seen between \autoref{fig:electrostaticSLAB_initialProfile_PHI} and \autoref{fig:electrostaticSLAB_endProfile_PHI}. It remains to investigate whether the observed attenuation matches the expected decay rate $\lambda$. A Fourier transformation as to determine oscillatory modes for the standing acoustic waves in the previous section is not of great help here, instead we use a non-linear least squares to fit the time evolution of $\Phi(t)$ at an arbitrary point in the domain except the grounded point. We fit the parameters $\Phi_0$, $\lambda$ and $C$ from \autoref{eq:electrostaticSLABdecay} to the simulation data and compare the hence estimated $\lambda$ to the theoretical decay rate for the given initial wave. \autoref{fig:electrostaticSLAB_decayRateFit} shows that there is a strong agreement between the theoretical and fitted decay rates for a large array of domain configurations. The wavenumbers $k_\parallel$ and $k_\perp$ were modified by changing the poloidal respectively the radial size of the domain with always the first wave mode spanning the entire domain. We can safely claim that the original electrostatic implementation produces the expected physical behaviour.
+The uniform decay can be clearly seen between Fig. \ref{fig:electrostaticSLAB_initialProfile_PHI} and Fig. \ref{fig:electrostaticSLAB_endProfile_PHI}. It remains to investigate whether the observed attenuation matches the expected decay rate $\lambda$. A Fourier transformation as to determine oscillatory modes for the standing acoustic waves in the previous section is not of great help here, instead we use a non-linear least squares to fit the time evolution of $\Phi(t)$ at an arbitrary point in the domain except the grounded point. We fit the parameters $\Phi_0$, $\lambda$ and $C$ from Eq. \ref{eq:electrostaticSLABdecay} to the simulation data and compare the hence estimated $\lambda$ to the theoretical decay rate for the given initial wave. Fig. \ref{fig:electrostaticSLAB_decayRateFit} shows that there is a strong agreement between the theoretical and fitted decay rates for a large array of domain configurations. The wavenumbers $k_\parallel$ and $k_\perp$ were modified by changing the poloidal respectively the radial size of the domain with always the first wave mode spanning the entire domain. We can safely claim that the original electrostatic implementation produces the expected physical behaviour.
 
 \subsection{Electromagnetic case}
 While acoustic waves are characteristic for a physical medium, Alfvén waves dominate oscillations of ions within a magnetic field. The motion occurs in direction of the magnetic field lines where the ion mass accounts for the inertia and the magnetic field tension for the restoring wave force. The Alfvén wave group velocity for a species $i$ is given by:
@@ -247,19 +259,19 @@ While acoustic waves are characteristic for a physical medium, Alfvén waves dom
 	v_A = \frac{B}{\sqrt{m_in_i\mu_0}} \label{eq:AlfvenGroupVelocity}
 \end{equation}
 
-With the new parallel magnetic vector potential $A_\parallel$ into the vorticity \autoref{eq:vorticityEquation_electromagnetic} Alfvén waves should appear in the simulation and the aim of this section is to prove their existence. We follow the same approach as in the previous section for the electrostatic case and reduce the system to the strict necessary minimum and keep following equations: 
+With the new parallel magnetic vector potential $A_\parallel$ into the vorticity Eq. \ref{eq:vorticityEquation_electromagnetic} Alfvén waves should appear in the simulation and the aim of this section is to prove their existence. We follow the same approach as in the previous section for the electrostatic case and reduce the system to the strict necessary minimum and keep following equations: 
 \begin{align}
 	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] &= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA_\parallel\right) \label{eq:electromagneticSLAB_PHI} \\
 	\Delta_{\perp}A_\parallel &= -\mu_0\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA_\parallel\right) \label{eq:electromagneticSLAB_APara}
 \end{align}
 
-We ignore any kind of advection phenomena thus all densities $n_{i/e}$ and temperatures $T_{i/e}$ keep their initial uniform distributions their gradients vanish. If we perform the linear analysis of the remaining system we get following relation for \autoref{eq:electromagneticSLAB_PHI}:
+We ignore any kind of advection phenomena thus all densities $n_{i/e}$ and temperatures $T_{i/e}$ keep their initial uniform distributions their gradients vanish. If we perform the linear analysis of the remaining system we get following relation for Eq. \ref{eq:electromagneticSLAB_PHI}:
 \begin{align*}
 	&&i\frac{m_in_i}{B^2}k_\perp^2\omega\hat{\Phi} &= \sigma_\parallel k_\parallel^2\hat{\Phi}-\sigma_\parallel k_\parallel\omega\hat{A}_\parallel \\
 	&\Leftrightarrow& \hat{A}_\parallel &= \left(\frac{k_\parallel}{\omega} - i\frac{m_in_ik_\perp^2}{\sigma_\parallel B^2k_\parallel}\right)\hat{\Phi}
 \end{align*}
 
-and for \autoref{eq:electromagneticSLAB_APara}:
+and for Eq. \ref{eq:electromagneticSLAB_APara}:
 \begin{align*}
 	&&-k_\perp^2\hat{A}_\parallel &= i\mu_0\sigma_\parallel k_\parallel\hat{\Phi} - i\mu_0\sigma_\parallel\omega\hat{A}_\parallel \\
 	&\Leftrightarrow&\hat{A}_\parallel &= \frac{\mu_0\sigma_\parallel k_\parallel}{\mu_0\sigma_\parallel\omega + i k_\perp^2}\hat{\Phi}
@@ -302,7 +314,7 @@ and the system frequency:
 In the case that the damping term is much smaller than the oscillatory term (if for instance the parallel wave mode dominates over the perpendicular one), $\omega$ is a real number and the system frequency only depends on the Alvén group velocity and we should be able to observe pure Alfvén waves.
 $$ \omega_0 = v_A k_\parallel$$
 
-In \autoref{eq:electromagneticSLAB_overdampedDecayRate} and \autoref{eq:electromagneticSLAB_underdampedFrequency} we see that there are two possible solution for the decay rate respectively the oscillation frequency. This does not conflict with our assumed wave solution which has been defined in \autoref{eq:FourierModeSolution} as the sum of several Fourier modes and each solution here contributes to one mode. 
+In Eq. \ref{eq:electromagneticSLAB_overdampedDecayRate} and Eq. \ref{eq:electromagneticSLAB_underdampedFrequency} we see that there are two possible solution for the decay rate respectively the oscillation frequency. This does not conflict with our assumed wave solution which has been defined in Eq. \ref{eq:FourierModeSolution} as the sum of several Fourier modes and each solution here contributes to one mode. 
  
 As in the electrostatic case from the previous section, the just described system is not invertible and $\Phi$ is defined up to a constant. Grounding the potential in one single point is however not a suitable solution here because it deteriorates the condition number of the vorticity matrix past solvability. Instead two other approaches will be followed to check if simulations can reproduce the expected physical behaviour. 
 
@@ -327,9 +339,9 @@ As in the electrostatic case from the previous section, the just described syste
 %	\label{fig:electromagneticGroundedSLAB_system}
 %\end{figure}
 %
-%In the simulations with a grounded line, the initial wave solution has been applied to the vorticity field $\Omega$ to prevent steep gradients and instabilities if it was done on $\Phi$ directly. Very soon, the two potentials $\Phi$ and $A_\parallel$ respond to this initial excitation and a wave profile appears as depicted in \autoref{fig:electromagneticSLAB_initialProfile_A}. The line of grounded points in the middle of the domain however breaks the wave which then smoothly lines up with the equilibrium point $\Phi_0 = 0V$ and $A_{\parallel,0} = 0Tm$ around the grounded line. At this point it may be emphasized that only the electric potential $\Phi$ is grounded, but as both potential fields are strongly coupled the grounded line affects $A_\parallel$ equally. We thus have a wave that is guided between two poloidal grounded lines (remember that the domain is periodic in radial direction) so by construction the system cannot account for radial dynamics. If we consider a point that is furthest away from the grounded line (e.g. any point on the domain boundary in the example above) we might still be able to observe some expected physical behaviour. At first glance, if we track $A_\parallel$ in one point over time as in \autoref{fig:electromagneticSLAB_evolution_A}, a decaying oscillation appears which is in line with the here dominant underdamped regime. 	
+%In the simulations with a grounded line, the initial wave solution has been applied to the vorticity field $\Omega$ to prevent steep gradients and instabilities if it was done on $\Phi$ directly. Very soon, the two potentials $\Phi$ and $A_\parallel$ respond to this initial excitation and a wave profile appears as depicted in Fig. \ref{fig:electromagneticSLAB_initialProfile_A}. The line of grounded points in the middle of the domain however breaks the wave which then smoothly lines up with the equilibrium point $\Phi_0 = 0V$ and $A_{\parallel,0} = 0Tm$ around the grounded line. At this point it may be emphasized that only the electric potential $\Phi$ is grounded, but as both potential fields are strongly coupled the grounded line affects $A_\parallel$ equally. We thus have a wave that is guided between two poloidal grounded lines (remember that the domain is periodic in radial direction) so by construction the system cannot account for radial dynamics. If we consider a point that is furthest away from the grounded line (e.g. any point on the domain boundary in the example above) we might still be able to observe some expected physical behaviour. At first glance, if we track $A_\parallel$ in one point over time as in Fig. \ref{fig:electromagneticSLAB_evolution_A}, a decaying oscillation appears which is in line with the here dominant underdamped regime. 	
 %
-%First we investigate the underdamped scenario by opposing simulation results to the expected damping rates $\lambda$ and frequencies $\omega_0$. As for the previous electromagnetic we fit the four free parameters in \autoref{eq:electromagneticSLAB_underdampedSolution} to simulation data with a nonlinear least squares method. With 1000 sample points we get a high fitting fidelity with a relative standard deviation of the order of $10^{-9}$ and the difference if the fit is performed on $\Phi$ or $A_\parallel$ has about the same magnitude. 
+%First we investigate the underdamped scenario by opposing simulation results to the expected damping rates $\lambda$ and frequencies $\omega_0$. As for the previous electromagnetic we fit the four free parameters in Eq. \ref{eq:electromagneticSLAB_underdampedSolution} to simulation data with a nonlinear least squares method. With 1000 sample points we get a high fitting fidelity with a relative standard deviation of the order of $10^{-9}$ and the difference if the fit is performed on $\Phi$ or $A_\parallel$ has about the same magnitude. 
 %
 %\begin{figure}[H]
 %	\centering
@@ -357,7 +369,7 @@ As in the electrostatic case from the previous section, the just described syste
 %\subsubsection{Diagonal perturbation}
 %Another approach that
 % 
-%\autoref{eq:electromagneticSLAB_PHI} on the potential is then replaced by:
+%Eq. \ref{eq:electromagneticSLAB_PHI} on the potential is then replaced by:
 %\begin{equation*}
 %	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] + \varepsilon \Phi= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA\right) + \varepsilon \Phi_e
 %\end{equation*}

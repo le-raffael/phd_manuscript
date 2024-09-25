@@ -447,8 +447,6 @@ If we decompose the electrostatic vorticity system in the same way, this system 
 	\end{cases}
 \end{align}
 
-
-
 However such systems tend to be numerically hard to solve and one common approach ---cite--- is to replace the zero-side side of the algebraic equation by the time derivative of the algebraic variable with a small coefficient, which effectively transforms the system into a (stiff) ODE. Exactly this has been done in the new formulation of \autoref{eq:S3X_vorticityEquation_ElectronInertia} with the further benefit that the $j_\parallel$ has a physical meaning.
 
 Let us now consider the electromagnetic system with electron inertia, magnetic induction and flutter. The full vorticity system is then given by: 
@@ -460,7 +458,7 @@ Let us now consider the electromagnetic system with electron inertia, magnetic i
 		j_\parallel + \frac{\sigma_\parallel m_e}{n_e}\left[\partial_t j_\parallel + \grad\cdot\left(j_\parallel\mathbf{u}_e\right)\right] =& \sigma_\parallel \left(-\grad_\parallel\Phi + T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e\right) \\ 
 		& - \left(\beta_0\partial_t A_\parallel + \beta_0\mathfrak{D}_A \right) \\		
 		& + \frac{\sigma_\parallel m_e}{n_e}\left[\sum_iZ_i\left[\grad\cdot\left(\gamma_i\mathbf{u}_e \right) + \partial_t \gamma_i\right] - \mathfrak{D}_j^e\right] \\
-		\grad\cdot\grad_\perp A_\parallel& = -j_\parallel
+		\hspace{3cm}\grad\cdot\grad_\perp A_\parallel =& -j_\parallel
 	\end{cases}
 \end{equation}
 

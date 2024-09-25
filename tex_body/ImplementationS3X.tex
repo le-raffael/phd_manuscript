@@ -22,7 +22,7 @@ In the base $(\boldsymbol{e}_{\psi}, \boldsymbol{e}_{\theta}, \boldsymbol{e}_{\v
 
 
 \subsection{Domain decomposition and mesh design}
-
+\label{ssec:impl_meshDecomposition}
 In order to keep a structured flux-surfaces aligned mesh for any magnetic equilibrium, the real domain is mapped into a Cartesian domain decomposed into multiple connected zones \cite{tamain2016tokam3x}. Each point of the domain is distinctly identified by the set of curvilinear coordinates $[\psi, \theta, \varphi]$ defined in Sec. \ref{ssec:Implementation_CoordinateSystem}. The domain is segmented along the toroidal coordinate $\varphi$, into $N_{\varphi}$ poloidal planes. Tables of data fields are provided for each subdomain. Ghost cells store the information on the neighborhood within a matrix that defines how these subdomains are connected to each other. Depending on the domain, these ghost cells contain either the values of the neighboring subdomains' fields or the values imposed by the boundary conditions. An example of the mesh and its zone decomposition is shown in Fig. \ref{fig:TCVzoneDecomposition}, where the X-point requires six zones. \newline
 
 \begin{figure}[H]\centering
@@ -594,7 +594,7 @@ Each of the In this structure, flutter is treated equivalent to drift velocities
 
 
 \subsection{Parallel diffusion operator with flutter}
-\label{ssec:3DGunter}
+\label{ssec:impl_3DGunter}
 
 In the magnetostatic setting, the parallel diffusion operator on $v_i$ and $T_\alpha$ can be solved independently on each flux surface in a 2D system on the $\theta - \varphi$ plane. The scheme developed by Günter et al. \cite{gunter2005} has proven well-suited to solve the 2D parallel Laplacian equations with minimized numerical spread for highly anisotropic problems. For an operator of the type $\nabla \cdot (\kappa \nabla_\parallel \circ \mathbf{b} )$, parallel gradients are first calculated in cell corners with finite differences and then used in the fluxes across each cell face to get the divergence. The corners where gradients are calculated are shown in Figure \ref{fig:Gunter2D}. This scheme is particularly effective if the poloidal and toroidal components $b^\theta$ and $b^\varphi$ of the contravariant magnetic unit vector in the curvilinear metric have similar magnitudes. This is usually enforced through careful mesh generation. \\
 
@@ -627,7 +627,7 @@ However, with flutter (Sec. \ref{ssec:S3X_flutter}), magnetic flux surfaces are 
 
 \subsection{Parallel diffusion on $\Phi$}
 
-For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the position of the green gradients in Fig. \ref{fig:GunterStencils_flutter}.
+For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:impl_3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the position of the green gradients in Fig. \ref{fig:GunterStencils_flutter}.
 
 
  
