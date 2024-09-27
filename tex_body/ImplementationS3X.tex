@@ -46,7 +46,7 @@ In order to keep a structured flux-surfaces aligned mesh for any magnetic equili
 \subsection{Curvilinear coordinates}
 \label{ssec:MetricCurvilinearCoordinates}
 
-The flux-surface-aligned discretization involves a curved grid in poloidal $\theta$ and toroidal $\varphi$ directions. To map the real geometry to the orthonormal grid on each subdomain, we require a metric transformation. The second chapter of the book by D’haeseleer et al \cite{CurvilinearGrids} describes well the numerical implications of curvilinear grids and serves as the basis of the present implementation. \\
+The flux-surface-aligned discretization involves a curved grid in poloidal $\theta$ and toroidal $\varphi$ directions. To map the real geometry to the orthonormal grid on each subdomain, we require a metric transformation. The second chapter of the book by D’haeseleer \emph{et al.}\cite{CurvilinearGrids} describes well the numerical implications of curvilinear grids and serves as the basis of the present implementation. \\
 
 Let $U=[u^\psi, u^\theta, u^\varphi]^T$ be the three parameters that describe every point in the domain $\Omega$ with respect to the curvilinear system of coordinates. On a torus, we can find an invertible transformation $R$ that maps each possible $U\in\Omega$ to a unique point in cartesian coordinates, thus: 
 
@@ -96,7 +96,7 @@ In order to benefit from the first-order parallel derivative that separates the 
 
 
 
-\subsection{Description and notation of the staggered grid}
+\subsection{Description and notation}
 The scalar variable $A_\parallel$ is the magnitude of the parallel magnetic vector potential that is a factor of the unit vector $\mathbf{b}$ in direction of the externally induced magnetic field lines. By construction of the domain, $\mathbf{b}$ has only components in $\varphi$ and $\theta$ directions. So far, all physical quantities are calculated on the collocated grid points at the domain cell centers. In the newly introduced equation on $A_\parallel$, the magnetic vector potential appears homogeneous to the potential, pressure and temperature gradients and the additional $A_\parallel$ term in the original equation states that the divergence of $A_\parallel$ accounts for the change in vorticity. Thus, $A_\parallel$ is always one spatial derivative away from the original quantities. As it is common in classical CFD simulation the velocity, $A_\parallel$ is not defined on cell centers but on a staggered grid on the cell edges in $\psi$-direction. Because the magnetic field lines do not evolve in radial direction and only parallel gradients contribute to $A_\parallel$, its grid is only staggered in  poloidal and toroidal directions. To distinguish quantities on both grids, the indexes $[i_\psi, i_\theta - \frac{1}{2},i_\varphi-\frac{1}{2}]$ describe discrete positions on the staggered grid. \\
 
 \begin{figure}[H]
@@ -625,12 +625,12 @@ However, with flutter (Sec. \ref{ssec:S3X_flutter}), magnetic flux surfaces are 
 
 
 
-\subsection{Parallel diffusion on $\Phi$}
+\subsection{Vorticity equation with flutter}
 
 For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:impl_3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the position of the green gradients in Fig. \ref{fig:GunterStencils_flutter}.
 
 
  
-
+\subsection{Radial sheath boundary conditions}
 
 

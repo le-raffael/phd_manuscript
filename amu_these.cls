@@ -111,6 +111,7 @@
 \RequirePackage{amsmath}					%% formules mathématiques
 \RequirePackage{amssymb}					%% symboles mathématiques
 \RequirePackage{amsfonts}					%% polices mathématiques
+\RequirePackage{bigints}					%% polices mathématiques
 
 \RequirePackage{xspace}						%% gestions des espaces dans les macros
 \RequirePackage{xparse}						%% macros avancées

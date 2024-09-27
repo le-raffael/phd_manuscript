@@ -1,10 +1,16 @@
-\chapter{Electromagnetic simulations on limited geometries}
+\chapter{Limited Geometry}
 \label{chap:analSimulations}
 
-\section{Electromagnetic mode excitation}
+\section{Electromagnetic modes excitation}
 \label{sec:anal_DAW_modeExcitation}
 
-As an introduction to simulations with SOLEDGE3X, let us consider the linear behavior of drift-Alfvén waves again. To put later simulation results in perspective, we analyze the impact of electromagnetic terms on drift-wave turbulence within a linearized system. Specifically, we compare the effects of a finite electron mass (EI-inert), electromagnetic induction with electron mass (EM), and electromagnetic induction with both flutter and electron mass (EM-flutter) in comparison to the baseline electrostatic case. The dispersion relation from Eq. \ref{eq:edge_DAWdispersionRelation} is adjusted to each of the four scenarios and solved exactly using the Python library SymPy for symbolic computation. Notably, we use the full dispersion relation without applying the simplifications used when we introduced the linear behavior of the drift-Alfvén system in \autoref{ssec:edge_DAW_dispersionRelation}. 
+As an introduction to simulations with SOLEDGE3X, let us consider the linear behavior of drift-Alfvén waves again. To put later simulation results in perspective, we analyze the impact of electromagnetic terms on drift-wave turbulence within a linearized system. Specifically, we compare the effects of a finite electron mass (EI-inert), electromagnetic induction with electron mass (EM), and electromagnetic induction with both flutter and electron mass (EM-flutter) in comparison to the baseline electrostatic case. The dispersion relation from Eq. \ref{eq:edge_DAWdispersionRelation} is adjusted to each of the four scenarios and solved exactly using the Python library SymPy for symbolic computation. Notably, we use the full dispersion relation without applying the simplifications used when we introduced the linear behavior of the drift-Alfvén system in Sec. \ref{ssec:edge_DAW_dispersionRelation}. To recall, the dispersion relation is given by: 
+
+´\begin{equation}
+	\label{eq:anal_DAWdispersionRelation}
+	i\left(\rho_{L,e}^2k_\perp^2 + \beta_0\right)\omega^3 + \left(-i\beta_0\omega_* - \frac{\eta_\parallel en_0T_0k_\perp^2}{B^2}\right)\omega^2 - i\omega_s^2\left(\omega_*-\left(1 + \rho_L^2 k_\perp^2\right)\omega\right) = 0
+\end{equation}
+
 
 Given the coupled nature system, there are several complex solutions for $\omega$ for each scenario, where each corresponds to a different mode. In Fig. \ref{fig:anal_modalBehavior}, the real and imaginary components of all modes are plotted as functions of the perpendicular wave number $k_\perp$, with typical parameters for a mid-sized tokamak. The real component $\omega_R$ represents the wave phase frequency, while the imaginary component $\gamma$ describes the growth or damping rate of each mode. A positive $\gamma$ indicates an unstable mode with exponential growth, whereas a negative $\gamma$ corresponds to a stable mode that is damped over time.
 
@@ -43,7 +49,6 @@ Given the coupled nature system, there are several complex solutions for $\omega
 	\centering
 	\begin{subfigure}[t]{0.85\textwidth}
 		\centering
-		%		\includegraphics[width=1\textwidth]{schemes/modes_ES.jpg}
 		\includegraphics[width=1\textwidth]{schemes/modes_EM-flutter.jpg}
 		\subcaption{Electromagnetic system with flutter}
 		\label{fig:anal_modesFlutter}
@@ -84,13 +89,15 @@ The real part is altered by the electromagnetic additions, but the change of pha
 \subsection{Analysis of a plasma blob}
 \label{ssec:plasmablob}
 
-The linear analysis from the previous section has only , as characteristic shear Alfvén and thermal electron times are much shorter than the ion cyclotronic time, which underlies the resolution of typical turbulent SOLEDGE3X simulations. Drift Alfvén waves in turn correspond to the impact of inductive electromagnetic effect on the formation of drift waves, where the term $\partial_t A_\parallel$ in Ohm's law (Eq. \ref{eq:ParallelCurrent}) modifies the non-adiabatic response of the potential $\Phi$ to parallel fluctuations of the electron pressure $p_e$. To study the these effects on a plasma blob in a slab domain. \newline
+The linear analysis from the previous section has only , as characteristic shear Alfvén and thermal electron times are much shorter than the ion cyclotronic time, which underlies the resolution of typical turbulent SOLEDGE3X simulations. Drift Alfvén waves in turn correspond to the impact of inductive electromagnetic effect on the formation of drift waves, where the term $\partial_t A_\parallel$ in Ohm's law modifies the non-adiabatic response of the potential $\Phi$ to parallel fluctuations of the electron pressure $p_e$. To study the these effects on a plasma blob in a slab domain. \newline
 
-We place ourselves in a plasma environment similar to the separatrix region in the diverted TCV simulations from the next Sec. \ref{sec:TCVsimulations}. The magnetic field is aligned to the toroidal coordinate with $B_{eq,t} = 1.3$T with a curvature of $1.1$m from the tokamak center, similar to the position of the separatrix at the outer mid-plane in TCV. Limiters are placed at both toroidal ends such that that connection length $L_\varphi = 65$m. A cartesian grid with coordinates $r$ and $z$ discretizes each poloidal plane, allowing radial fluxes out and with periodic boundary conditions in the vertical $z$-direction. The electron temperature is kept constant at $T_e=60$eV, ions are cold and the background density is set to $n_0 = 10^{19}$part/m$^3$. To simplify the study and prevent numerical difficulties at the sheath, we apply Neumann-0 boundary $\partial_\parallel n^{BC} = 0$ on the density and the potential $\Phi$ is fixed to $\Phi^{BC} = \Lambda T_e^{BC}$. This is a major simplification to the typical SOLEDGE3X sheath conditions described in Sec. \ref{sec:boundaryConditions}. The axisymmetric blob initially takes a Gaussian profile 
+We place ourselves in a plasma environment similar to the separatrix region in the diverted TCV simulations from the next Chapter \ref{chap:TCV}. The magnetic field is aligned to the toroidal coordinate with $B_{eq,t} = 1.3$T with a curvature of $1.1$m from the tokamak center, similar to the position of the separatrix at the outer mid-plane in TCV. Limiters are placed at both toroidal ends such that that connection length $L_\varphi = 65$m. A cartesian grid with coordinates $r$ and $z$ discretizes each poloidal plane, allowing radial fluxes out and with periodic boundary conditions in the vertical $z$-direction. The electron temperature is kept constant at $T_e=60$eV, ions are cold and the background density is set to $n_0 = 10^{19}$part/m$^3$. To simplify the study and prevent numerical difficulties at the sheath, we apply Neumann-0 boundary $\partial_\parallel n^{BC} = 0$ on the density and the potential $\Phi$ is fixed to $\Phi^{BC} = \Lambda T_e^{BC}$. This is a major simplification to the typical SOLEDGE3X sheath conditions described in Sec. \ref{sec:S3X_boundaryConditions}. The axisymmetric blob initially takes a Gaussian profile 
+
 \begin{equation}
 	n = n_0 \left(1 + \alpha e^{-\left[(r-r_b)^2+(z-z_b)^2\right]/\delta_b}\right)
 	\label{eq:blobInitProfile}
 \end{equation}
+
 with a blob overdensity $\alpha = 2$ and radius $\delta_b = 1$cm. The blob evolves with curvature and electric drifts, neglecting anomalous perpendicular diffusion and viscous effects. Further, electron inertia effect are neglected with $m_e = 0$. We compare the reference electrostatic case with magnetic induction in the parallel electric field and the full electromagnetic setting including flutter. The simulation results are collected in Fig. \ref{fig:BLOB}. \newline
 
 \begin{figure}[H]\centering
@@ -110,8 +117,6 @@ In the center of the domain, drift waves determine the potential $\Phi$ but it i
 
 In the previous section, we examined how a single plasma blob propagates across open field lines. However, this does not account for how the blob appears in the first place. In this second part of the slab study, we investigate the onset of drift waves. We consider the same setting as before but with a background density of $n_0 = 2 \cdot 10^{19}$ part/m$^3$ and isothermal electrons and ions at $T_e = T_i = 50$ eV. Instead of an initial overdensity, we apply a constant particle source of $5 \cdot 10^{22}$ part/s on the core side, at all $R < 1.12$ m. The emergence of drift-wave instabilities for the three scenarios is shown in Fig. \ref{fig:SLABturb}. \newline
 
-Initially, the particle source causes the density to build up on the core side of the slab. The radial gradient becomes stronger and soon collapses into drift waves. These waves are particularly pronounced in the electrostatic and electromagnetic inductive models. The term $\partial_t A_\parallel$ in Ohm's law intensifies the turbulent interchange, with plasma filaments reaching much further outward. On the other hand, the electromagnetic model with flutter has a stabilizing effect, producing only a thin turbulent layer at the exit of the source and maintaining a strong gradient at the transition from high- to low-density regions. As more particles are introduced at the source, the pressure differential causes this transition line to bend at scales of the simulation box, while the local gradient remains very steep. \newline
-
 \begin{figure}[H]\centering
 	\centering
 	\includegraphics[width=.95\textwidth]{schemes/slab_source.png}
@@ -119,6 +124,7 @@ Initially, the particle source causes the density to build up on the core side o
 	\label{fig:SLABturb}
 \end{figure}
 
+Initially, the particle source causes the density to build up on the core side of the slab. The radial gradient becomes stronger and soon collapses into drift waves. These waves are particularly pronounced in the electrostatic and electromagnetic inductive models. The term $\partial_t A_\parallel$ in Ohm's law intensifies the turbulent interchange, with plasma filaments reaching much further outward. On the other hand, the electromagnetic model with flutter has a stabilizing effect, producing only a thin turbulent layer at the exit of the source and maintaining a strong gradient at the transition from high- to low-density regions. As more particles are introduced at the source, the pressure differential causes this transition line to bend at scales of the simulation box, while the local gradient remains very steep. \newline
 
 \section{Circular geometry}
 
@@ -135,11 +141,20 @@ Flat limiter on the low-field side
 \end{figure}
 
 
-\subsection{Growth rates}
+\subsection{Instability growth rates}
 
+As we restart the simulations from a smooth profile, we can observe the growth of instabilities in the beginning of the simulation. Initially, instabilities will grow linearly until they reach a saturation point, when nonlinear effects kick in. In this first (short) phase, we will be able to verify the tendencies from the analysis of the dispersion relation in Sec. \ref{sec:anal_DAW_modeExcitation}, thus electron inertia has a slight and magnetic induction a strong destabilizing while flutter stabilizes the system. To evaluate the perturbations, we calculate the root mean square (RMS) deviation from the toroidal average in every cell. The global metric is then obtained by averaging the local values over the volume $V$ of the entire domain. 
+
+\begin{equation}
+	RMS_X = \frac{1}{V}\int_V \sqrt{\frac{X^2 - \langle X \rangle_\varphi^2}{\langle X \rangle_\varphi^2}}  dV
+\end{equation}
+	
+We compare the RMS for both the ion density and temperature at each timestep where a plasma save is available. 
 
 \subsubsection{Electron inertia}
 
+First, we study the impact of electron inertia. For that, we artificially modify the value of the electron mass from its physical value. The results for the RMS of ion density and temperature are collected in Fig. \ref{fig:CIRC_meScan}. We observe that perturbations grow faster as the electron mass increases, reaching the saturation level earlier. The saturation itself is comparable in both cases. The biggest difference already appears between the cases $0m_e$ and $0.5m_e$, hence adding a finite electron mass has an immediate effect to the original implementation where electrons react instantaneously to the system, even for a small mass. 
+ 
 \begin{figure}[H]\centering
 	\begin{subfigure}[t]{0.45\textwidth}
 		\centering
@@ -151,13 +166,14 @@ Flat limiter on the low-field side
 		\includegraphics[width=1\textwidth]{schemes/RMST_meScan.jpg}
 		\subcaption{RMS of temperature $T_i$}
 	\end{subfigure}
-	\caption{Evolution of the the perturbation intensity for different values of $m_e$. The electron mass is artificially increased and the 0 factor corresponds effectively to the electrostatic reference}
+	\caption{Evolution of the the root mean square deviation for different values of $m_e$. The electron mass is artificially increased and the 0 factor corresponds effectively to the electrostatic reference}
 	\label{fig:CIRC_meScan}
 \end{figure}
 
 
-
 \subsubsection{Magnetic induction}
+
+Second, we modify the value of the reference $\beta_0$ that appears in the dimensionless equations for the term $\partial_t A_\parallel$ in the parallel electric field. From a physical standpoint, we actually change the vacuum permeability $\mu_0$ as the reference pressure $n_0T_0$ and magnetic field strength $B_0$ remain unchanged for the rest of the model. All simulations are run with the true value of the electron mass, so the base case $0\beta_0$ is equivalent to the green line in the $m_e$ scan above. In Fig. \ref{fig:CIRC_betaScan}, we observe that perturbations grow faster the stronger $\beta_0$ is. For the case $1\beta_0$, we also included flutter as a dashed line, and we see there that the growth rate is reduced again to levels below the electron inertial case. 
 
 \begin{figure}[H]\centering
 	\begin{subfigure}[t]{0.45\textwidth}
@@ -170,13 +186,13 @@ Flat limiter on the low-field side
 		\includegraphics[width=1\textwidth]{schemes/RMST_betaScan.jpg}
 		\subcaption{RMS of temperature $T_i$}
 	\end{subfigure}
-	\caption{Evolution of the the perturbation intensity for different values of $\beta$. The  is artificially increased and the 0 factor corresponds effectively to the electrostatic with electron inerita. The electron mass for all scenarios is physical (factor 1 in Fig. \ref{fig:CIRC_meScan}).}
+	\caption{Evolution of the the root mean square deviation for different values of $\beta$. The  is artificially increased and the 0 factor corresponds effectively to the electrostatic with electron inerita. The electron mass for all scenarios is physical (factor 1 in Fig. \ref{fig:CIRC_meScan}).}
 	\label{fig:CIRC_betaScan}
 \end{figure}
 
+For both the $m_e$ and $\beta_0$ scan, we could see that the linear growth corresponds to the expectations from the linear analysis. As the effects of electron inertia and magnetic induction get stronger, plasma perturbations grow faster and reach their saturation point faster. Note that the saturation levels are similar for all scenarios, so the used RMS metric is not very adapted to analyze the subsequent nonlinear phase of the simulation. \\
 
-
-\subsection{Stabilization by flutter}
+The results here can however not be correlated one-to-one to the dispersion relation. In the SOLEDGE3X model, interchange instabilities also contribute to the rise of perturbation, and the simulation was run with the energy conservation equation and hence ion and electron temperature gradients add an additional source of instability. The dispersion relation was calculated without curvature effects and using an isothermal assumption, but the general expected trend is still observed. 
 
 
 

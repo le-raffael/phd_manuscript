@@ -1,4 +1,4 @@
-\chapter{The SOLEDGE3X electromagnetic model}
+\chapter{The physical model}
 \label{chap:SOLEDGE3X_framework}
 
 In the previous chapter, we laid the foundations of drift-reduced models for edge plasma. The project SOLEDGE3X was born with the merge of the 3D turbulence code TOKAM3X\cite{tamain2016tokam3x} and the 2D transport code SolEdge2D\cite{Bufferand_2015}. It stands as a comprehensive multi-species 2D/3D fluid solver to investigate transport and turbulence at the plasma edge up to the first wall, with a particular focus on modeling plasma-wall interactions. This has allowed successful investigations of numerous facets of edge plasma dynamics, such as turbulence\cite{Bufferand_2021} impurity transport\cite{Ciraolo2021} or ITER first-wall fluxes\cite{Rivals2022}. Until now, however, the model has been limited to electrostatic turbulence, with only fluctuations in the electric potential, determined by the non-adiabatic response to density fluctuations, being taken into account. \\
@@ -241,13 +241,13 @@ The vorticity equation gives an relation for the electric potential $\Phi$, requ
 
 
 
-\section{Electromagnetic Model in SOLEDGE3X}
+\section{Ingredients for electromagnetism}
 \label{sec:S3X_electromagneticModel}
 
 Until now we have expressed the SOLEDGE3X transport equations as they are used in the existing electrostatic version of the code. It lays the framework on which we are now going to build the electromagnetic model. As demonstrated in the previous Sec. \ref{sec:edge_EMeffects}, it consists of three key elements: electron inertia, magnetic induction and flutter. In this section, each of the ingredients will be introduced separately, to clearly identify the impact of each on the vorticity equation. 
 
 
-\subsection{Electron Inertia}
+\subsection{Electron inertia}
 \label{ssec:ModelElectronInertia}
 
 %As we have seen in ...., the bad condition number of the vorticity equation has its roots in the combined perpendicular and parallel diffusion on the electric potential. One attempt to ameliorate the situation would be to split these terms in a way that their respective discrete operators are not applied on the same unknown in the vorticity matrix. To express the system in such a way, it is convenient to include the parallel current $j_\parallel$ as a separate variable in the system. In the definition of the parallel current density \autoref{eq:DefinitionParallelCurrent}, we omitted the effects of electron inertia in the generalized Ohm's law. Its full expression states:
@@ -333,7 +333,7 @@ For better readability let us express the system in matrix form, where $\circ$ s
 
 
 
-\subsection{Electromagnetic Induction}
+\subsection{Electromagnetic induction}
 
 Magnetic induction is added to the system with the term $\partial_t A_\parallel$ to the definition of the parallel electric field. It appears in the generalized Ohm's law for the parallel current \ref{eq:DefinitionParallelCurrent}, which in turn is member of the vorticity equation \ref{eq:TransportEquationVorticity}.
 
@@ -393,7 +393,7 @@ These equations use Ohm's law without the electron inertia term previously intro
 
 
 
-\subsection{Electromagnetic Flutter}
+\subsection{Electromagnetic flutter}
 \label{ssec:S3X_flutter}
 Due to the strong anisotropy in tokamaks, most edge turbulence codes rely on alignment to the magnetic equilibrium (see discussion in Ref.\cite{SCHWANDER_2024}). However, in the electromagnetic model, small perturbations of $\mathbf{B}_{eq}$ can exist and are driven by fluctuations of $A_\parallel$ such as $\tilde{\mathbf{B}} = \nabla \times (\tilde{A_\parallel} \mathbf{b})$. Therefore, these fluctuations of $A_\parallel$ have to be estimated and $A_\parallel$ cannot be used directly. Indeed, the diamagnetic current induced by the evolution of the full plasma pressure is balanced by a stationary background parallel current, the Pfirsch-Schlüter current, which induces a stationary part of significant amplitude in $A_\parallel$ through Ampere's law (Eq. \ref{eq:S3X_AmpereLaw}). This latter is denoted $A_{\parallel,0}$, and corresponds to the Grad-Shafranov shift due to Pfirsch-Schlüter currents that are accounted for in the parallel current. This shift $A_{\parallel,0}$ is obviously accounted for in $B_{eq}$, and therefore it has to be subtracted from $A_\parallel$ in nonlinear parallel operators. This is done in this work by simply removing the toroidal average as proposed by Ref.\cite{giacomin2022gbs} in the GBS code: \newline
 
@@ -417,7 +417,7 @@ This leads to:
 
 The gradient $\nabla \tilde{A}_\parallel$ scales with the characteristic turbulent length $1/L_\perp$ and the curl $\nabla \times \mathbf{b}$ with the machine dimension $1/a$. Therefore, $\frac{\mathbf{b}_{eq} \times \nabla \tilde{A}_\parallel}{\norm{\mathbf{B}}}$ is the main contributor to the flutter field.
 
-Note that Hager et al. \cite{hager2022} have suggested an additional time-averaged $\left<A_\parallel\right>_{\varphi,t}$ to evaluate fluctuations in the parallel electromagnetic potential, arguing that turbulent structures might appear at the same position on all poloidal planes and should therefore not be removed in the flutter calculation. This approach has been used in recent work in the GRILLIX code \cite{zhang2024}, but was not adopted in the present work, as it was estimated that the gain in accuracy did not compensate for the additional computation and memory costs. \\
+Note that Hager \emph{et al.}\cite{hager2022} have suggested an additional time-averaged $\left<A_\parallel\right>_{\varphi,t}$ to evaluate fluctuations in the parallel electromagnetic potential, arguing that turbulent structures might appear at the same position on all poloidal planes and should therefore not be removed in the flutter calculation. This approach has been used in recent work in the GRILLIX code \cite{zhang2024}, but was not adopted in the present work, as it was estimated that the gain in accuracy did not compensate for the additional computation and memory costs. \\
 
 The perturbed magnetic unit field $\tilde{\mathbf{b}}$ is calculated at the beginning of each timestep and added to the equilibrium unit vector $\mathbf{b}_{eq}$. The complete vector $\mathbf{b} = \mathbf{b}_{eq} + \tilde{\mathbf{b}}$ is then used in all parallel advection, gradient, and diffusion terms. Since we base our calculations on plasma fields from the previous timestep, this perturbation can be seen as an additional first-order drift in the equations. The expression in the framework of the conservation equations does not change with flutter, but the underlying definition of parallel gradients and divergence surely increases in complexity. \\
 

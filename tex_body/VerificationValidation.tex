@@ -1,5 +1,5 @@
 \chapter{Verification and Validation}
-\section{Verification by the Method of manufactured solutions}
+\section{Verification by the method of manufactured solutions}
 To ensure the correctness of the newly implemented system with the magnetic vector potential $A_\parallel$, a test model has been set up with the method of manufactured solutions (MMS) \cite{ManufacturedSolution}. This allows to directly compare the numerical and analytic solutions and therefore validate the implementation and verify the order of convergence of the numerical operators. 
 
 \subsection{Test set-up}
@@ -148,12 +148,10 @@ To be as realistic as possible with the real flutter, it is scaled by the magnit
 
 .... 
 \subsection{Pure advection}
-A first step to verify the correct physical behaviour of the simulation would be to investigate the plasma advection equations. \\
-For this objective we set up a simplistic plasma model on a rectangular 2D SLAB topology. Periodic boundary conditions in all directions allow to properly observe wave propagation without any inference at the domain boundaries. In an isothermal hydrogen plasma without source terms and drifts, the governing equations then simplify to:
+A first step to verify the correct physical behaviour of the simulation and to test the general validation framework would be to investigate the plasma advection equations. We can hence define parallel and perpendicular wavenumbers $k_\parallel$ and $k_\perp$ that  For this objective we set up a simplistic plasma model on a rectangular 2D SLAB topology, where magnetic field is uniform in poloidal Z direction. Periodic boundary conditions in all directions allow to properly observe wave propagation without any inference at the domain boundaries. In an isothermal hydrogen plasma without source terms and drifts, the governing equations then simplify to:
 
 \begin{align}
 	\partial_t n_i + \grad\cdot\left(n_i\mathbf{u}_i\right) &= 0 \label{eq:AdvectionLinearAnalysis_ionMass} \\
-	n_e &= n_i \label{eq:AdvectionLinearAnalysis_quasiNeutrality} \\
 	\partial_t \left(m_in_iu_\parallel\right) + \grad\cdot\left(m_in_iu_\parallel u_i\right) &= -2T_e\grad_\parallel n_e \label{eq:AdvectionLinearAnalysis_parallelMomentumBalance}
 \end{align}
 
@@ -164,7 +162,7 @@ To perform the linear analysis of the system, we assume that field variables suc
 	 X = \bar{X} + \hat{X} = X_0 + \sum\tilde{X}_{\omega,k_\perp,k_\parallel}e^{i(-\omega t + k_\perp \psi + k_\parallel \theta)} \label{eq:FourierModeSolution}
 \end{equation}
 
-Electron and ion density are identical because of the quasi-neutrality assumption in Eq. \ref{eq:AdvectionLinearAnalysis_quasiNeutrality}. Since we do not consider any drifts the radial component $u_\psi$ of the velocity vector vanishes. Further, the mean density is $\bar{n}=n_0$ while the mean velocity $\bar{u}_\theta$ is zero. Because we are only interested in a first order approximation of the solution, we neglect all higher-order mixed fluctuating terms. Thus, Eq. \ref{eq:AdvectionLinearAnalysis_ionMass} and Eq. \ref{eq:AdvectionLinearAnalysis_parallelMomentumBalance} transform to:
+Since we do not consider any drifts the radial component $u_\psi$ of the velocity vector vanishes. Further, the mean density is $\bar{n}=n_0$ while the mean velocity $\bar{u}_\theta$ is zero. Because we are only interested in a first order approximation of the solution, we neglect all higher-order mixed fluctuating terms. Thus, Eq. \ref{eq:AdvectionLinearAnalysis_ionMass} and Eq. \ref{eq:AdvectionLinearAnalysis_parallelMomentumBalance} transform to:
 
 \begin{align*}
 	&&-i\omega\hat{n} + i\bar{n}k_\parallel\hat{u}_\theta + i\bar{u}_\theta k_\parallel\hat{n} &= 0 &\Leftrightarrow&& \hat{u}_\theta &= \frac{\omega}{n_0k_\parallel}\hat{n} \\
@@ -206,7 +204,7 @@ It is apparent that both solutions for $\omega$ are real therefore non-decaying 
 The system is initialized with one wavemode along the "poloidal" length of $L=100$m so the wavenumber here is $k_\parallel = 2\pi / L \approx 0.0628$. The plasma temperature is kept constant at $T = 100$eV and the mass of a deuterium atom equals to $m_i \approx 3.34\cdot 10^{-27}$kg, so we can expect a system frequency of $\omega\approx 978$Hz from the dispersion relation in Eq. \ref{eq:AdvectionLinearAnalysis_dispersionRelation}. This corresponds precisely to the main frequency peak in Fig. \ref{fig:AdvectionSLAB_FFT} and thus acoustic waves appear in the system as expected. The smaller peaks at higher frequency modes are however not physical and are likely due to numerical noise as their appearance highly depends on the spatial and temporal resolution and their intensity increases for longer simulations. 
 
 
-\subsection{Electrostatic case}
+\subsection{Electrostatic vorticity equation}
 Before plunging into the vorticity equation with $A_\parallel$ it may be interesting to discuss whether the correct behaviour is actually observed in the original electrostatic implementation. For that we reduce the system to the bare minimum set of equations that involve the electric potential $\Phi$. Neglecting all kind of transport equations and source phenomena remains the following simple equation on $\Phi$: \\
 \begin{equation}
 		\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] = -\grad\cdot\sigma_\parallel\grad_\parallel\Phi \label{eq:AdvectionSLAB_PHI}
@@ -252,7 +250,7 @@ The time integration of this system can only be performed by solving the implici
 
 The uniform decay can be clearly seen between Fig. \ref{fig:electrostaticSLAB_initialProfile_PHI} and Fig. \ref{fig:electrostaticSLAB_endProfile_PHI}. It remains to investigate whether the observed attenuation matches the expected decay rate $\lambda$. A Fourier transformation as to determine oscillatory modes for the standing acoustic waves in the previous section is not of great help here, instead we use a non-linear least squares to fit the time evolution of $\Phi(t)$ at an arbitrary point in the domain except the grounded point. We fit the parameters $\Phi_0$, $\lambda$ and $C$ from Eq. \ref{eq:electrostaticSLABdecay} to the simulation data and compare the hence estimated $\lambda$ to the theoretical decay rate for the given initial wave. Fig. \ref{fig:electrostaticSLAB_decayRateFit} shows that there is a strong agreement between the theoretical and fitted decay rates for a large array of domain configurations. The wavenumbers $k_\parallel$ and $k_\perp$ were modified by changing the poloidal respectively the radial size of the domain with always the first wave mode spanning the entire domain. We can safely claim that the original electrostatic implementation produces the expected physical behaviour.
 
-\subsection{Electromagnetic case}
+\subsection{Electromagnetic vorticity equation}
 While acoustic waves are characteristic for a physical medium, Alfvén waves dominate oscillations of ions within a magnetic field. The motion occurs in direction of the magnetic field lines where the ion mass accounts for the inertia and the magnetic field tension for the restoring wave force. The Alfvén wave group velocity for a species $i$ is given by:
 
 \begin{equation}
@@ -260,6 +258,7 @@ While acoustic waves are characteristic for a physical medium, Alfvén waves dom
 \end{equation}
 
 With the new parallel magnetic vector potential $A_\parallel$ into the vorticity Eq. \ref{eq:vorticityEquation_electromagnetic} Alfvén waves should appear in the simulation and the aim of this section is to prove their existence. We follow the same approach as in the previous section for the electrostatic case and reduce the system to the strict necessary minimum and keep following equations: 
+
 \begin{align}
 	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] &= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA_\parallel\right) \label{eq:electromagneticSLAB_PHI} \\
 	\Delta_{\perp}A_\parallel &= -\mu_0\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA_\parallel\right) \label{eq:electromagneticSLAB_APara}
@@ -316,105 +315,105 @@ $$ \omega_0 = v_A k_\parallel$$
 
 In Eq. \ref{eq:electromagneticSLAB_overdampedDecayRate} and Eq. \ref{eq:electromagneticSLAB_underdampedFrequency} we see that there are two possible solution for the decay rate respectively the oscillation frequency. This does not conflict with our assumed wave solution which has been defined in Eq. \ref{eq:FourierModeSolution} as the sum of several Fourier modes and each solution here contributes to one mode. 
  
-As in the electrostatic case from the previous section, the just described system is not invertible and $\Phi$ is defined up to a constant. Grounding the potential in one single point is however not a suitable solution here because it deteriorates the condition number of the vorticity matrix past solvability. Instead two other approaches will be followed to check if simulations can reproduce the expected physical behaviour. 
-
-%\subsubsection{Grounded line}
-%One approach is to set the potential not in one but in several points to a fixed value. The potential in the remaining domain then distributes according to this value and the whole system becomes solvable. Numerically, this is achieved by replacing the row of the matrix corresponding to the grounded point by a single 1 on the diagonal and the matching term in the RHS vector by the desired value for $\Phi$. This operation is equal to enforcing Dirichlet boundary conditions in radial direction if $\Phi$ is grounded at all points with index $i_\psi^G$. 
+As in the electrostatic case from the previous section, the just described system is not invertible and $\Phi$ is defined up to a constant. Grounding the potential in one single point is however not a suitable solution here because it deteriorates the condition number of the vorticity matrix past solvability. To solve this issue, I set the potential not in one but in several points to a fixed value. The potential in the remaining domain then distributes according to this value and the whole system becomes solvable. Numerically, this is achieved by replacing the row of the matrix corresponding to the grounded point by a single 1 on the diagonal and the matching term in the RHS vector by the desired value for $\Phi$. This operation is equal to enforcing Dirichlet boundary conditions in radial direction if $\Phi$ is grounded at all points with index $i_\psi^G=16$. 
 %
-%\begin{figure}[H]
-%	\centering
-%	\begin{subfigure}[b]{0.45\textwidth}
-%		\centering
-%		\includegraphics[width=.98\textwidth]{schemes/44_APara.png}
-%		\subcaption{$A_\parallel(\psi,\theta)$ at the timestep 440\\ \ }
-%		\label{fig:electromagneticSLAB_initialProfile_A}
-%	\end{subfigure}
-%	\begin{subfigure}[b]{0.45\textwidth}
-%		\centering
-%		\includegraphics[width=1\textwidth]{schemes/excitedSLAB_2D_timeplot_A.png}
-%		\subcaption{Time evolution of $A_\parallel(t)$ in the lower left corner of the domain}
-%		\label{fig:electromagneticSLAB_evolution_A}
-%	\end{subfigure}
-%	\caption{Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points. All point at the radial center with $i_\psi^G$ are grounded.}
-%	\label{fig:electromagneticGroundedSLAB_system}
-%\end{figure}
-%
-%In the simulations with a grounded line, the initial wave solution has been applied to the vorticity field $\Omega$ to prevent steep gradients and instabilities if it was done on $\Phi$ directly. Very soon, the two potentials $\Phi$ and $A_\parallel$ respond to this initial excitation and a wave profile appears as depicted in Fig. \ref{fig:electromagneticSLAB_initialProfile_A}. The line of grounded points in the middle of the domain however breaks the wave which then smoothly lines up with the equilibrium point $\Phi_0 = 0V$ and $A_{\parallel,0} = 0Tm$ around the grounded line. At this point it may be emphasized that only the electric potential $\Phi$ is grounded, but as both potential fields are strongly coupled the grounded line affects $A_\parallel$ equally. We thus have a wave that is guided between two poloidal grounded lines (remember that the domain is periodic in radial direction) so by construction the system cannot account for radial dynamics. If we consider a point that is furthest away from the grounded line (e.g. any point on the domain boundary in the example above) we might still be able to observe some expected physical behaviour. At first glance, if we track $A_\parallel$ in one point over time as in Fig. \ref{fig:electromagneticSLAB_evolution_A}, a decaying oscillation appears which is in line with the here dominant underdamped regime. 	
-%
-%First we investigate the underdamped scenario by opposing simulation results to the expected damping rates $\lambda$ and frequencies $\omega_0$. As for the previous electromagnetic we fit the four free parameters in Eq. \ref{eq:electromagneticSLAB_underdampedSolution} to simulation data with a nonlinear least squares method. With 1000 sample points we get a high fitting fidelity with a relative standard deviation of the order of $10^{-9}$ and the difference if the fit is performed on $\Phi$ or $A_\parallel$ has about the same magnitude. 
-%
-%\begin{figure}[H]
-%	\centering
-%	\begin{subfigure}[b]{0.45\textwidth}
-%		\centering
-%		\includegraphics[width=.98\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_para_fixed.png}
-%		\subcaption{Poloidal mode fixed to $k_\parallel = $}
-%		\label{fig:electromagneticSLAB_errorGrounded_kPara_fixed}
-%	\end{subfigure}
-%	\begin{subfigure}[b]{0.45\textwidth}
-%		\centering
-%		\includegraphics[width=1\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_perp_fixed.png}
-%		\subcaption{Radial mode fixed to $k_\perp = 100m^{-1}$}
-%		\label{fig:electromagneticSLAB_errorGrounded_kPerp_fixed}
-%	\end{subfigure}
-%	\caption{Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$ with respect to the expected values in a grounded electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points.}
-%	\label{fig:electromagneticSLAB_errorGrounded}
-%\end{figure}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=.98\textwidth]{schemes/44_APara.png}
+		\subcaption{$A_\parallel(\psi,\theta)$ at the timestep 440\\ \ }
+		\label{fig:electromagneticSLAB_initialProfile_A}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/excitedSLAB_2D_timeplot_A.png}
+		\subcaption{Time evolution of $A_\parallel(t)$ in the lower left corner of the domain}
+		\label{fig:electromagneticSLAB_evolution_A}
+	\end{subfigure}
+	\caption{Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points. All point at the radial center with $i_\psi^G$ are grounded.}
+	\label{fig:electromagneticGroundedSLAB_system}
+\end{figure}
 
+In the simulations with a grounded line, the initial wave solution has been applied to the vorticity field $\Omega$ to prevent steep gradients and instabilities if it was done on $\Phi$ directly. Very soon, the two potentials $\Phi$ and $A_\parallel$ respond to this initial excitation and a wave profile appears as depicted in Fig. \ref{fig:electromagneticSLAB_initialProfile_A}. The line of grounded points in the middle of the domain however breaks the wave which then smoothly lines up with the equilibrium point $\Phi_0 = 0V$ and $A_{\parallel,0} = 0Tm$ around the grounded line. At this point it may be emphasized that only the electric potential $\Phi$ is grounded, but as both potential fields are strongly coupled the grounded line affects $A_\parallel$ equally. We thus have a wave that is guided between two poloidal grounded lines (remember that the domain is periodic in radial direction) so by construction the system cannot account for radial dynamics. If we consider a point that is furthest away from the grounded line (e.g. any point on the domain boundary in the example above) we might still be able to observe some expected physical behaviour. At first glance, if we track $A_\parallel$ in one point over time as in Fig. \ref{fig:electromagneticSLAB_evolution_A}, a decaying oscillation appears which is in line with the here dominant underdamped regime. 	
 
+We investigate the underdamped scenario by opposing simulation results to the expected damping rates $\lambda$ and frequencies $\omega_0$. As for the previous electromagnetic we fit the four free parameters in Eq. \ref{eq:electromagneticSLAB_underdampedSolution} to simulation data with a nonlinear least squares method. With 1000 sample points we get a high fitting fidelity with a relative standard deviation of the order of $10^{-9}$ and the difference if the fit is performed on $\Phi$ or $A_\parallel$ has about the same magnitude. 
 
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=.98\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_para_fixed.png}
+		\subcaption{Poloidal mode fixed to $k_\parallel = 0.01m^{-1}$}
+		\label{fig:electromagneticSLAB_errorGrounded_kPara_fixed}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/groundedSLABunderdampedFiterrors_k_perp_fixed.png}
+		\subcaption{Radial mode fixed to $k_\perp = 100m^{-1}$}
+		\label{fig:electromagneticSLAB_errorGrounded_kPerp_fixed}
+	\end{subfigure}
+	\caption{Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$ with respect to the expected values in a grounded electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points.}
+	\label{fig:electromagneticSLAB_errorGrounded}
+\end{figure}
 
-
-
-%\subsubsection{Diagonal perturbation}
-%Another approach that
-% 
-%Eq. \ref{eq:electromagneticSLAB_PHI} on the potential is then replaced by:
-%\begin{equation*}
-%	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] + \varepsilon \Phi= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA\right) + \varepsilon \Phi_e
-%\end{equation*}
-%
-%This addition naturally affects the dispersion relation and we end up with:
-%\begin{equation*}
-%	\omega^2+\left(i\gamma k_\perp^2 - \frac{B^2\epsilon}{m_in_ik_\perp^2}\right)\omega-v_A^2k_\parallel^2+\frac{v_A^2 \epsilon}{\sigma_\parallel}=0
-%\end{equation*}
-%
-%This eventually changes the previously calculated frequencies and damping rates. For the overdamped case, we get:
-%$$ \lambda = \frac{\gamma}{2}k_\perp^2 - \frac{B^2\epsilon}{2m_in_ik_\perp^2} \pm \sqrt{\frac{\gamma^2}{4}k_\perp^4-v_A^2k_\parallel^2}$$
+While the frequency behaves well with respect to the analytic predictions, we see a strong mismatch for the damping, especially for low $k_\perp$ and high $k_\parallel$ values. This is likely due to the grounded points aligned to a same radial, perpendicular coordinate that skews the propagation of the wave. Better results are expected if the grounded points would correspond to the wave dynamics, as will be applied in the subsequent test.
 
 
 \subsection{Linear transition from Alfvén to thermal electron waves}
 
-In Sec. \ref{sec:edge_DAW}, we introduced drift-Alfvén waves. With the electromagnetic extensions, drift-waves are coupled to higher-frequency modes that transition from the Alfvén to the thermal electron speed and travel along magnetic field lines. These modes are associated with negative growth rate and usually dampen out quite fast. They can however be used to validate the electromagnetic implementation. The thought behind it is that if we reduce the system to suppress drift-waves, and run simulations with a sufficiently temporal resolution, the transition should appear in the SOLEDGE3X simulations. \\
+For the last, most integrative test, we switch to a 3D slab domain. In Sec. \ref{sec:edge_DAW}, we introduced drift-Alfvén waves. With the electromagnetic extensions, drift-waves are coupled to higher-frequency modes that transition from the Alfvén to the thermal electron speed and travel along magnetic field lines. These modes are associated with negative growth rate and usually dampen out quite fast. They can however be used to validate the electromagnetic implementation. The thought behind it is that if we reduce the system to suppress drift-waves, and run simulations with a sufficiently temporal resolution, the transition should appear in the SOLEDGE3X simulations. \\
+
+The computational domain is a 3D slab domain with periodic boundary conditions in all directions. The magnetic field is assumed to be constant in the $\theta-\varphi$ plane, and is therefore somewhat similar to the topology in production cases. It allows to validate the implementation of parallel operators in  a realistic setting with respect to the linear behavior. The wavenumbers $k_\psi$, $k_\theta$, and $k_\varphi$ are defined by the respective dimensions of the slab. Parallel and perpendicular wavenumbers express as: \newline
+
+\begin{align}
+	k_\parallel = b_\theta k_\theta + b_\varphi k_\varphi &&& k_\perp^2 = k_\psi^2 + k_\theta^2 + k_\varphi^2 - k_\parallel^2
+\end{align}
 
 The following simplified model (Eq. \ref{eq:VV_fourFieldModel}) is considered on the electron density $n_e$, parallel current $j_\parallel$, and the potentials $\Phi$ and $A_\parallel$: \newline
 
 \begin{equation}
 	\left\{
 	\begin{aligned}
-		\partial_t n_e &= \frac{1}{e}\nabla \cdot (j_\parallel \mathbf{b}) \\
-		j_\parallel + \frac{\sigma_\parallel m_e}{n_e e^2} \partial_t j_\parallel  &= \sigma_\parallel \left( -\nabla_\parallel \Phi - \partial_t A_\parallel + \frac{T_e}{e} \nabla_\parallel \log(n_e) \right) \\
-		\nabla \cdot \left[ \frac{m_i n_i}{B^2} \partial_t \nabla_\perp \Phi \right] &= \nabla \cdot (j_\parallel \mathbf{b}) \\
-		\Delta_\perp A_\parallel &= -\mu_0 j_\parallel 
+		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad^2_\perp\Phi\right] &= \grad\cdot(j_\parallel\mathbf{b}) \\
+		\grad^2_\perp A_\parallel &= -\mu_0j_\parallel \\
+		\eta_\parallel j_\parallel + \frac{ m_e}{n_ee^2} \partial_t j_\parallel  &= \left(-\grad_\parallel\Phi - \partial_t A_\parallel + 	T_e\grad_\parallel\log(n_e)\right) \\
+		\partial_t n_e &= \frac{1}{e}\grad\cdot (j_\parallel\mathbf{b}) 
 	\end{aligned}
 	\right.
 	\label{eq:VV_fourFieldModel}
 \end{equation}
 
-The computational domain is a 3D slab domain with periodic boundary conditions in all directions. The magnetic field is assumed to be constant in the $\theta-\varphi$ plane. The wavenumbers $k_\psi$, $k_\theta$, and $k_\varphi$ are defined by the respective dimensions of the slab. Parallel and perpendicular wavenumbers express as: \newline
+Again we need to ground the potential somewhere to make the system invertible. For the 3D system, I grounded all points on a diagonal plane that cuts the slab in two opposite corners and is orthogonal to the vector $[1,1,1]^T$. With an initial wave profile on the density, a standing wave appears then for all four fields. A typical snapshot is shown in Fig. \ref{fig:electromagneticSLAB_snapshotAPara}. The magnetic vector potential $A_\parallel$ and $j_\parallel$ oscillate in phase, while density and potential are shifted by a quarter of a phase in positive and negative direction respectively.
 
-\begin{align}
-	k_\parallel = b_\theta k_\theta + b_\varphi k_\varphi &&& k_\perp = \sqrt{k_\psi^2 + k_\theta^2 + k_\varphi^2 - k_\parallel^2}
-\end{align}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+		\includegraphics[height=5.2cm]{schemes/SnapshotTransitionSLAB.jpg}
+		\subcaption{Snapshot of $A_\parallel$ [Tm]}
+		\label{fig:electromagneticSLAB_snapshotAPara}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.65\textwidth}
+		\centering
+		\includegraphics[height=4.8cm]{schemes/evolutionTransitionSlab.jpg}
+		\subcaption{Evolution of the four fields in one point of the domain}
+		\label{fig:electromagneticSLAB_evolution}
+	\end{subfigure}
+	\caption{Characteristic evolution of the four-field electromagnetic model in a domain with $N_\psi=N_\theta=N_\varphi=63$ grid points.}
+	\label{fig:electromagneticSLAB_fourFieldModel}
+\end{figure}
 
-The Alfvén wave speed is given by $v_A = \frac{B_0}{\sqrt{m_u n_e \mu_0}}$ and the electron thermal speed by $v_{th,e} = \sqrt{\frac{e T_e}{m_e}}$. In the zero-resistivity limit, the dispersion relation states that we deal with a complex wave frequency, whose real component is: \newline
+The complex dispersion relation of the four-field model has a real and an imaginary part indicating the appearance of a decaying wave:
 
 \begin{align}
 	\label{eq:VV_dispersionRelation}
-	\omega_0^2 = \frac{v_A^2}{1 + \frac{m_e}{e^2 \mu_0 n_e} k_\perp^2} k_\parallel^2 + \frac{1}{\frac{n_e \mu_0}{T_0 k_\perp^2} + \frac{1}{v_{th,e}^2}} k_\parallel^2  
+	\omega_A^2 = \left(\frac{v_A^2}{1 + \frac{m_e}{e^2 \mu_0 n_e} k_\perp^2} + \frac{1}{\frac{n_e \mu_0}{T_0 k_\perp^2} + \frac{1}{v_{th,e}^2}}\right) k_\parallel^2 - \frac{\eta_\parallel^2k_\perp^4}{4\left(\mu_0+\frac{m_e}{e^2n_i}k_\perp^2\right)^2}
 \end{align}
 
-From Eq. \ref{eq:VV_dispersionRelation}, we expect a wave in the parallel direction traveling at the Alfvén velocity for small $k_\perp$ and at the thermal electron velocity at high $k_\perp$. In the slab domain, $k_\perp$ is changed by changing the radial dimension of the domain. The results of our numerical simulations perfectly match the predictions by Dudson \cite{Dudson2021} and the numerical results obtained by Stegmeir \emph{et al.} \cite{stegmeir2019} and show the expected transition when $k_\perp$ is varied, Fig. \ref{fig:transitionSLAB}. \newline
+The dispersion relation describes "shear Alfvén waves", according to which perturbations travel along magnetic field lines. In cases with high parallel conductivity, the first term dominates the dispersion relation. We then observe that the relation describes a wave in parallel direction whose velocity is bound by the Alfvén wave speed $v_A = \frac{B}{\sqrt{m_in_i\mu_0}}$ for small $k_\perp$ and by the thermal electron wave speed $v_ {th,e} = \sqrt{\frac{T_e}{m_e}}$ for large $k_\perp$. This is in line with the findings by Dudson \emph{et al.}\cite{Dudson2021} and reflects the need for electron inertia to avoid unphysically large speeds in the upper $k_\perp$ limit. \\
+
+From Eq. \ref{eq:VV_dispersionRelation}, we expect a wave in the parallel direction traveling at the Alfvén velocity for small $k_\perp$ and at the thermal electron velocity at high $k_\perp$. In the slab domain, $k_\perp$ is changed by changing the radial dimension of the domain. The results of our numerical simulations perfectly match the predictions by Dudson \cite{Dudson2021} and the numerical results obtained by Stegmeir \emph{et al.}\cite{stegmeir2019} and show the expected transition when $k_\perp$ is varied, Fig. \ref{fig:transitionSLAB}. \newline
 
 \begin{figure}[h]\centering
 	\centering
@@ -422,28 +421,5 @@ From Eq. \ref{eq:VV_dispersionRelation}, we expect a wave in the parallel direct
 	\caption{Fitted wave frequencies as a function of the perpendicular wave numbers. The lines indicate the theoretical wave frequencies in the electrostatic case with finite electron mass (ES), the electromagnetic case with $m_e = 0$ (EM), and the complete electromagnetic case with electron inertia (ES + EM).}
 	\label{fig:transitionSLAB}
 \end{figure}
-
-
-
-
-!!!! ALERNATIVE TEXT !!!!!!!
-Density perturbations provoke an electromagnetic response. To this effect, we consider a standard four-field model that couples the electron density $n_e$ with the parallel current density $j_\parallel$ and both potentials $\Phi$ and $A_\parallel$. The governing equations now are: 
-
-\begin{align}
-	\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad^2_\perp\Phi\right] &= \grad\cdot(j_\parallel\mathbf{b}) \\
-	\grad^2_\perp A_\parallel &= -\mu_0j_\parallel \\
-	\eta_\parallel j_\parallel + \frac{ m_e}{n_ee^2} \partial_t j_\parallel  &= \left(-\grad_\parallel\Phi - \partial_t A_\parallel + T_e\grad_\parallel\log(n_e)\right) \\
-	\partial_t n_e &= \frac{1}{e}\grad\cdot (j_\parallel\mathbf{b}) 
-	\label{eq:fourFieldModel}
-\end{align}
-
-Its complex dispersion relation has a real and an imaginary part indicating the appearance of a decaying wave. 
-
-\begin{equation}
-	\label{eq:dispersionRelation}
-	\omega_A^2 = \left(\frac{v_A^2}{1 + \frac{m_e}{e^2 \mu_0 n_e} k_\perp^2} + \frac{1}{\frac{n_e \mu_0}{T_0 k_\perp^2} + \frac{1}{v_{th,e}^2}}\right) k_\parallel^2 - \frac{\eta_\parallel^2k_\perp^4}{4\left(\mu_0+\frac{m_e}{e^2n_i}k_\perp^2\right)^2}
-\end{equation}
-
-The dispersion relation describes "shear Alfvén waves", according to which perturbations travel along magnetic field lines. In cases with high parallel conductivity, the first term dominates the dispersion relation. We then observe that the relation describes a wave in parallel direction whose velocity is bound by the Alfvén wave speed $v_A = \frac{B}{\sqrt{m_in_i\mu_0}}$ for small $k_\perp$ and by the thermal electron wave speed $v_ {th,e} = \sqrt{\frac{T_e}{m_e}}$ for large $k_\perp$. This is in line with the findings by Dudson et al \cite{Dudson2021} and reflects the need for electron inertia to avoid unphysically large speeds in the upper $k_\perp$ limit.
 
 

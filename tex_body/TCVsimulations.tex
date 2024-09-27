@@ -1,4 +1,5 @@
-\chapter{Electromagnetic simulations on a realistic diverted geometry}
+\chapter{Diverted Geometry}
+\label{chap:TCV}
 
 To demonstrate the abilities of SOLEDGE3X to perform electromagnetic turbulence simulations of a realistic tokamak geometry, the configuration of the test cases has been inspired by the TCV-X21 benchmark \cite{oliveira2022}. This latter addresses L-mode discharges in TCV with a single lower X-point. 
 
@@ -23,7 +24,6 @@ In Fig. \ref{fig:EMsnapshots}, typical poloidal cuts of important plasma fields 
 	\caption{Simulation snapshots of the full electromagnetic scenario with flutter. The first poloidal plane is shown after 6 ms simulated plasma time on the TCV case. From left to right, the first row shows the ion density $n_i$, the electron temperature $T_e$, the electric potential $\Phi$, and the radial "ExB" drift velocity $v_E^\psi$. The second row shows the parallel magnetic potential $A_\parallel$, the parallel current density $j_\parallel$, the amplitude of the flutter field $\norm{\mathbf{\tilde{B}}}$, and the radial flutter advection velocity $v_{\tilde{b}^\psi}$.}
 	\label{fig:EMsnapshots}
 \end{figure}
-
 
 
 
@@ -109,49 +109,16 @@ The viscosity and heat diffusion solvers are not directly affected by the electr
 In total, electron inertia decreases the computing time with an excellent improvement of the vorticity matrix condition. The magnetic inductive model means slightly higher computational costs, because the implicit vorticity problem doubles in size. Including electromagnetic flutter in the system almost quadruples the execution time compared to the original implementation because the radial parallel gradient complicates both the implicit vorticity and the parallel diffusion problem. The timestep size does not vary considerably between the scenarios and hence has only a limited impact on the overall performance.
 
 
+\section{A glance at flutter}
 
-\section{Electromagnetic power scan}
-
-Full model, with electron inertia, magnetic induction and flutter. 
-
-Increase input power of the Ohmic heating in the TCV scenarios. Density is controlled by Horsten neutral model.
-
-\subsection{Qualitative evolution of the simulation}
-
-First phase the plasma heats up. As it reaches a quasi-steady state (surge in output heat fluxes to compensate the core source), Increase in turbulent transport across separatrix. But importantly: strong increase of the radial flutter flux.
-
-\subsection{Mid-plane profiles}
-
-
-\begin{figure}[H]\centering
-	\begin{subfigure}[t]{0.30\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/TCVpowerScan_OMP_profiles_e-_n.png}
-		\subcaption{Plasma density $n$}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.30\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/TCVpowerScan_OMP_profiles_D+_T.png}
-		\subcaption{Electron temperature $T_e$}
-	\end{subfigure}
-	\begin{subfigure}[t]{0.30\textwidth}
-		\centering
-		\includegraphics[width=1\textwidth]{schemes/TCVpowerScan_OMP_profiles_global_fields_E_r.png}
-		\subcaption{Electric potential $\Phi$}
-	\end{subfigure}
-	\caption{Radial profiles at the outer mid-plane after 4ms.}
-	\label{fig:TCV_powerScan_OMP_profiles}
-\end{figure}
-
-
-Formation of a pedestal ?
-
-
-
-
-\subsection{Flutter in the high-power cases}
+\subsection{Grad-Shafranov shift}
 
 Poincaré plots:
+
+What about the average taken out to avoid twice the Grad-Shafranov shift ? 
+
+
+\subsection{View of the fluctuating magnetic field}
 
 
 \begin{figure}[H]\centering
@@ -162,9 +129,50 @@ Poincaré plots:
 \end{figure}
 
 
+\subsection{Electromagnetic transport}
 
 
-What about the average taken out to avoid twice the Grad-Shafranov shift ? 
+
+
+
+%\section{Electromagnetic power scan}
+%
+%Full model, with electron inertia, magnetic induction and flutter. 
+%
+%Increase input power of the Ohmic heating in the TCV scenarios. Density is controlled by Horsten neutral model.
+%
+%\subsection{Qualitative evolution of the simulation}
+%
+%First phase the plasma heats up. As it reaches a quasi-steady state (surge in output heat fluxes to compensate the core source), Increase in turbulent transport across separatrix. But importantly: strong increase of the radial flutter flux.
+%
+%\subsection{Mid-plane profiles}
+%
+%
+%\begin{figure}[H]\centering
+%	\begin{subfigure}[t]{0.30\textwidth}
+%		\centering
+%		\includegraphics[width=1\textwidth]{schemes/TCVpowerScan_OMP_profiles_e-_n.png}
+%		\subcaption{Plasma density $n$}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.30\textwidth}
+%		\centering
+%		\includegraphics[width=1\textwidth]{schemes/TCVpowerScan_OMP_profiles_D+_T.png}
+%		\subcaption{Electron temperature $T_e$}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.30\textwidth}
+%		\centering
+%		\includegraphics[width=1\textwidth]{schemes/TCVpowerScan_OMP_profiles_global_fields_E_r.png}
+%		\subcaption{Electric potential $\Phi$}
+%	\end{subfigure}
+%	\caption{Radial profiles at the outer mid-plane after 4ms.}
+%	\label{fig:TCV_powerScan_OMP_profiles}
+%\end{figure}
+%
+%
+%Formation of a pedestal ?
+%
+%
+
 
 
 
