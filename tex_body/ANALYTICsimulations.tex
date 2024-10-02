@@ -1,6 +1,10 @@
 \chapter{Limited Geometry}
 \label{chap:analSimulations}
 
+
+The linear analysis from the previous section is only of very limited use, as characteristic shear Alfvén and thermal electron times are much shorter than the ion cyclotronic time, which underlies the resolution of typical turbulent SOLEDGE3X simulations. Drift Alfvén waves in turn correspond to the impact of inductive electromagnetic effect on the formation of drift waves, where the term $\partial_t A_\parallel$ in Ohm's law modifies the non-adiabatic response of the potential $\Phi$ to parallel fluctuations of the electron pressure $p_e$. This chapter seeks to investigate these effects on a few analytic geometries. In the first Sec. \ref{sec:anal_DAW_modeExcitation}, we take a closer look at the theoretic linear dynamics of drift-Alfvén waves with electromagnetic effects. We then consider a toroidal slab geometry in Sec. \ref{sec:anal_SLAB} on which we study the propagation of a plasma blob and the excitation of drift-wave turbulence. Finally in Sec. \ref{sec:anal_CIRC}, we consider the linear and nonlinear turbulence phases on a limited circular geometry with open and closed field lines.
+
+
 \section{Electromagnetic modes excitation}
 \label{sec:anal_DAW_modeExcitation}
 
@@ -86,12 +90,23 @@ The real part is altered by the electromagnetic additions, but the change of pha
 
 
 \section{Slab configurations}
+\label{sec:anal_SLAB}
+
+We place ourselves in a plasma environment similar to the separatrix region in the diverted TCV simulations from the next Chapter \ref{chap:TCV}. The magnetic field is aligned to the toroidal coordinate with $B_{eq,t} = 1.3$T with a curvature of $1.1$m from the tokamak center, similar to the position of the separatrix at the outer mid-plane in TCV. Limiters are placed at both toroidal ends such that that connection length $L_\varphi = 45$m. A cartesian grid with coordinates $r$ and $z$ discretizes each poloidal plane, allowing radial fluxes out and with periodic boundary conditions in the vertical $z$-direction. To simplify the study and prevent numerical difficulties at the sheath, we apply Neumann-0 boundary $\partial_\parallel n^{BC} = 0$ on the density and the potential $\Phi$ is fixed to $\Phi^{BC} = \Lambda T_e^{BC}$. This is a major simplification to the typical SOLEDGE3X sheath conditions described in Sec. \ref{sec:S3X_boundaryConditions}. A 3D representation of the domain is given in Fig. \ref{fig:anal_slabDomain}
+
+
+\begin{figure}[H]\centering
+	\centering
+	\includegraphics[width=.8\textwidth]{schemes/3DblobView.png}
+	\caption{3D representation of the slab domain with four poloidal planes. The toroidal length of the domain is artificially increased to 45m while keeping the radius at 1.1m}
+	\label{fig:anal_slabDomain}
+\end{figure}
+
+
 \subsection{Analysis of a plasma blob}
 \label{ssec:plasmablob}
 
-The linear analysis from the previous section has only , as characteristic shear Alfvén and thermal electron times are much shorter than the ion cyclotronic time, which underlies the resolution of typical turbulent SOLEDGE3X simulations. Drift Alfvén waves in turn correspond to the impact of inductive electromagnetic effect on the formation of drift waves, where the term $\partial_t A_\parallel$ in Ohm's law modifies the non-adiabatic response of the potential $\Phi$ to parallel fluctuations of the electron pressure $p_e$. To study the these effects on a plasma blob in a slab domain. \newline
-
-We place ourselves in a plasma environment similar to the separatrix region in the diverted TCV simulations from the next Chapter \ref{chap:TCV}. The magnetic field is aligned to the toroidal coordinate with $B_{eq,t} = 1.3$T with a curvature of $1.1$m from the tokamak center, similar to the position of the separatrix at the outer mid-plane in TCV. Limiters are placed at both toroidal ends such that that connection length $L_\varphi = 65$m. A cartesian grid with coordinates $r$ and $z$ discretizes each poloidal plane, allowing radial fluxes out and with periodic boundary conditions in the vertical $z$-direction. The electron temperature is kept constant at $T_e=60$eV, ions are cold and the background density is set to $n_0 = 10^{19}$part/m$^3$. To simplify the study and prevent numerical difficulties at the sheath, we apply Neumann-0 boundary $\partial_\parallel n^{BC} = 0$ on the density and the potential $\Phi$ is fixed to $\Phi^{BC} = \Lambda T_e^{BC}$. This is a major simplification to the typical SOLEDGE3X sheath conditions described in Sec. \ref{sec:S3X_boundaryConditions}. The axisymmetric blob initially takes a Gaussian profile 
+In the first series of test, we study the propagation of a plasma blob in the slab domain. The electron temperature is kept constant at $T_e=60$eV, ions are cold and the background density is set to $n_0 = 10^{19}$part/m$^3$. The axisymmetric blob initially takes a Gaussian profile 
 
 \begin{equation}
 	n = n_0 \left(1 + \alpha e^{-\left[(r-r_b)^2+(z-z_b)^2\right]/\delta_b}\right)
@@ -126,22 +141,27 @@ In the previous section, we examined how a single plasma blob propagates across 
 
 Initially, the particle source causes the density to build up on the core side of the slab. The radial gradient becomes stronger and soon collapses into drift waves. These waves are particularly pronounced in the electrostatic and electromagnetic inductive models. The term $\partial_t A_\parallel$ in Ohm's law intensifies the turbulent interchange, with plasma filaments reaching much further outward. On the other hand, the electromagnetic model with flutter has a stabilizing effect, producing only a thin turbulent layer at the exit of the source and maintaining a strong gradient at the transition from high- to low-density regions. As more particles are introduced at the source, the pressure differential causes this transition line to bend at scales of the simulation box, while the local gradient remains very steep. \newline
 
+
+
+
 \section{Circular geometry}
+\label{sec:anal_CIRC}
+
+In a more integrative scenario, we place ourselves in a circular geometry with a flat limiter on the low-field side. The configuration has now both closed and open flux surfaces with a separatrix at the interface, which allows to study the propagation of turbulent structures from the core to the SOL. We compare the original electrostatic model with electron inertia, electron inertia and magnetic induction, and the full model with electron inertia, induction and flutter.
 
 \subsection{Simulation set-up}
 
-Flat limiter on the low-field side
-
+The circular geometry corresponds to a tokamak with major and minor radii $R_0 = 0.9$m and $a=0.2$m. The toroidal magnetic field is $B_\varphi = 1.3$T and the poloidal field maintains a safety factor $q_s=3$, such that the pitch angle is constant at $\alpha = \arctan1/q_s \approx 18.4°$. The simulation domain spans the radial coordinates $[0.8r_{sep},1.15r_{sep}]$ and to save simulation time, we only consider a quarter of the torus and assume a periodic extension to the remaining three-quarters. The domain is discretized in $N_\psi\cross N_\theta \cross N_\varphi = 128\cross512\cross64$ points per direction, or about a total of 4.2 million cells. A constant heat source of 1MW is applied to both electrons and ions and a particle source of $10^{22}$ part/s is applied in a Gaussian-shaped region between 0.81 and 0.87$r_{sep}$. Initial profiles have been obtained by running the code in transport mode with anomalous perpendicular diffusion coefficients $1.$ m$^2$/s and $0.3$ m$^2$/s for density respectively temperature until stable profiles established. Typical simulation snapshots for the four scenarios are given in Fig. \ref{fig:anal_CIRC_fluctT}.
 
 \begin{figure}[H]\centering
 	\centering
-	\includegraphics[width=1\textwidth]{schemes/CIRC_fluctT.jpg}
-	\caption{Snapshots of the electron temperature $T_e$ fluctuations}
-	\label{fig:CIRC_fluctPHI}
+	\makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{schemes/CIRC_fluctT.jpg}}    
+	\caption{Snapshots of the toroidal fluctuations in electron temperature $T_e - \langle T_e\rangle_\varphi$ after 0.1ms simulated plasma time.}
+	\label{fig:anal_CIRC_fluctT}
 \end{figure}
 
 
-\subsection{Instability growth rates}
+\subsection{Linear instability growth}
 
 As we restart the simulations from a smooth profile, we can observe the growth of instabilities in the beginning of the simulation. Initially, instabilities will grow linearly until they reach a saturation point, when nonlinear effects kick in. In this first (short) phase, we will be able to verify the tendencies from the analysis of the dispersion relation in Sec. \ref{sec:anal_DAW_modeExcitation}, thus electron inertia has a slight and magnetic induction a strong destabilizing while flutter stabilizes the system. To evaluate the perturbations, we calculate the root mean square (RMS) deviation from the toroidal average in every cell. The global metric is then obtained by averaging the local values over the volume $V$ of the entire domain. 
 
@@ -186,13 +206,143 @@ Second, we modify the value of the reference $\beta_0$ that appears in the dimen
 		\includegraphics[width=1\textwidth]{schemes/RMST_betaScan.jpg}
 		\subcaption{RMS of temperature $T_i$}
 	\end{subfigure}
-	\caption{Evolution of the the root mean square deviation for different values of $\beta$. The  is artificially increased and the 0 factor corresponds effectively to the electrostatic with electron inerita. The electron mass for all scenarios is physical (factor 1 in Fig. \ref{fig:CIRC_meScan}).}
+	\caption{Evolution of the root mean square deviation for different values of $\beta$. The  is artificially increased and the 0 factor corresponds effectively to the electrostatic with electron inerita. The electron mass for all scenarios is physical (factor 1 in Fig. \ref{fig:CIRC_meScan}).}
 	\label{fig:CIRC_betaScan}
 \end{figure}
 
 For both the $m_e$ and $\beta_0$ scan, we could see that the linear growth corresponds to the expectations from the linear analysis. As the effects of electron inertia and magnetic induction get stronger, plasma perturbations grow faster and reach their saturation point faster. Note that the saturation levels are similar for all scenarios, so the used RMS metric is not very adapted to analyze the subsequent nonlinear phase of the simulation. \\
 
 The results here can however not be correlated one-to-one to the dispersion relation. In the SOLEDGE3X model, interchange instabilities also contribute to the rise of perturbation, and the simulation was run with the energy conservation equation and hence ion and electron temperature gradients add an additional source of instability. The dispersion relation was calculated without curvature effects and using an isothermal assumption, but the general expected trend is still observed. 
+
+
+\subsection{Nonlinear turbulence phase}
+
+The linear phase only concerns the very beginning of the simulation. During the vast majority of the density and energy ramp-up phase, fluctuations have saturated and nonlinear effects dominate turbulent structures. For this phase, we drop the $m_e$ and $\beta$ scans and only consider the scenarios with their true physical values.
+
+
+\subsubsection{Evolution of mid-plane profiles}
+
+At first, let us compare temperature profiles at the outer mid-plane for the electrostatic scenarios with and without electron inertia. The evolution of the profiles, as well as the associated particle fluxes, are given in Fig. \ref{fig:CIRC_EI_OMPevolution}. The corresponding plots for the density are found in App. \ref{app:turbulentProfiles}.
+
+One can recognize the linear growth phase in the beginning of the simulation, during which temperature builds up in direct vicinity to the core. After about 0.04ms plasma time, the hot plasma collapses into energy bursts that start traveling towards the separatrix. It immediately appears that these bursts travel 
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_T_PHI.jpg}
+		\subcaption{Electrostatic - ion temperature}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_T_PHIJ_mass_1.jpg}
+		\subcaption{Electron inertia - ion temperature}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_fluxE_psi_PHI.jpg}
+		\subcaption{Electrostatic - radial heat flux}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_fluxE_psi_PHIJ_mass_1.jpg}
+		\subcaption{Electron inertia - radial heat flux}
+	\end{subfigure}
+	\caption{Evolution of the radial ion temperature profiles and heat fluxes at the outer mid-plane for the electrostatic scenarios. The dashed line indicates the position of the separatrix and the plasma in the first poloidal plane is taken}
+	\label{fig:CIRC_EI_OMPevolution}
+\end{figure}
+
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_T_PHIAJ_beta_1.jpg}
+		\subcaption{Electromagnetic - ion temperature}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_T_flutter.jpg}
+		\subcaption{Electromagnetic with flutter - ion temperature}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_fluxE_psi_PHIAJ_beta_1.jpg}
+		\subcaption{Electromagnetic - radial heat flux}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotOMPtime_spec1_fluxE_psi_flutter.jpg}
+		\subcaption{Electromagnetic with flutter - radial heat flux}
+	\end{subfigure}
+	\caption{Evolution of the radial ion temperature profiles and heat fluxes at the outer mid-plane for the electromagnetic scenarios. The dashed line indicates the position of the separatrix and the plasma in the first poloidal plane is taken}
+	\label{fig:CIRC_EM_OMPevolution}
+\end{figure}
+
+
+
+\subsection{Mode structures}
+
+In the simulation snapshots in Fig. \ref{fig:anal_CIRC_fluctT}, we observe turbulent blobs on all four graphs. To assess the turbulence, it could be interesting to compare their structures and detect any differences between the scenarios. For this purpose, we rather consider a flux surface instead of a poloidal plane. Specifically, we choose the surface at $i_\psi=70$ as it is just short of the separatrix on the core side. The advantage of a closed surface is its periodicity in both directions, such that we can easily perform a modal analysis there. To remove any constant mode, we first remove the toroidal average of the density field $n_i' = n_i-\rangle n_i\rangle_\varphi$. A view of the field is in Fig. \ref{fig:CIRC_fluxSurface_flutter_real}. We observe long, seemingly toroidally attached filaments that appear regularly in the perpendicular direction. \newline 
+
+On this field, we now perform a two-dimensional Fourier transform, and extract its power spectrum:
+
+\begin{equation}
+	P_{\tilde{n}}(k_\theta,k_\varphi) = \left|\tilde{n}(k_\theta,k_\varphi)\right|^2\qquad\qquad\text{with: }\tilde{n}(k_\theta,k_\varphi) = \mathcal{F}\{n_i'(\theta,\varphi)\}
+\end{equation}
+
+To remove noise from the discretization scale, we first apply a Gaussian filter with a small $\sigma$ on the data. The next step is to transform the poloidal and toroidal wave representation to the parallel and perpendicular space. For this purpose, we simply rotate the wave vectors by the pitch angle $\alpha$
+ 
+\begin{align}
+	\textbf{k}_\parallel &= +\textbf{k}_\varphi\cos\alpha + \textbf{k}_\theta\sin\alpha &
+	\textbf{k}_\perp     &= -\textbf{k}_\varphi\sin\alpha + \textbf{k}_\theta\cos\alpha
+\end{align}
+
+The rotated power spectrum for the flutter scenario can be seen in \ref{fig:CIRC_fluxSurface_flutter_Fourier}. We observe a dominant mode at $k_\parallel=0$ that mathces the long filaments. The black diagonal line effectively corresponds to the toroidal mode $k_\varphi=0$, which is exactly 0 because the toroidal average of $n$ was removed. The modes at high $k_\perp$ also vanished thanks to the Gaussian filter.
+ 
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plot2Dtube_spec1_n_flutter.jpg}
+		\subcaption{Toroidal density fluctuations $n_i'$}
+		\label{fig:CIRC_fluxSurface_flutter_real}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/plotPowerSpectrum_spec1_n_flutter.jpg}
+		\subcaption{Power spectrum $P_{\tilde{n}}$}
+		\label{fig:CIRC_fluxSurface_flutter_Fourier}
+	\end{subfigure}
+	\caption{View of the flux surface at $i_\psi=70$ at the time for the flutter scenario in real and in Fourier space. The arrows indicate the direction of the parallel and perpendicular wave vectors $\textbf{k}_\parallel$ and $\textbf{k}_\perp$. The spectrum is rotated to the $[\textbf{k}_\parallel,\textbf{k}_\perp]$ coordinate system.}
+	\label{fig:CIRC_fluxSurface_flutter}
+\end{figure}
+
+In the perpendicular direction, we can distinguish some bands that characterize the filamentary structure of the turbulence. To isolate them, we take the sum over all $k_\parallel$ while excluding all modes that are too close to the constant mode $\pm30$m$^{-1}$:
+
+\begin{equation}
+	\tilde{n}_\perp(k_\perp) = \int_{\mathbb{R}\setminus (-30, 30)}\tilde{n}dk_\parallel
+\end{equation}
+
+We can then plot the evolution of the power spectrum $\tilde{n}_\perp$ over the simulated plasma time. For the electrostatic and flutter scenarios, they are in Fig. \ref{fig:CIRC_evolutionKperp} and for the electron inertia and induction scenarios in App. \ref{sec:turbulentProfiles_CIRCmodal}.
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/k_perp_time_spec1_n_PHI.jpg}
+		\subcaption{Electrostatic scenario}
+		\label{fig:CIRC_evolutionKperp_PHI}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/k_perp_time_spec1_n_flutter.jpg}
+		\subcaption{Full electromagnetic scenario}
+		\label{fig:CIRC_evolutionKperp_flutter}
+	\end{subfigure}
+	\caption{Evolution of the power spectrum of $\tilde{n}_\perp$ associated to the perpendicular modes $k_\perp$ in the range $[-400,400]$m$^{-1}$ over the simulation time. }
+	\label{fig:CIRC_evolutionKperp}
+\end{figure}
+
+
+
 
 
 
