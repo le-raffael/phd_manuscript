@@ -151,7 +151,7 @@ In a more integrative scenario, we place ourselves in a circular geometry with a
 
 \subsection{Simulation set-up}
 
-The circular geometry corresponds to a tokamak with major and minor radii $R_0 = 0.9$m and $a=0.2$m. The toroidal magnetic field is $B_\varphi = 1.3$T and the poloidal field maintains a safety factor $q_s=3$, such that the pitch angle is constant at $\alpha = \arctan1/q_s \approx 18.4°$. The simulation domain spans the radial coordinates $[0.8r_{sep},1.15r_{sep}]$ and to save simulation time, we only consider a quarter of the torus and assume a periodic extension to the remaining three-quarters. The domain is discretized in $N_\psi\cross N_\theta \cross N_\varphi = 128\cross512\cross64$ points per direction, or about a total of 4.2 million cells. A constant heat source of 1MW is applied to both electrons and ions and a particle source of $10^{22}$ part/s is applied in a Gaussian-shaped region between 0.81 and 0.87$r_{sep}$. Initial profiles have been obtained by running the code in transport mode with anomalous perpendicular diffusion coefficients $1.$ m$^2$/s and $0.3$ m$^2$/s for density respectively temperature until stable profiles established. Typical simulation snapshots for the four scenarios are given in Fig. \ref{fig:anal_CIRC_fluctT}.
+The circular geometry corresponds to a tokamak with major and minor radii $R_0 = 0.9$m and $a=0.2$m. The toroidal magnetic field is $B_\varphi = 1.3$T and the poloidal field maintains a safety factor $q_s=3$, such that the pitch angle is constant at $\alpha = \arctan1/q_s \approx 18.4°$. The simulation domain spans the radial coordinates $[0.8,1.15]r_{sep}$ and to save simulation time, we only consider a quarter of the torus and assume a periodic extension to the remaining three-quarters. The domain is discretized in $N_\psi\cross N_\theta \cross N_\varphi = 128\cross512\cross64$ points per direction, or about a total of 4.2 million cells. A constant heat source of 1MW is applied to both electrons and ions and a particle source of $10^{22}$ part/s is applied in a Gaussian-shaped region between 0.81 and 0.87$r_{sep}$. Initial profiles have been obtained by running the code in transport mode with anomalous perpendicular diffusion coefficients $1.$ m$^2$/s and $0.3$ m$^2$/s for density respectively temperature until stable profiles established. Typical simulation snapshots for the four scenarios are given in Fig. \ref{fig:anal_CIRC_fluctT}.
 
 \begin{figure}[H]\centering
 	\centering
@@ -300,13 +300,13 @@ The rotated power spectrum for the flutter scenario can be seen in \ref{fig:CIRC
  
 
 \begin{figure}[H]\centering
-	\begin{subfigure}[t]{0.45\textwidth}
+	\begin{subfigure}[t]{0.55\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{schemes/plot2Dtube_spec1_n_flutter.jpg}
 		\subcaption{Toroidal density fluctuations $n_i'$}
 		\label{fig:CIRC_fluxSurface_flutter_real}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.45\textwidth}
+	\begin{subfigure}[t]{0.4\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{schemes/plotPowerSpectrum_spec1_n_flutter.jpg}
 		\subcaption{Power spectrum $P_{\tilde{n}}$}

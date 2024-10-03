@@ -178,7 +178,7 @@ Let us trace the perturbed field lines driven by flutter on the first poloidal p
 	\centering
 	\includegraphics[width=1\textwidth]{schemes/poincareFlutterHighPower.png}
 	\caption{Poincaré plot of the fluctuating magnetic field in the TCV high-power case for a random seed of 2500 points in a TCV poloidal plane.}
-	\label{fig:TCV_poincareFlutter}
+	\label{fig:TCV_poincareFlutter}	
 \end{figure}
 
 We observe the formation of islands whose centers are aligned with the separatrix. Their size corresponds approximately to typical turbulent filaments and their radial extent correlates to the region with steep temperature gradients. Some islands form also in vicinity to the core boundary, but this region is prone to artificial turbulence from the close heat source and fluid models  only have a limited validity there. A similar plot for the X21 flutter case, in App. \ref{sec:turbulentProfiles_poincareLmode}, does not exhibit any coherent structures, reinforcing the idea that the magnetic fluctuations play an important role for the transport barrier at high power. The exact physical mechanisms behind this observation still need to be investigated thoroughly.
@@ -186,7 +186,30 @@ We observe the formation of islands whose centers are aligned with the separatri
 
 \subsubsection{Grad-Shafranov shift}
 
-What about the average taken out to avoid twice the Grad-Shafranov shift ? 
+In Sec. \ref{ssec:S3X_flutter}, we discussed the necessity of removing the equilibrium component from $A_\parallel$ before calculating the flutter field components. The concern was that $A_\parallel$ contains contributions from the Pfirsch-Schlüter current, which have already been accounted for in the poloidal flux function $\Psi$ that defines the equilibrium field $B_{pol}$. For the time being, we remove the toroidal average of $A_\parallel$ at each timestep, yielding stable simulations. The effects of this procedure are shown in Fig. \ref{fig:TCV_poloidalFieldGS}, where we compare the flutter field to $B_{pol}$ with and without removing the average. When the full $A_\parallel$ is used, large structures appear, particularly on the low-field side, reaching 13\% of the amplitude of $B_{pol}$. However, when we use only the toroidal fluctuations of $A_\parallel$ for the flutter, these structures disappear, leaving fine filaments at a much lower amplitude against a $\tilde{\textbf{B}}=0$ background. Thus, this pre-processing step for $A_\parallel$ appears necessary and effective. It also suggests that for the current applications of SOLEDGE3X, there is no need to apply an additional time-averaging process, as proposed by \cite{zhang2024}, since we do not observe transient structures.
+
+\begin{figure}[H]\centering
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/Hmode_Bpol_eq.jpg}
+		\subcaption{Equilibrium poloidal field}
+		\label{fig:TCV_poloidalFieldGS_Beq}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/Hmode_BEM_noAverage.jpg}
+		\subcaption{Flutter field from \\ the full $A_\parallel$}
+		\label{fig:TCV_poloidalFieldGS_Btilde_fullA}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.3\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{schemes/Hmode_BEM_averaged.jpg}
+		\subcaption{Flutter field from \\ the fluctuating $A_\parallel$}
+		\label{fig:TCV_poloidalFieldGS_Btilde_fluctuatingA}
+	\end{subfigure}
+	\caption{Comparison of the magnitude of the flutter field to the poloidal magnetic field strength $B_{pol}$. Snapshot on the first poloidal plane at the end of the high-power scenario.}
+	\label{fig:TCV_poloidalFieldGS}
+\end{figure}
 
 
 
