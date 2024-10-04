@@ -1,5 +1,26 @@
 \chapter{Tokamak Concept}
 \label{chap:TokamakConcept}
+
+\vfill
+\begin{chaptersummarybox}
+	With a given initial velocity, charged particles travel along magnetic field lines on a circular trajectory with the Larmor radius $\rho_L$ and cyclotron frequency $\omega_B$. 
+	\begin{align*}
+		\rho_L   &= \frac{m\norm{\mathbf{v}_{\perp,0}}}{qB} &
+		\omega_B &= \frac{qB}{m}
+	\end{align*}	
+	Any force perpendicular to the magnetic field causes particles to drift with the velocity $\mathbf{v}_d = \frac{\mathbf{B}\cross\mathbf{F}_\perp}{qB^2}$. To control particle motion, tokamaks employ toroidal and poloidal magnetic fields $B_{\varphi}$ and $B_{p}$ to shape a helical configuration around a torus. To compensate for plasma currents, the magnetohydrodynamic equilibrium causes the so-called Grad-Shafranov shift, which pushes the poloidal field outward. A low ratio between thermodynamic to magnetic pressure, $\beta = \frac{neT}{B^2/2\mu_0}$, is important to avoid plasma instabilities. \\
+	At scales beyond the Debye length $\lambda_D = \sqrt{\frac{\varepsilon_0T_e}{n_ee^2}}$, the plasma organizes itself in a state of quasi-neutrality. Collisions between particles cause momentum, energy and charge exchanges, leading to viscosity, heat diffusion and resistivity according to the Spitzer-Härm model:
+	\begin{align*}
+		\nu_{SH}    &\propto \frac{T_e^{5/2}}{Z^4 \ln \Lambda} &
+		\kappa_{SH} &\propto \frac{T_e^{5/2}}{Z \ln \Lambda}   &
+		\eta_{SH}   &\propto\frac{Z \ln \Lambda}{T_e^{3/2}}
+	\end{align*}
+	At the sheath, where magnetic field lines intersect the tokamak wall, a net negative charge develops that attracts ions at high speeds. In divertors, the heat exhaust is concentrated on two thin target lines, and the width $\lambda_q$ is critical for reactor designs.
+\end{chaptersummarybox}
+\vfill
+
+\newpage
+
 Fusion reactions require extreme temperatures at about 15keV to happen. At such high temperatures, any matter transforms into an ionized state, called plasma, where electrons are dissociated from their atomic core. Charged particles are particularly responsive to magnetic fields, a property that will be used by tokamaks to confine the hot plasma and protect the physical walls of the device. 
 
 A deuterium plasma is an ionized gas comprising positively charged ions ($D^+$) and negatively charged electrons ($e^-$). Initially, both species exhibit independent dynamics. Despite having exactly opposite charges, ions are significantly heavier than electrons, with a mass ratio of $m_i/m_e \approx 3.7\cdot 10^3$. Both ions and electrons can be described by their respective momenta and temperatures. In Sec. \ref{sec:intro_particlesInPlasma}, we first describe their independent behavior in a magnetized environment, then how species interact in Sec. \ref{sec:intro_particlesInteration} and we finish with Sec. \ref{sec:intro_SOL} about the importance of the Scrape-Off-Layer.
@@ -8,7 +29,7 @@ A deuterium plasma is an ionized gas comprising positively charged ions ($D^+$) 
 \section{Particles in a magnetized plasma}
 \label{sec:intro_particlesInPlasma}
 
-This first section describes the fundamental working principle of plasma confined in a tokamaks. Before all, we must understand how charged particles behave when exposed to strong magnetic fields (in Sec. \ref{ssec:intro_magneticConfinement}) and how they experience drifts in perpendicular direction (in Sec. \ref{ssec:edge_plasmaDrifts}). This knowledge allows us to design a magnetic "cage", in which particles are trapped, or confined (in Sec. \ref{ssec:intro_tokamakConfiguration}). The governing equations of this magnetic configuration are given in Sec. \ref{sec:intro_GradShafranov} and Sec. \ref{ssec:intro_limitedDivertedConfig} introduces and compares limited and diverted configurations.
+This first section describes the fundamental working principle of plasma confined in a tokamaks. Before all, we must understand how charged particles behave when exposed to strong magnetic fields (in Sec. \ref{ssec:intro_magneticConfinement}) and how they experience drifts in perpendicular direction (in Sec. \ref{ssec:intro_plasmaDrifts}). This knowledge allows us to design a magnetic "cage", in which particles are trapped, or confined (in Sec. \ref{ssec:intro_tokamakConfiguration}). The governing equations of this magnetic configuration are given in Sec. \ref{sec:intro_GradShafranov} and Sec. \ref{ssec:intro_limitedDivertedConfig} introduces and compares limited and diverted configurations.
 
 \subsection{Gyromotion of a single particle}
 \label{ssec:intro_magneticConfinement}

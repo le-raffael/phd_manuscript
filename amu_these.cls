@@ -138,6 +138,14 @@
 \RequirePackage{pdfpages}					%% insertion de pdf
 \RequirePackage{hyperref}					%% pdf interactifs (package hyperref appelé en dernier)
 
+\RequirePackage{tcolorbox}
+\newtcolorbox{chaptersummarybox}[1][]{
+	colback=blue!5!white,  % background color
+	colframe=blue!75!black,  % frame color
+	fonttitle=\bfseries,    % title formatting
+	title=Chapter Summary,  % box title
+	#1 % allows for additional options
+}
 \pdfminorversion=5							%% PDF en version 1.5
 \pdfobjcompresslevel 0						%% compression des objets
 \pdfcompresslevel 0							%% compression du PDF

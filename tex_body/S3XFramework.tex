@@ -1,6 +1,29 @@
 \chapter{The physical model}
 \label{chap:SOLEDGE3X_framework}
 
+\vfill
+\begin{chaptersummarybox}
+	In the new electromagnetic model for SOLEDGE3X, conservation equations for mass, momentum, energy, and charge are extended to include magnetic induction and electron inertia effects. Additionally, it requires solving for the parallel magnetic vector potential $A_\parallel$ in Ampère's law. The dimensionless model equations are:
+	\begin{align*}
+		\partial_t n_i + \nabla\cdot\left(n_i\mathbf{u}\right) =& S_{n,i} - \mathfrak{D}_n^i \\
+		m_i\partial_t \gamma_{i} + m_i\grad\cdot\left(\gamma_{\parallel,i}\mathbf{u}\right) + \grad_\parallel{p_i} =& Z_in_iE_\parallel - \mathbf{b}\cdot\grad\cdot\boldsymbol{\Pi}_i + S_{\gamma,i} + R_{\parallel,i} - \mathfrak{D}_\gamma^i \\
+		\partial_t \varepsilon_\alpha + \nabla \cdot \left( (\varepsilon_\alpha + p_\alpha)\mathbf{u}_\alpha + \boldsymbol{\Pi}_i\cdot\mathbf{u}_\alpha + q_\alpha \right) =& \mathbf{u}_\alpha \cdot \left(Z_\alpha n_\alpha\mathbf{E}_\alpha + \mathbf{R}_\alpha \right) + Q_\alpha + S_{\varepsilon,\alpha} - \mathfrak{D}_\varepsilon^\alpha \\
+		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\left(j_\parallel \textbf{b}\right) =& \grad\cdot\left(\mathbf{j}^* + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_\pi  - \mathfrak{D}_\Omega \\
+		\eta_\parallel j_\parallel + \frac{m_e}{n_e}\left(\partial_t j_\parallel + \mathfrak{D}_j + \grad\cdot\left[\textbf{u}_j j_\parallel \right]\right) =& -\grad_\parallel\Phi - \beta_0 \left(\partial_tA_\parallel + \mathfrak{D}_A\right) \\ 
+		&+ T_e\grad_\parallel\log(n_e) + 1.71\grad_\parallel T_e \\
+		\grad\cdot\grad_\perp A_\parallel =& -j_\parallel
+	\end{align*}
+	
+	The magnetic potential drives perturbations in the magnetic field, commonly referred to as flutter. To avoid double-counting currents already included for the poloidal equilibrium field, only toroidal fluctuations $\tilde{A}_\parallel = A_\parallel - \langle A_\parallel\rangle_\varphi$ contribute. Flutter is calculated as:
+	\begin{equation*}
+		\tilde{\mathbf{b}} = \beta_0 \left(- \frac{\mathbf{b}_{eq} \times \nabla \tilde{A}_\parallel}{\norm{\mathbf{B}}} + \frac{\tilde{A}_\parallel \nabla \times \mathbf{b}_{eq}}{\norm{\mathbf{B}}}\right)
+	\end{equation*}
+	The flutter field is assumed to be small compared to the equilibrium field and is added as a first-order correction, $\textbf{b} = \textbf{b}_{eq} + \tilde{\textbf{b}}$. It affects transport in the parallel direction as well as parallel gradients in Ohm's law, parallel viscous forces, and parallel heat conduction.
+\end{chaptersummarybox}
+\vfill
+\newpage
+
+
 In the previous chapter, we laid the foundations of drift-reduced models for edge plasma. The project SOLEDGE3X was born with the merge of the 3D turbulence code TOKAM3X\cite{tamain2016tokam3x} and the 2D transport code SolEdge2D\cite{Bufferand_2015}. It stands as a comprehensive multi-species 2D/3D fluid solver to investigate transport and turbulence at the plasma edge up to the first wall, with a particular focus on modeling plasma-wall interactions. This has allowed successful investigations of numerous facets of edge plasma dynamics, such as turbulence\cite{Bufferand_2021} impurity transport\cite{Ciraolo2021} or ITER first-wall fluxes\cite{Rivals2022}. Until now, however, the model has been limited to electrostatic turbulence, with only fluctuations in the electric potential, determined by the non-adiabatic response to density fluctuations, being taken into account. \\
 
 By the end of this chapter, we will have formulated a set of self-consistent transport equations that include electromagnetic effects. The existing SOLEDGE3X framework is extended to accomodate a finite electron mass in Ohm's law, an inductive term in the parallel electric field and flutter perturbations of the magnetic equilibrium. This requires the addition of two new fields: the parallel current density $j_\parallel$ and the parallel magnetic vector potential $A_\parallel$. \\
@@ -179,8 +202,6 @@ jDia
 jPi
 jPolaRS
 
-
-
 Neglecting curvature terms, we can derive an expression for the perpendicular polarization current from \autoref{eq:definitionSmallOmega}.
 \begin{align}
 	\mathbf{j}_{p} =& -\partial_t\boldsymbol{\omega}_s - \sum_{i}Z_i\grad\cdot\left(\mathbf{u}^{(0)}_i\otimes\boldsymbol{\omega}_i\right) \\
@@ -236,7 +257,8 @@ If we now inject \autoref{eq:DefinitionParallelCurrent} into he vorticity equati
 	 \grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right]  = \grad\cdot\sigma_\parallel \left[-\grad_\parallel\Phi +  T_e\grad_\parallel\log(n_e) + 1.71\grad_\parallel T_e\right]\mathbf{b} + F_\Omega
 \end{equation}
 
-where $F_\Omega = \left(\mathbf{j}^* + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_\pi  - \mathfrak{D}_\Omega$ regroups the remaining terms. \\
+
+where $F_\Omega = \grad\cdot\left(\mathbf{j}^* + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_\pi  - \mathfrak{D}_\Omega$ regroups the remaining terms. \\
 The vorticity equation gives an relation for the electric potential $\Phi$, required to calculate "ExB" drifts and therefore essential to simulate plasma turbulence. Because of the low resistivity $\eta_\parallel$, this problem is actually numerically hard to solve. Explicit approaches are then strongly constrained by a timestep size of the order of the collision time. Implicit approaches have to handle a numerically difficult problem, with two Laplacian operators, one perpendicular and one parallel, with a high anisotropy because of the unfavorable ratio $\sigma_\parallel B^2 / m_in_i$ between the respective diffusion coefficients. The hardness to solve the system is a major obstacle for turbulent simulations on larger tokamaks because of prohibitive solve times of iterative solvers. Hotter scenarios, as they would occur in fusion-relevant devices, pose an additional problem as $\eta_\parallel\propto T_e^{-1.5}$, resulting in an even poorer numerical condition of the problem. 
 
 

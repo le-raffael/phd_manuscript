@@ -1,11 +1,44 @@
 \chapter{Numerical Implementation}
 \label{chap:Implementation}
+\begin{chaptersummarybox}
+	The SOLEDGE3X mesh is aligned with magnetic flux surfaces and uses a multi-domain decomposition to handle singularities at X-points. In the FVM approach, time integration is performed with an implicit-explicit scheme, where all collisional processes and the new Alfvénic and electron inertial dynamics are solved implicitly. To benefit from first-order spatial derivatives, the new fields $A_\parallel$ and $j_\parallel$ are defined on a poloidally and toroidally staggered grid. This setup requires new discrete operators to accommodate the divergence $\left|\grad\cdot X^{stg}\textbf{b}\right|_{col}$ of a staggered field onto a collocated grid and parallel gradients $\left|\textbf{b}\cdot\grad X^{col}\right|_{stg}$ of collocated fields onto the staggered grid for the electromagnetic vorticity equation, as well as a staggered-to-staggered perpendicular Laplacian operator $\left|\grad\cdot\grad_\perp X^{stg}\right|_{stg}$ for Ampère's law. With four staggered radial cell faces facing the X-point at once, Neumann boundary conditions are applied there. \\	
+	The new Ampère's law is solved along with the vorticity equation in a coupled 3D system for $\Phi$ and $A_\parallel$:	
+	\begin{align*}
+		\begin{pmatrix}
+			\nabla \cdot \left[ D_\perp \nabla_\perp \circ \right] + \nabla \cdot \left[ D_\parallel \nabla_\parallel \circ \mathbf{b} \right]  
+			& \frac{\beta_0}{\delta_t} \nabla \cdot \left[ D_\parallel \circ \mathbf{b} \right] \\
+			-D_\parallel \nabla_\parallel \circ &
+			\frac{\beta_0}{\delta_t} D_\parallel \circ - \nabla \cdot \left[ \nabla_\perp \circ \right]
+		\end{pmatrix}
+		\begin{pmatrix}
+			\Phi^{n+1} \\ A_\parallel^{n+1}
+		\end{pmatrix} 
+		= 
+		\begin{pmatrix}
+			\nabla \cdot \left[ D_t j^{n}_\parallel \mathbf{b} \right] + \text{RHS}^\Phi \\
+			D_t j^{n}_\parallel + \text{RHS}^{A_\parallel}
+		\end{pmatrix}& \\
+		\text{with: } D_\perp = \frac{m_i n_i}{B^2 \delta_t}, D_\parallel = \frac{1}{\eta_\parallel + \mu}, D_t = \frac{\mu}{\eta_\parallel + \mu}, \text{ and } \mu = \frac{m_e}{(n_e \delta_t)} &
+	\end{align*}	
+	Electron inertia mitigates the anisotropy between perpendicular and parallel Laplacian operators, acting as a lower bound for resistivity $\eta_\parallel$, and significantly improves the condition number in high-temperature plasmas. However, coupling with $A_\parallel$ worsens the matrix condition. \\
+	Flutter adds a radial component to the magnetic field, requiring adjustments to all parallel operators in the flux-aligned geometry. For advection, flutter is treated as an additional drift velocity. The off-diagonal terms in the vorticity system increase coupling between $\Phi$ and $A_\parallel$, raising computational costs. To ensure consistency, the discrete parallel Laplacian on $\Phi$ must match the combination of divergence with gradient operators. For parallel viscous forces and heat conductivity, a new discrete operator was developed to limit radial numerical diffusion, but solving these problems now requires a full-domain 3D solver, increasing the computational cost.
+\end{chaptersummarybox}
+
+\newpage
+
+The SOLEDGE3X framework uses a finite-volume method (FVM) with an implicit-explicit time integration scheme and variable stepsize (VSIMEX)\cite{wang2008variable}. In turbulence simulations, we focus on timescales slower than the cyclotronic frequency $\omega_C$, allowing explicit time-stepping for advection, friction, pressure, and energy source terms. This multi-step method is implemented for orders 1 to 3, with the timestep updated to match a targeted CFL value.
+
+Ionization/recombination processes, resistive and viscous effects from the Spitzer-Härm model, electron inertia, and Alfvén dynamics involve faster dynamics than the ion cyclotronic time, and would strongly restrict the timestep size. These terms are therefore solved implicitly. To reduce complexity, they can be decoupled and solved sequentially for density, parallel velocity, temperature, and the vorticity equation.
+
+This chapter details the implementation of the new electromagnetic model in this implicit-explicit framework. Sec. \ref{sec:impl_geometry} gives an overview of the field-aligned meshing and curvilinear coordinate system. Sec. \ref{sec:impl_staggeredMesh} introduces the poloidally and toroidally staggered mesh for the new fields $A_\parallel$ and $j_\parallel$, with the necessary discrete operators. Sec. \ref{sec:impl_EMvorticity} discusses the new electromagnetic vorticity equation, solved implicitly on $\Phi$ and $A_\parallel$. Finally, Sec. \ref{sec:impl_flutter} addresses the impact of the radial magnetic field component from flutter on all parallel operators.
+
 
 \section{Geometrical consideration}
+\label{sec:impl_geometry}
 
 \subsection{Coordinate system}
 \label{ssec:Implementation_CoordinateSystem}
-Let $R_0$ be the major radius on the magnetic axis and $(R, Z, \varphi)$ a fixed cylindrical coordinate system. The magnetic equilibrium is assumed to be toroidally symmetric and to encompass both closed and open flux surfaces with singularities at one or more X-points. The last closed flux surface located at the X-point is identified as the separatrix, marking the beginning of the scrape-off layer (SOL), as shown in Fig. \ref{fig:MagneticConfiguration}. The 2D equilibrium magnetic field $\mathbf{B}_{eq} = B_{eq} \mathbf{b}_{eq}$ is a combination of a toroidal field, $\mathbf{B}_{eq,\varphi}$, and a poloidal field, $\mathbf{B}_{eq,p}$, as described in in Ref. \cite{wesson_1978}:
+Let $R_0$ be the major radius on the magnetic axis and $(R, Z, \varphi)$ a fixed cylindrical coordinate system. The magnetic equilibrium is assumed to be toroidally symmetric and to encompass both closed and open flux surfaces with singularities at one or more X-points. The 2D equilibrium magnetic field $\mathbf{B}_{eq} = B_{eq} \mathbf{b}_{eq}$ is a combination of a toroidal field, $\mathbf{B}_{eq,\varphi}$, and a poloidal field, $\mathbf{B}_{eq,p}$, as described in Sec. \ref{ssec:intro_tokamakConfiguration}:
 
 \begin{equation}
 	\mathbf{B}_{eq} = \mathbf{B}_{eq,\varphi} + \mathbf{B}_{eq,p} = F \nabla{\varphi} + \nabla{\Psi} \times \nabla{\varphi}
@@ -90,7 +123,7 @@ It may be noted that the matrices formed by the indices $i,j\in\{\theta,\psi,\va
 
 
 \section{The staggered mesh}
-
+\label{sec:impl_staggeredMesh}
 
 In order to benefit from the first-order parallel derivative that separates the $A_\parallel$ and $j_\parallel$ from the other plasma fields $\Phi$, $n_e$, and $T_e$ (Eqs. \ref{eq:MagneticPotential} and \ref{eq:VorticityEquation}), these two variables are defined on a toroidally $\varphi$ and poloidally $\theta$ staggered grid. They are calculated at cell edges in the parallel direction and can be directly matched to the fluxes entering and leaving the collocated cells. One of the major benefits is to minimize numerical diffusion and preserve turbulent structures, following findings in FVM simulations for fluid mechanics \cite{meier1999comparison}. In the radial $\psi$ direction, we keep the collocated position as the only parallel gradient in $\psi$ comes from the flutter term, which in nature is much smaller than the equilibrium field. If the mesh were also staggered in $\psi$, we would face strong numerical radial diffusion of parallel fluxes, defying the motivation of a staggered grid for $A_\parallel$ and $j_\parallel$. \newline
 
@@ -336,24 +369,13 @@ The staggered grid has direct implications on the estimation of fluxes around me
 
 
 
-\section{Time discretization}
-
-The model uses an explicit time discretization for the advection terms and an implicit one for the diffusive terms. In turbulence simulations, we limit ourselves to timescales slower than the cyclotronic frequency $\omega_C$. This applies to all advection phenomena, as well as to friction, pressure, and energy source terms, which can then comfortably be solved explicitly in time. \newline
-
-However, ionization/recombination processes, resistive and viscous effects from the Spitzer-Härm model at collisional scales, electron inertia and Alfvén dynamics involve much faster dynamics then the ion cyclotronic time that would massively constrain the allowed timestep size. Therefore, all terms involving these effects are solved implicitly. To reduce numerical complexity, they can be decoupled and solved sequentially for the density, the parallel velocity, the temperature, and finally the vorticity system on the potentials. \\
-
-The time discretization is based on a variable stepsize implicit-explicit scheme (VSIMEX) \cite{wang2008variable}, associating explicit time discretization for the advection terms and an implicit one for the diffusive terms. In turbulence simulations, we limit ourselves to timescales slower than the cyclotronic frequency $\omega_C$. This applies to all advection phenomena, as well as to friction, pressure, and energy source terms, which can then comfortably be solved explicitly in time. \\
-
-This multi-step method is implemented for orders 1 to 3, and the timestep is updated such that fluxes and velocities in the simulation domain match a targeted CFL value. \newline
-
-
 
 
 
 
 
 \section{Electromagnetic vorticity system}
-
+\label{sec:impl_EMvorticity}
 
 The newly introduced fields $j_\parallel$ and $A_\parallel$ are solved implicitly along with the electric potential $\Phi$. As we face a coupled system that connects all points in the domain, direct solvers such as PASTIX are not suitable, especially for fine 3D meshes. We instead prefer to use iterative solvers available in the the PETSc or HYPRE libraries. For the original vorticity system, the Stabilized version of the Biconjugate Gradient method (BiCGStab) along with the Geometric Algebraic Multigrid (GAMG) preconditionner proved to be very efficient and it is desirable to use them on the new systems. This section describes some special numerical features in the construction of the system to facilitate the convergence of the above iterative scheme. \autoref{ssec:equilibrationBLockMatrices} introduces specific row and column scaling to equilibrate the blocks in the new system and \autoref{ssec:StaggeredFieldsMatrix} describes how to handle staggered fields to be compatible with the iterative scheme.
 
@@ -574,7 +596,7 @@ Overall, electromagnetic models exhibit a higher condition number. In particular
 
 
 \section{Numerical treatment of flutter}
-
+\label{sec:impl_flutter}
 In our perturbative approach, flutter introduces a radial component to the magnetic field. As the meshing remains aligned to the equilibrium field, the unit magnetic field has now an additional non-zero contravariant component $b^\psi$ in the curvilinear metric. We must hence extend all parallel operators in the code to consider it. Flutter also has a poloidal and a (small) toroidal component, but these are much less problematic to treat as they can be added to the equilibrium components:
 
 \begin{align}
@@ -588,8 +610,7 @@ In this section, we describe how the radial magnetic field has been included in 
 
 \subsection{Finite volumes with flutter}
 
-The spatial discretization is based on a second-order conservative finite-volume scheme associated with a 3rd-order WENO reconstruction and Donat, Marquina fluxes for a modified Riemann solver for the advection terms to handle both shocks and complicated smooth solution structures \cite{tamain2016tokam3x, Bufferand2021}. \newline
-Each of the In this structure, flutter is treated equivalent to drift velocities. 
+The spatial discretization is based on a second-order conservative FVM scheme associated with a 3rd-order WENO reconstruction and Donat, Marquina fluxes for a modified Riemann solver for the advection terms to handle both shocks and complicated smooth solution structures \cite{tamain2016tokam3x, Bufferand2021}. In this structure, flutter is treated equivalent to drift velocities. 
 
 
 

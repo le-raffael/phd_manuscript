@@ -1,10 +1,38 @@
 \chapter{Description of Plasmas}
 \label{chap:PlasmaSimulations}
 
+\vfill
+\begin{chaptersummarybox}
+	The kinetic description of plasmas applies the Lorentz equation to distribution functions $f$ of particle densities and velocities with appropriate collision operators.
+	\begin{equation*}
+		\pdv{f}{t} + \mathbf{v} \cdot \nabla_{\mathbf{x}} f + \frac{\mathbf{F}}{m} \cdot \nabla_{\mathbf{v}} f = C_{\text{coll}} + C_{\text{other}}
+	\end{equation*}
+	From this, conservation equations for mean quantities can be derived for density, momentum, and energy, with fluid closures to avoid higher-order moments. These equations are coupled to Gauss's, Ampère's, and Faraday's laws for magnetism.
+	\begin{align*}
+	\begin{aligned}
+		\partial_t n + \grad\cdot\left(n\mathbf{v}\right) &= S_n & 
+		mn\left(\partial_t \textbf{v} + \textbf{v}\cdot\grad\textbf{v} \right) &= -\grad p + \textbf{F} 	
+		\end{aligned}\\\begin{aligned}
+		\partial_t p+\textbf{v}\cdot\grad p + \frac{5}{3}p\grad\textbf{v} &= \frac{2}{3}\grad\cdot\textbf{Q}+S_E 
+		\end{aligned}\\\begin{aligned}
+		\grad\cdot\textbf{B} &= 0 & \grad\cross\textbf{B} &= \mu_0 \textbf{j} & \partial_t \textbf{B} &= \grad\cross\left(\textbf{v}\cross\textbf{B} - \eta\textbf{j}\right) + S_\textbf{B}
+	\end{aligned}
+	\end{align*}
+	In drift-reduced fluid models, MHD equations are projected onto the parallel direction, where the drift-ordering assumption allows to incorporate plasma drifts  in the advection terms and finite-Larmor radius effects. These models are well-suited to simulate drift-wave and interchange instabilities in the tokamak edge. Turbulence arises from electrostatic potential fluctuations  to density fluctuations in the non-adiabatic electron response in Ohm's law. These instabilities are characterized by collisional (resistive), inertial, and inductive effects, with associated parameters:
+	\begin{align*}
+		C &= \eta\left(\frac{qR}{L_\perp}\right)^2	&
+		\mu_{eff} &= \frac{m_e}{m_i}\left(\frac{qR}{L_\perp}\right)^2 &
+		\beta_{eff} &= \beta\left(\frac{qR}{L_\perp}\right)^2
+	\end{align*}
+	The interplay between these parameters determines whether the turbulence is driven by collisional, electron inertial, or electromagnetic effects.
+\end{chaptersummarybox}
+\vfill
+\newpage
+
 
 The difficulty in obtaining global experimental measurements in tokamaks requires complementary numerical simulations. Currently, these numerical data are essential to complement experimental measurements and support their interpretation. In the longer term, they will be used to make predictions and support the design of ITER experiments. Self-consistent simulations of the plasma edge are challenged by a complex geometry and the variety of involved scales. The magnetic equilibrium exhibits both open and closed magnetic field lines, breaking the toroidal symmetry. Turbulent fluctuations typically have sizes on the order of the ion gyroradius $\rho_\alpha$ ($\ge 0.4\, \text{mm}$) \cite{hennequin2004} in the perpendicular direction to the magnetic field lines, and compete with phenomena occurring along them on the order of the parallel connection length $\propto q_s R_0$ (where $q_s$ is the safety factor, and $R_0$ the tokamak major radius), which can extend up to 100 meters. \\
 
-This chapter presents the different approaches to describe plasma self-consistently. In a first section \ref{sec:desc_modelHierarchy}, we explain the steps how the Lorentz force can be successively rewritten in a kinetic equation, and as conservation equations on mean plasma quantities. We extend the discussion in Sec. \ref{sec:edge_driftWaves} to drift-reduced fluid models that are commonly used for turbulent plasma simulations of the tokamak edge. Finally, we analyze in Sec. \ref{sec:edge_DAW} from a theoretical point of view the impact of electromagnetic effects on drift-wave turbulence in our models. 
+This chapter presents the different approaches to describe plasma self-consistently. In a first section \ref{sec:desc_modelHierarchy}, we explain the steps how the Lorentz force can be successively rewritten in a kinetic equation and in a conservation equations on mean plasma quantities. We extend the discussion in Sec. \ref{sec:edge_driftWaves} to drift-reduced fluid models that are commonly used for turbulent plasma simulations of the tokamak edge. Finally, we analyze in Sec. \ref{sec:edge_DAW} from a theoretical point of view the impact of electromagnetic effects on drift-wave turbulence in our models. 
 
 
 \section{A hierarchy of models}
@@ -120,7 +148,7 @@ To derive a conservation equation for $\varepsilon$, we multiply Vlasov's equati
 This simplifies to:
 \begin{equation}
 	\label{eq:SecondMomentTransportEquation}
-	\partial_t \varepsilon + ´\nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
+	\partial_t \varepsilon + \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = qn \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
 \end{equation}
 The collisional heat flux $\mathbf{q}$ arises from the fluid closure, replacing all higher-order moments. The term $Q$ represents a collisional heat source, while $R_\varepsilon$ accounts for sources associated with non-Coulombian collisions in $C_{\text{other}}$. Notably, the magnetic field term $\mathbf{u} \times \mathbf{B}$ does not appear in the energy equation, as the torque $\frac{1}{2} u^2 \mathbf{u} \times \mathbf{B} \cdot \nabla_{\mathbf{v}} f$ does not perform work and therefore does not contribute to energy changes. \newline
 
@@ -136,13 +164,13 @@ In the magnetohydrodynamics (MHD) approach, the conservation equations are coupl
 \label{ssec:desc_extendedMHD}
 Many of the explanations in this section are based on the lecture notes by E. Franck\cite{lessig2016fluid}. The complete set of MHD equations is as follows:
 \begin{align}
-	m\partial_t n + \nabla \cdot (n \mathbf{u}) &= 0 \label{eq:desc_MHDmass} \\
+	\partial_t n + \nabla \cdot (n \mathbf{u}) &= 0 \label{eq:desc_MHDmass} \\
 	mn\partial_t\mathbf{u} + mn\mathbf{u}\cdot\nabla\mathbf{u} + \nabla p &= \mathbf{j} \times \mathbf{B} \boxed{- \nabla \cdot \boldsymbol{\Pi}} \label{eq:desc_MHDmomentum} \\
 	\frac{3}{2}\partial_t p_i + \frac{3}{2} \mathbf{u} \cdot \nabla p_i + \frac{5}{2}p_i \nabla \cdot \mathbf{u} &= \boxed{- \nabla \cdot \mathbf{q}_i - \nabla \cdot (\boldsymbol{\Pi}_i : \nabla \mathbf{u})} \label{eq:desc_MHDionpressure} \\
 	\frac{3}{2}\partial_t p_e + \frac{3}{2} \mathbf{u} \cdot \nabla p_e + \frac{5}{2}p_e \nabla \cdot \mathbf{u}  &= \boxed{- \nabla \cdot \mathbf{q}_e - \nabla \cdot (\boldsymbol{\Pi}_e : \nabla \mathbf{u}) + \eta \norm{\mathbf{j}}^2 + \frac{3}{2}\mathbf{j}\cdot \bm{\mathcal{P}}} \label{eq:desc_MHDelectronpressure} \\
 	\partial_t \mathbf{B} &= -\nabla \times \left(-\mathbf{u} \times \mathbf{B} \boxed{+ \eta \mathbf{j} - \bm{\mathcal{P}} + \bm{\mathcal{H}}}\right) \label{eq:desc_MHDohmlaw} \\
 	\nabla \cdot \mathbf{B} &= 0 \label{eq:desc_MHDgausslaw} \\
-	\nabla \times \mathbf{B} &= \mu_0 \mathbf{j} \label{eq:desc_MHDamperelaw}
+	\textbf{v} \times \mathbf{B} &= \mu_0 \mathbf{j} \label{eq:desc_MHDamperelaw}
 \end{align}
 
 Equations \ref{eq:desc_MHDmass} through \ref{eq:desc_MHDamperelaw} are derived directly from the fluid moments described in Sec. \ref{sec:desc_fluidMoments}, where the pressure replaces the energy and is solved for both ions and electrons. These equations are coupled with Ohm's law (Eq. \ref{eq:desc_MHDohmlaw}) under the magnetostatic assumption, Gauss's law for magnetism (Eq. \ref{eq:desc_MHDgausslaw}), and Ampère's law (Eq. \ref{eq:desc_MHDamperelaw}). In ideal steady-state, we see that the momentum balance is dominated by the equilibrium between thermodynamic and magnetic forces $\grad p = \mathbf{j}\cross\mathbf{B}$. In combination with Ampère's law, all components are available to derive the Grad-Shafranov equation \ref{eq:intro_GradShafranovEquation} as it has been done in Sec. \ref{sec:intro_GradShafranov}. \\
