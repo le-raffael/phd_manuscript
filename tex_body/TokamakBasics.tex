@@ -93,7 +93,14 @@ In steady-state conditions, the electric force compensates the Lorentz force, le
 	\mathbf{v}_E = \frac{\mathbf{E}_\perp \times \mathbf{B}}{B^2}
 \end{equation}
 
-This velocity applies uniformly to all particles at all times, as it depends only on the electric and magnetic fields in place. Since neither the mass nor the charge contributes to $\mathbf{v}_E$, both electrons and ions move in the same direction at the same speed, and under the quasi-neutrality assumption, no current is generated.
+This velocity applies uniformly to all particles at all times, as it depends only on the electric and magnetic fields in place. Since neither the mass nor the charge contributes to $\mathbf{v}_E$, both electrons and ions move in the same direction at the same speed, and under the quasi-neutrality assumption, no current is generated. \newline 
+
+Perpendicular pressure gradients also exert a force on particles. They result in the diamagnetic drift:
+
+\begin{equation}
+	\label{eq:intro_diaDrift}
+	\mathbf{v}_* = \frac{\textbf{B}\cross\grad_\perp p}{enZB^2}
+\end{equation}
 
 For the next drift, we consider the gyromotion of a particle in a non-uniform magnetic field. Under the adiabatic condition from Eq. \ref{eq:intro_adiabaticCondition}, the magnetic moment $\mu$ of the gyrating particle is conserved along its trajectory:
 
@@ -134,7 +141,8 @@ The polarization drift occurs if the electric field in the plasma varies with ti
 Note that the directions of "grad B", curvature or polarization drifts depend on the particle's charge, causing electrons and ions to move in opposite directions and generating an effective current. The total perpendicular velocity acting on a confined particle is the sum of all these drifts:
 
 \begin{equation}
-	\mathbf{v}_d = \mathbf{v}_E + \mathbf{v}_{\nabla B} + \mathbf{v}_c + \mathbf{v}_p
+	\label{eq:intro_vperpDrifts}
+	\mathbf{v}_d = \mathbf{v}_E + \mathbf{v}_* + \mathbf{v}_{\nabla B} + \mathbf{v}_c + \mathbf{v}_p
 \end{equation}
 
 In fact, any force perpendicular to the magnetic field will cause a drift:
@@ -169,7 +177,7 @@ The fundamental principle of a tokamak lies in its magnetic configuration, which
 		\subcaption{Resulting helical magnetic field}
 		\label{fig:TokamakBasics_Btot}
 	\end{subfigure}
-	\caption{Simplified scheme of the magnetic field components on a flux surface (a) and the total magnetic field (b).}
+	\caption[Simplified scheme of the magnetic field components on a flux surface]{Simplified scheme of the magnetic field components on a flux surface.}
 	\label{fig:1_magneticConfigurationTorus}
 \end{figure}
 
@@ -251,7 +259,7 @@ This equation is a second-order nonlinear partial differential equation. The pro
 		\subcaption{Major radius $R_0 = 0.5$m}
 		\label{fig:GS_PSI_R_0_5}
 	\end{subfigure}
-	\caption{Solution of the Grad-Shafranov equation on a circular cross-section with minor radius $a = 0.3$ m. A Cartesian mesh with $N = 200$ equidistant discretization points is used for the $R$ and $Z$ coordinates. The flux $\Psi$ is forced to 0 at the boundary. The toroidal magnetic field is given by $B_\varphi = B_0 R_0 / R$ with $B_0 = 1$T. The pressure follows an exponential distribution $p(\Psi) = p_0 (e^{-\Psi} - 1)$ with $p_0 = 1$ MPa.}
+	\caption[Solution of the Grad-Shafranov equation on a circular cross-section with minor radius $a = 0.3$ m]{Solution of the Grad-Shafranov equation on a circular cross-section with minor radius $a = 0.3$ m. A Cartesian mesh with $N = 200$ equidistant discretization points is used for the $R$ and $Z$ coordinates. The flux $\Psi$ is forced to 0 at the boundary. The toroidal magnetic field is given by $B_\varphi = B_0 R_0 / R$ with $B_0 = 1$T. The pressure follows an exponential distribution $p(\Psi) = p_0 (e^{-\Psi} - 1)$ with $p_0 = 1$ MPa.}
 	\label{fig:1_PsiFlux}
 \end{figure}
 
@@ -288,7 +296,7 @@ They are completed by poloidal field coils (light purple), placed outside the ma
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{schemes/ITER_2.jpg}
-	\caption{Cutaway of the ITER tokamak (source: ITER Organization)}
+	\caption[Cutaway of the ITER tokamak]{Cutaway of the ITER tokamak (source: ITER Organization)}
 	\label{fig:1_ITER}
 \end{figure}
 
@@ -310,7 +318,7 @@ A diverted configuration, as depicted in Fig. \ref{fig:WEST_diverted}, improves 
 		\subcaption{lower null configuration}
 		\label{fig:WEST_diverted}
 	\end{subfigure}
-	\caption{Comparison of the limited and diverted configuration on a WEST geometry. }
+	\caption[Comparison of the limited and diverted configuration on a WEST geometry]{Comparison of the limited and diverted configuration on a WEST geometry. }
 	\label{fig:1_limdivConfigs}
 \end{figure}
 
@@ -364,7 +372,7 @@ Following the derivation in Chapter 3 of Hutchinson \emph{et al.}\cite{hutchinso
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.62\textwidth]{schemes/collision.png}
-	\caption{Trajectory of the projectile particle (red) colliding with the target particle (green). The vector \( \mathbf{b} \) denotes the impact factor and \( \chi \) is the deflection angle caused by the collision.}
+	\caption[Trajectory of the projectile particle (red) colliding with the target particle (green)]{Trajectory of the projectile particle (red) colliding with the target particle (green). The vector \( \mathbf{b} \) denotes the impact factor and \( \chi \) is the deflection angle caused by the collision.}
 	\label{fig:TokamakBasics_collision}
 \end{figure}
 
@@ -400,7 +408,7 @@ In practice, we do not want to study every collision but are interested in the t
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.45\textwidth]{schemes/collision_crossSection.png}
-	\caption{Volume for given \( d\!b \) and \( d\!x \) in which collisions on the projectile are considered.}
+	\caption[Volume for given \( d\!b \) and \( d\!x \) in which collisions on the projectile are considered]{Volume for given \( d\!b \) and \( d\!x \) in which collisions on the projectile are considered.}
 	\label{fig:TokamakBasics_collisionCrossSection}
 \end{figure}
 

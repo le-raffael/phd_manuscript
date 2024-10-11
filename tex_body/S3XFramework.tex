@@ -8,7 +8,7 @@
 		\partial_t n_i + \nabla\cdot\left(n_i\mathbf{u}\right) =& S_{n,i} - \mathfrak{D}_n^i \\
 		m_i\partial_t \gamma_{i} + m_i\grad\cdot\left(\gamma_{\parallel,i}\mathbf{u}\right) + \grad_\parallel{p_i} =& Z_in_iE_\parallel - \mathbf{b}\cdot\grad\cdot\boldsymbol{\Pi}_i + S_{\gamma,i} + R_{\parallel,i} - \mathfrak{D}_\gamma^i \\
 		\partial_t \varepsilon_\alpha + \nabla \cdot \left( (\varepsilon_\alpha + p_\alpha)\mathbf{u}_\alpha + \boldsymbol{\Pi}_i\cdot\mathbf{u}_\alpha + q_\alpha \right) =& \mathbf{u}_\alpha \cdot \left(Z_\alpha n_\alpha\mathbf{E}_\alpha + \mathbf{R}_\alpha \right) + Q_\alpha + S_{\varepsilon,\alpha} - \mathfrak{D}_\varepsilon^\alpha \\
-		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\left(j_\parallel \textbf{b}\right) =& \grad\cdot\left(\mathbf{j}^* + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_\pi  - \mathfrak{D}_\Omega \\
+		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\left(j_\parallel \textbf{b}\right) =& \grad\cdot\left(\mathbf{j}_{\grad B} + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_{p_i}  - \mathfrak{D}_\Omega \\
 		\eta_\parallel j_\parallel + \frac{m_e}{n_e}\left(\partial_t j_\parallel + \mathfrak{D}_j + \grad\cdot\left[\textbf{u}_j j_\parallel \right]\right) =& -\grad_\parallel\Phi - \beta_0 \left(\partial_tA_\parallel + \mathfrak{D}_A\right) \\ 
 		&+ T_e\grad_\parallel\log(n_e) + 1.71\grad_\parallel T_e \\
 		\grad\cdot\grad_\perp A_\parallel =& -j_\parallel
@@ -100,7 +100,7 @@ For simulations of the SOL in SOLEDGE3X, the three fluid moments in Eqs. \ref{eq
 	\mathbf{u} &= u_\parallel \mathbf{b} + \mathbf{u}_\perp & \text{with} \quad u_\parallel = \mathbf{u}\cdot\mathbf{b} \quad &\text{and} \quad \mathbf{u}_\perp = \mathbf{b}\cross\mathbf{u}
 \end{align}
 
-This decomposition also applies to any other vector field. The perpendicular velocity is calculated with the plasma drifts in Eq. \ref{eq:edge_vPerpDrifts}. Similarly, we define parallel and perpendicular gradient operators as follows:
+This decomposition also applies to any other vector field. The perpendicular velocity is calculated with the plasma drifts in Eq. \ref{eq:intro_vperpDrifts}. Similarly, we define parallel and perpendicular gradient operators as follows:
 
 \begin{align}
 	\nabla_\parallel &= \mathbf{b}\cdot\nabla & \nabla_\perp &= \grad - \grad_\parallel
@@ -196,13 +196,13 @@ The total current is due to charge transport by plasma species. It is hence calc
 	\mathbf{j} = \sum_{\alpha} Z_\alpha n_\alpha \mathbf{u}_\alpha
 \end{equation}
 
-As the current is directly linked to the plasma species transport, it is decomposed into the same terms as the velocities in equations \ref{eq:VelPerp0Component} and \ref{eq:VelPerp1Component}. The "E cross B" drift is the same for all species therefore its contribution to the current vanishes with the quasineutrality assumption. 
+As the current is directly linked to the plasma species transport, it is decomposed into the same terms as the velocities in equations \ref{eq:VelPerp0Component} and \ref{eq:VelPerp1Component}. The "E cross B" drift is the same for all species therefore its contribution to the current vanishes with the quasineutrality assumption. The "grad B", parallel pressure and the polarization current from the Reynold's stress tensor are directly calculated from the corresponding drift velocities:
 
-jDia
-jPi
-jPolaRS
+\begin{align}
+	\mathbf{j}_{\grad B} &= \sum_{\alpha} Z_\alpha n_\alpha \mathbf{u}_{\grad B,\alpha} & \mathbf{j}_{\pi} &= -\frac{1}{3}\sum_{i} Z_\alpha  \frac{\pi_{\parallel,i}}{T_i} \mathbf{u}_{\grad B,i} & \mathbf{j}_{\Pi} &= \sum_{\alpha} Z_\alpha n_\alpha \mathbf{u}_{\Pi,\alpha}  	
+\end{align}
 
-Neglecting curvature terms, we can derive an expression for the perpendicular polarization current from \autoref{eq:definitionSmallOmega}.
+Neglecting curvature terms, we can derive an expression for the perpendicular polarization current from Eq. \ref{eq:definitionSmallOmega}.
 \begin{align}
 	\mathbf{j}_{p} =& -\partial_t\boldsymbol{\omega}_s - \sum_{i}Z_i\grad\cdot\left(\mathbf{u}^{(0)}_i\otimes\boldsymbol{\omega}_i\right) \\
 	&\text{with:  }\boldsymbol{\omega}_s = \sum_{i}Z_i\boldsymbol{\omega}_i \nonumber
@@ -219,23 +219,23 @@ The divergence of the total current can then be transformed into a transport equ
 
  \begin{align}
  	&& \grad\cdot\mathbf{j} &= 0 \nonumber \\
- 	&\Leftrightarrow& -\grad\cdot\mathbf{j_p} &= \grad\cdot\left(j_\parallel\mathbf{b} + \mathbf{j}^* + \mathbf{j}_{\perp,\Pi} + \mathbf{j}_{\pi} \right) \nonumber \\
- 	&\Leftrightarrow& \partial_t\Omega &= \grad\cdot\sum_{i}Z_i\grad\cdot\left(\mathbf{u}^{(0)}_i\otimes\boldsymbol{\omega}_i\right) +\grad\cdot\left(j_\parallel\mathbf{b} + \mathbf{j}^* + \mathbf{j}_{\perp,\Pi} + \mathbf{j}_{\pi} \right)
+ 	&\Leftrightarrow& -\grad\cdot\mathbf{j}_p &= \grad\cdot\left(j_\parallel\mathbf{b} + \mathbf{j}_{\grad B} + \mathbf{j}_{\perp,\Pi} + \mathbf{j}_{\pi} \right) \nonumber \\
+ 	&\Leftrightarrow& \partial_t\Omega &= \grad\cdot\sum_{i}Z_i\grad\cdot\left(\mathbf{u}^{(0)}_i\otimes\boldsymbol{\omega}_i\right) +\grad\cdot\left(j_\parallel\mathbf{b} + \mathbf{j}_{\grad B} + \mathbf{j}_{\perp,\Pi} + \mathbf{j}_{\pi} \right)
  	\label{eq:TransportEquationVorticity}
  \end{align}
-If this equation is combined with \autoref{eq:definitionSmallOmega} we get :
+If this equation is combined with Eq. \ref{eq:definitionSmallOmega} we get :
  \begin{align}
  	&& \boldsymbol{\omega}_i =& \frac{m_i}{Z_iB^2}\left(n_i\grad_\perp\Phi + \frac{1}{Z_i}\grad_{\perp}\left(p_i-\frac{\pi_{\parallel,i}}{3}\right)\right) - \frac{m_i}{Z_i^2B^2}\mathbf{S}_{u_{\perp,i}} \nonumber\\
 	&\Leftrightarrow& \sum_{i}Z_i\boldsymbol{\omega}_i =& \sum_{i}Z_i\left[\frac{m_i}{Z_i B^2}\left(n_i\grad_\perp\Phi + \frac{1}{Z_i}\grad_{\perp}\left(p_i-\frac{\pi_{\parallel,i}}{3}\right)\right) - \frac{m_i}{Z_i^2B^2}\mathbf{S}_{u_{\perp,i}}\right] \nonumber\\
 	&\Leftrightarrow& \Omega =& \grad\cdot\sum_{i}\left[\frac{m_i}{ B^2}\left(n_i\grad_\perp\Phi + \grad_{\perp}\left(p_i-\frac{\pi_{\parallel,i}}{3}\right)\right) - \frac{m_i}{Z_i B^2}\mathbf{S}_{u_{\perp,i}}\right] \nonumber \\
-	&\Leftrightarrow& \partial_t\mathbf{\Omega} =& \grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] + \partial_t \Omega_\pi - \mathfrak{D}_\Omega \nonumber \\
-	&\Leftrightarrow& \grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right]  =&  \grad\cdot\left(j_\parallel\mathbf{b} + \mathbf{j}^* + \mathbf{j}_{\perp,\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_\pi - \mathfrak{D}_\Omega \label{eq:FirstFormVorticityEquation}
+	&\Leftrightarrow& \partial_t\mathbf{\Omega} =& \grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] + \partial_t \Omega_{p_i} - \mathfrak{D}_\Omega \nonumber \\
+	&\Leftrightarrow& \grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right]  =&  \grad\cdot\left(j_\parallel\mathbf{b} + \mathbf{j}_{\grad B} + \mathbf{j}_{\perp,\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_{p_i} - \mathfrak{D}_\Omega \label{eq:FirstFormVorticityEquation}
  \end{align}
  
-In this calculation we used the Boussinesq approximation and the Einstein summation over the ion index $i$ allows for a more compact expression. Since we express a conservation on the vorticity $\Omega$, we also introduced an anomalous diffusion term $\mathfrak{D}_\Omega$. All pressure terms are regrouped in $\Omega_\pi$:
+In this calculation we used the Boussinesq approximation and the Einstein summation over the ion index $i$ allows for a more compact expression. Since we express a conservation on the vorticity $\Omega$, we also introduced an anomalous diffusion term $\mathfrak{D}_\Omega$. All pressure terms are regrouped in $\Omega_{p_i}$:
 
 \begin{equation}
-	\Omega_\pi = \grad\cdot\sum_{i}\left(\frac{m_i}{Z_i B^2}\grad_\perp[n_i T_i]\right)
+	\Omega_{p_i} = \grad\cdot\sum_{i}\left(\frac{m_i}{Z_i B^2}\grad_\perp[n_i T_i]\right)
 \end{equation}
 
 
@@ -250,7 +250,7 @@ For now, we assume a static magnetic field and define the parallel electric fiel
  
 $$\frac{1}{n_e}\grad_\parallel p_e = T_e\grad_\parallel\log(n_e) + \grad_\parallel T_e$$
 
-If we now inject \autoref{eq:DefinitionParallelCurrent} into he vorticity equation \autoref{eq:FirstFormVorticityEquation}, we obtain: 
+If we now inject Eq. \ref{eq:DefinitionParallelCurrent} into he vorticity equation Eq. \ref{eq:FirstFormVorticityEquation}, we obtain: 
  
 \begin{equation}
 	\label{eq:S3X_ElectrostaticVorticityEquation}
@@ -258,7 +258,7 @@ If we now inject \autoref{eq:DefinitionParallelCurrent} into he vorticity equati
 \end{equation}
 
 
-where $F_\Omega = \grad\cdot\left(\mathbf{j}^* + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_\pi  - \mathfrak{D}_\Omega$ regroups the remaining terms. \\
+where $F_\Omega = \grad\cdot\left(\mathbf{j}_{\grad B} + \mathbf{j}_{\Pi} + \mathbf{j}_{\pi}\right) - \partial_t \Omega_{p_i}  - \mathfrak{D}_\Omega$ regroups the remaining terms. \\
 The vorticity equation gives an relation for the electric potential $\Phi$, required to calculate "ExB" drifts and therefore essential to simulate plasma turbulence. Because of the low resistivity $\eta_\parallel$, this problem is actually numerically hard to solve. Explicit approaches are then strongly constrained by a timestep size of the order of the collision time. Implicit approaches have to handle a numerically difficult problem, with two Laplacian operators, one perpendicular and one parallel, with a high anisotropy because of the unfavorable ratio $\sigma_\parallel B^2 / m_in_i$ between the respective diffusion coefficients. The hardness to solve the system is a major obstacle for turbulent simulations on larger tokamaks because of prohibitive solve times of iterative solvers. Hotter scenarios, as they would occur in fusion-relevant devices, pose an additional problem as $\eta_\parallel\propto T_e^{-1.5}$, resulting in an even poorer numerical condition of the problem. 
 
 
@@ -272,10 +272,6 @@ Until now we have expressed the SOLEDGE3X transport equations as they are used i
 \subsection{Electron inertia}
 \label{ssec:ModelElectronInertia}
 
-%As we have seen in ...., the bad condition number of the vorticity equation has its roots in the combined perpendicular and parallel diffusion on the electric potential. One attempt to ameliorate the situation would be to split these terms in a way that their respective discrete operators are not applied on the same unknown in the vorticity matrix. To express the system in such a way, it is convenient to include the parallel current $j_\parallel$ as a separate variable in the system. In the definition of the parallel current density \autoref{eq:DefinitionParallelCurrent}, we omitted the effects of electron inertia in the generalized Ohm's law. Its full expression states:
-%$$ 
-%j_\parallel = \sigma_\parallel \left(E_\parallel + \frac{\grad_\parallel p_e}{n_ee} + \frac{0.71}{e}\grad_\parallel T_e + \frac{m_e}{e} \pdv{u_{\parallel,e}}{t}\right) 
-%$$
 
 The first element to the electromagnetic model is the electron inertia term in the generalized Ohm's law. To properly derive this term, we start with the parallel momentum conservation equations for electrons \ref{eq:derivationEI_electronParaMomenentum} and ions \ref{eq:derivationEI_ionParaMomenentum}.
 
@@ -303,6 +299,7 @@ Here the sum over ion species is not written explicitly, but every term involvin
 If we neglect all terms involving the electron mass, we exactly recover the electrostatic Ohm law from Eq. \ref{eq:DefinitionParallelCurrent}. The aim of this section is to consider a finite $m_e$, so we keep all terms. To truly obtain a transport equation on the current, we need to reformulate the advection term. There is no effective advection velocity for $j_\parallel$ readily available and the poor ambipolar definition of $\gamma_{\parallel,e}$ is of little help here. We can instead develop this term to obtain a formulation where $j_\parallel$ is advected by the electron velocity:
 
 \begin{align}
+	\label{eq:S3X_advectionJPara}
 	\grad\cdot\left(\sum_i Z_i\gamma_{\parallel,i}\mathbf{u}_i - \gamma_{\parallel,e}\mathbf{u}_e\right) &= \grad\cdot\left(\sum_i Z_i\gamma_{\parallel,i}\left(\mathbf{u}_i-\mathbf{u}_e\right) - j_\parallel\mathbf{u}_e\right)
 \end{align}
 
@@ -319,11 +316,13 @@ If we now combine Ohm's with electron inertia with the electrostatic vorticity e
 
 \begin{equation}
 	\label{eq:S3X_vorticityEquation_ElectronInertia}
-	\begin{cases}
+	\left\{
+	\begin{aligned}
 		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\cdot\left[j_\parallel\mathbf{b}\right]=& F_\Omega \\
 		j_\parallel + \frac{\sigma_\parallel m_e}{n_e}\left[\partial_t j_\parallel + \grad\cdot\left(j_\parallel\mathbf{u}_e\right)\right] =& \sigma_\parallel \left(-\grad_\parallel\Phi + T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e \right) \\ 
 		& + \frac{\sigma_\parallel m_e}{n_e}\left[\sum_iZ_i\left[\grad\cdot\left(\gamma_i\mathbf{u}_e \right) + \partial_t \gamma_i\right] - \mathfrak{D}_j^e\right]
-	\end{cases}
+	\end{aligned}
+	\right.
 \end{equation}
 
 
@@ -335,8 +334,7 @@ For better readability let us express the system in matrix form, where $\circ$ s
 			\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\circ\right] & 
 			- \grad\cdot\left[\circ\mathbf{b}\right] \\
 			\sigma_\parallel\grad_\parallel\circ &
-			1 + \frac{\sigma_\parallel m_e}{n_e}\partial_t \circ \\
-			0 & 1 
+			1 + \frac{\sigma_\parallel m_e}{n_e}\partial_t \circ
 		\end{pmatrix}
 		\begin{pmatrix}
 			\Phi \\ j_\parallel
@@ -375,11 +373,13 @@ As we evolve the magnetic potential together with the electric potential gradien
 
 \begin{align}
 	\label{eq:S3X_vorticityEquation_MagneticInduction}
-	\begin{cases}
+		\left\{
+	\begin{aligned}
 		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\cdot\left[j_\parallel\mathbf{b}\right]& = F_\Omega \\
 		j_\parallel& = \sigma_\parallel \left(-\grad_\parallel\Phi - \beta_0\partial_t A_\parallel - \beta_0\mathfrak{D}_A + T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e \right) \\
 		\grad\cdot\grad_\perp A_\parallel& = -j_\parallel
-	\end{cases}
+	\end{aligned}
+	\right.
 \end{align}
 
 It can also be compactly expressed in matrix form: 
@@ -410,7 +410,7 @@ It can also be compactly expressed in matrix form:
 
 
 
-These equations use Ohm's law without the electron inertia term previously introduced in \autoref{ssec:ModelElectronInertia}. It is obviously possible (and even necessary) to include the temporal  $j_\parallel$ in the electromagnetic equations and it is recommended to do so. To allow for maximal flexibility, any combination of $\Phi$ with $A_\parallel$ and/or $j_\parallel$ can be used and we will discuss each of these combinations in later chapters.
+These equations use Ohm's law without the electron inertia term previously introduced in {ssec:ModelElectronInertia}. It is obviously possible (and even necessary) to include the temporal  $j_\parallel$ in the electromagnetic equations and it is recommended to do so. To allow for maximal flexibility, any combination of $\Phi$ with $A_\parallel$ and/or $j_\parallel$ can be used and we will discuss each of these combinations in later chapters.
 
 
 
@@ -443,48 +443,27 @@ Note that Hager \emph{et al.}\cite{hager2022} have suggested an additional time-
 
 The perturbed magnetic unit field $\tilde{\mathbf{b}}$ is calculated at the beginning of each timestep and added to the equilibrium unit vector $\mathbf{b}_{eq}$. The complete vector $\mathbf{b} = \mathbf{b}_{eq} + \tilde{\mathbf{b}}$ is then used in all parallel advection, gradient, and diffusion terms. Since we base our calculations on plasma fields from the previous timestep, this perturbation can be seen as an additional first-order drift in the equations. The expression in the framework of the conservation equations does not change with flutter, but the underlying definition of parallel gradients and divergence surely increases in complexity. \\
 
-Notwithstanding the smallness of the flutter field, it is important to maintain the total magnetic field divergence-free. Let us verify this property with our definition of the flutter field:
 
-\begin{align}
-	\grad\cdot\mathbf{B} &= \grad\cdot B\mathbf{b}_{eq} + \grad\cdot B\mathbf{\tilde{b}} \nonumber \\
-	&= -\beta_0\mathbf{b}_{eq} \times \nabla \tilde{A}_\parallel + \beta_0\tilde{A}_\parallel \nabla \times \mathbf{b}_{eq} \nonumber \\
-	&= \beta_0\left[-\left(\grad\cross\mathbf{b}_{eq}\right)\cdot\grad A_\parallel + \mathbf{b}_{eq}\cdot\left(\grad\cross\grad A_\parallel\right) + A_\parallel\grad\cdot\left(\grad\cross\mathbf{b}_{eq}\right) + \grad A_\parallel\cdot\left(\grad\cross\mathbf{b}_{eq}\right)\right] \nonumber \\
-	&= 0
-\end{align}
-
-The equilibrium field is externally provided such that it is divergence free, so $\grad\cdot B\mathbf{b}_{eq} = 0$. We further used the vector calculus identities on second-order derivatives $\grad\cross\grad X = 0$ and $\grad\cdot\left(\grad\cross\mathbf{X}\right)$. It further proves the importance of the second (small) term in the definition of $\mathbf{\tilde{b}}$ (with $\grad\cross\mathbf{b}_{eq}$), as without it, the flutter field would not be divergence-free. On the other hand, this term is problematic with respect to gauge-fixing. The field $A_\parallel$ appears directly in the equation without derivative. This is in contradiction with gauge theory, which says that the electromagnetic vector potential is defined up to a constant. This problem appears at all because we do not take the entire vector potential $\textbf{A}$, but only its projection on the parallel equilibrium direction. 
-
-
-\subsection{Formulation of the electromagnetic vorticity system}
+\subsection{Full electromagnetic vorticity system}
 \label{sec:S3X_formulationEMsystem}
 
-One open question remains on how to formulate the parallel current in the vorticity equation. In the electrostatic equation \ref{eq:S3X_ElectrostaticVorticityEquation}, we directly expanded the constitutive terms of $j_\parallel$, clearly showing the anisotropic double Laplacian on $\Phi$. In the electromagnetic systems \ref{eq:S3X_vorticityEquation_ElectronInertia} and \ref{eq:S3X_vorticityEquation_MagneticInduction}, we opted to express $j_\parallel$ as a separate equation, mostly for clarity and to identify the new terms. We then remain with a single perpendicular Laplacian on $\Phi$, whereas the parallel Laplacian appears as a gradient in the equation on $j_\parallel$ succeeded by a divergence. This reveals however some hidden features of the system. \\
 
-If we decompose the electrostatic vorticity system in the same way, this system essentially takes the form of a Hessenberg index-1 DAE where $j_\parallel$ is the algebraic variable ---cite---:
-
-\begin{align}
-	\begin{cases}
-		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\cdot\left[j_\parallel\mathbf{b}\right]& = F_\Omega \\
-		j_\parallel& = \sigma_\parallel \left(-\grad_\parallel\Phi + T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e \right)
-	\end{cases}
-\end{align}
-
-However such systems tend to be numerically hard to solve and one common approach ---cite--- is to replace the zero-side side of the algebraic equation by the time derivative of the algebraic variable with a small coefficient, which effectively transforms the system into a (stiff) ODE. Exactly this has been done in the new formulation of \autoref{eq:S3X_vorticityEquation_ElectronInertia} with the further benefit that the $j_\parallel$ has a physical meaning.
-
-Let us now consider the electromagnetic system with electron inertia, magnetic induction and flutter. The full vorticity system is then given by: 
+Let us now consider the electromagnetic system with electron inertia, magnetic induction and flutter. The full vorticity system is then given by, where flutter is included in the direction of the magnetic field $\textbf{b}$: 
 
 \begin{equation}
 	\label{eq:S3X_vorticityEquation_FullElectromagnetic}
-	\begin{cases}
+	\left\{
+	\begin{aligned}
 		\grad\cdot\left[\frac{m_i n_i}{ B^2}\partial_t\grad_\perp\Phi\right] - \grad\cdot\left[j_\parallel\mathbf{b}\right]=& F_\Omega \\
 		j_\parallel + \frac{\sigma_\parallel m_e}{n_e}\left[\partial_t j_\parallel + \grad\cdot\left(j_\parallel\mathbf{u}_e\right)\right] =& \sigma_\parallel \left(-\grad_\parallel\Phi + T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e\right) \\ 
-		& - \left(\beta_0\partial_t A_\parallel + \beta_0\mathfrak{D}_A \right) \\		
+		& - \sigma_\parallel\beta_0\left(\partial_t A_\parallel + \mathfrak{D}_A \right) \\		
 		& + \frac{\sigma_\parallel m_e}{n_e}\left[\sum_iZ_i\left[\grad\cdot\left(\gamma_i\mathbf{u}_e \right) + \partial_t \gamma_i\right] - \mathfrak{D}_j^e\right] \\
 		\hspace{3cm}\grad\cdot\grad_\perp A_\parallel =& -j_\parallel
-	\end{cases}
+	\end{aligned}
+	\right.
 \end{equation}
 
- We then have a system over the parallel current $j_\parallel$ and the potential fields $\Phi$ and $A_\parallel$. In matrix form, this final system reads:
+We then have a system over the parallel current $j_\parallel$ and the potential fields $\Phi$ and $A_\parallel$. In matrix form, this final system reads:
 
 \begin{align}
 	\makebox[0.8\textwidth][l]{$\displaystyle
@@ -500,15 +479,40 @@ Let us now consider the electromagnetic system with electron inertia, magnetic i
 		\begin{pmatrix}
 			\Phi \\ j_\parallel \\ A_\parallel
 		\end{pmatrix}
-	$} \nonumber \\	
+		$} \nonumber \\	
 	\makebox[0.8\textwidth][r]{$\displaystyle
 		= \begin{pmatrix}
 			F_\Omega \\
 			\sigma_\parallel\left(T_e\grad_\parallel\log n_e + 1.71\grad_\parallel T_e - \frac{m_e}{n_e}\mathfrak{D}_j^e - \beta_0\mathfrak{D}_A \right) + \mathcal{A}_j \\
 			0
 		\end{pmatrix}
-	$} \label{eq:S3X_vorticityEquation_ElectronInertiaElectromagnetism_matrix}
+		$} \label{eq:S3X_vorticityEquation_ElectronInertiaElectromagnetism_matrix}
 \end{align}
+
+This system is a differential-algebraic equation (DAE), where the the vorticity equation and Ohm's law are differential equations and Ampère's law forms an algebraic constraint on $A_\parallel$ and $j_\parallel$. 
+
+\begin{equation}
+	\left\{\begin{aligned}
+		0 &= f(\partial^2_\perp \partial_t\Phi,\partial_\parallel j_\parallel,\psi,\theta,\varphi,t)\\
+		0 &= g(\partial_t j_\parallel,\partial_t A_\parallel,\partial_\parallel \Phi,j_\parallel,\psi,\theta,\varphi)\\
+		0 &= h(\partial^2_\perp A_\parallel,j_\parallel)
+	\end{aligned}\right.
+\end{equation}
+
+Since the function $h$ needs to be differentiated once to obtain the terms $\partial_t j_\parallel$ and $\partial_t A_\parallel$ from function $g$, the system is a Hessenberg index-1 DAE. Such systems are generally stiff and usually require appropriate implicit solvers that work best if an analytic expression of the Jacobian matrix is provided, which is a non-trivial task for our system. Consistent initial conditions on $A_\parallel$ and $j_\parallel$ are also essential to avoid bad numerical behavior or even divergence. One common solution is to reformulate the system into a standard PDE by eliminating the algebraic constraint. The obvious path here is to solve $h$ for $j_\parallel$ and replace all occurrences of $j_\parallel$ by $\partial_\perp^2 A_\parallel$. However, a triple spatial derivative $\partial_\parallel\partial_\perp^2 A_\parallel$ then appears in the vorticity equation, which adds stiffness, leads to non-physical oscillations, imposes a higher regularity in the solution (at least $C^3$), and requires complex boundary conditions to avoid boundary layers and singularities. Instead, we can solve for $j_\parallel$ and substitute the solution into the functions $f$ and $h$. Their expressions then involve a large number of terms, but none of them exceeds 2nd order spatial derivatives, and the system remains well-defined. It will also introduce the differential terms $\partial_t j_\parallel$ and $\partial_t A_\parallel$ to Ampère's law, such that the new system is effectively a coupled, first-order in time PDE. The abstract form of this new formulation is then:
+
+\begin{equation}
+	\left\{\begin{aligned}
+		0 &= \hat{f}(\partial^2_\perp \partial_t\Phi,\partial_\parallel \partial_t A_\parallel,\partial_\parallel \partial_t j_\parallel,\partial_\parallel^2 \Phi,\psi,\theta,\varphi,t)\\
+		0 &= \hat{h}(\partial_t A_\parallel,\partial_t j_\parallel,\partial^2_\perp A_\parallel,\partial_\parallel \Phi,j_\parallel,\psi,\theta,\varphi)
+	\end{aligned}\right.
+\end{equation}
+
+We still need to solve $g$ for $j_\parallel$ to have an expression for $\partial_t j_\parallel$, which can be done implicitly in a separate step. Details about the exact implementation are given in Sec. \ref{sec:impl_EMvorticity} of the next chapter.
+
+
+
+
 
 \section{Boundary conditions}
 \label{sec:S3X_boundaryConditions}

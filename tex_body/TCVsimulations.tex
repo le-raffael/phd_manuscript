@@ -1,7 +1,16 @@
 \chapter{Diverted Geometry}
 \label{chap:TCV}
 
-To demonstrate the abilities of SOLEDGE3X to perform electromagnetic turbulence simulations of a realistic tokamak geometry, the configuration of the test cases has been inspired by the TCV-X21 benchmark \cite{oliveira2022}. This latter addresses L-mode discharges in TCV with a single lower X-point. 
+\begin{chaptersummarybox}
+	The electromagnetic model is tested on a realistic X-point configuration based on the TCV-X21 benchmark case. In a flux-driven simulation with an injected power of 150kW, representative of an L-mode plasma, we compare the same four scenarios (electrostatic, electrostatic with electron inertia, magnetic induction, and magnetic induction with flutter). Overall, the plasma behavior is consistent with the findings in the limited geometries. Electron inertia does not significantly impact turbulence levels or mid-plane profiles. However, magnetic induction considerably increases cross-field particle and heat transport, leading to a strong flattening of density and temperature profiles, such that an energetic quasi-steady state is reached within 3ms of simulated plasma time. Flutter counteracts the inductive destabilization and restores steep profiles at a lower turbulence level than in the electrostatic cases. \\
+	Numerically, electron inertia accelerates the simulation by improving the condition number of the vorticity equation. The increase in system size due to magnetic induction slightly deteriorates CPU time, even though the number of iterations required for convergence remains below the level of the electrostatic case. With flutter, code performance worsens considerably, mainly due to the radial connection between flux surfaces in the geometry, which adds coupling in the implicit viscosity, parallel heat conduction, and vorticity problems. \\
+	In a preliminary study, the injected power was increased to 1.2MW with the full electromagnetic model and additional fluid neutrals. Under these conditions, flutter-induced radial heat transport in the parallel heat conduction starts to compete with energy transport by ExB drifts and eventually dominates the total electron power across the separatrix. Simultaneously, the fluctuating magnetic field shapes island-like patterns along the separatrix.
+\end{chaptersummarybox}
+
+\newpage
+
+
+To demonstrate the abilities of SOLEDGE3X to perform electromagnetic turbulence simulations of a realistic tokamak geometry, the configuration of the test cases has been inspired by the TCV-X21 benchmark\cite{oliveira2022}. This latter addresses L-mode discharges in TCV with a single lower X-point. 
 
 
 \section{Electrostatic versus electromagnetic scenarios}
@@ -21,7 +30,7 @@ In Fig. \ref{fig:EMsnapshots}, typical poloidal cuts of important plasma fields 
 \begin{figure}[H]\centering
 	\centering
 	\makebox[\textwidth][c]{\includegraphics[width=1.3\textwidth]{schemes/TCVnoNeutrSnapshots.png}}    
-	\caption{Simulation snapshots of the full electromagnetic scenario with flutter. The first poloidal plane is shown after 6 ms simulated plasma time on the TCV case. From left to right, the first row shows the ion density $n_i$, the electron temperature $T_e$, the electric potential $\Phi$, and the radial "ExB" drift velocity $v_E^\psi$. The second row shows the parallel magnetic potential $A_\parallel$, the parallel current density $j_\parallel$, the amplitude of the flutter field $\norm{\mathbf{\tilde{B}}}$, and the radial flutter advection velocity $v_{\tilde{b}^\psi}$.}
+	\caption[Simulation snapshots of the full electromagnetic scenario with flutter]{Simulation snapshots of the full electromagnetic scenario with flutter. The first poloidal plane is shown after 6 ms simulated plasma time on the TCV case. From left to right, the first row shows the ion density $n_i$, the electron temperature $T_e$, the electric potential $\Phi$, and the radial "ExB" drift velocity $v_E^\psi$. The second row shows the parallel magnetic potential $A_\parallel$, the parallel current density $j_\parallel$, the amplitude of the flutter field $\norm{\mathbf{\tilde{B}}}$, and the radial flutter advection velocity $v_{\tilde{b}^\psi}$.}
 	\label{fig:EMsnapshots}
 \end{figure}
 
@@ -46,7 +55,7 @@ With a different turbulence level, the heat exhaust is also affected, as shown i
 		\subcaption{Total heat exhaust}
 		\label{fig:HeatExhaust}
 	\end{subfigure}
-	\caption{Evolution of the kinetic energy and heat exhaust over time iterations on the turbulent TCV scenario. It indicates the turbulence level and its consequence on the total heat transport.}
+	\caption[Evolution of the kinetic energy and heat exhaust over time iterations on the turbulent TCV scenario]{Evolution of the kinetic energy and heat exhaust over time iterations on the turbulent TCV scenario. It indicates the turbulence level and its consequence on the total heat transport.}
 	\label{fig:plasmaEvolution}
 \end{figure}
 
@@ -68,7 +77,7 @@ The change in turbulence intensity naturally impacts the mean profiles in Fig. \
 		\includegraphics[width=1\textwidth]{schemes/OMP_profiles_global_fields_PHI.png}
 		\subcaption{Electric potential $\Phi$}
 	\end{subfigure}
-	\caption{Radial profiles at the outer mid-plane after 6 ms simulated plasma time. These profiles were obtained by averaging simulation data across all 32 toroidal planes and over the last 20 available plasma saves.}
+	\caption[Radial profiles at the outer mid-plane after 6 ms simulated plasma time]{Radial profiles at the outer mid-plane after 6 ms simulated plasma time. These profiles were obtained by averaging simulation data across all 32 toroidal planes and over the last 20 available plasma saves.}
 	\label{fig:OMP_profiles}
 \end{figure}
 
@@ -98,7 +107,7 @@ The overall performance of the code largely depends on how quickly a certain pla
 			\hline  
 		\end{tabularx}
 	}	
-	\caption{Numerical metrics on the four TCV scenarios for one timestep. All quantities are averaged over the last 20000 timesteps of the simulation. The execution time refers to the wall-clock time and must be multiplied by the number of used processors (768) to get the actual used CPU time.}
+	\caption[Numerical metrics on the four TCV scenarios for one timestep]{Numerical metrics on the four TCV scenarios for one timestep. All quantities are averaged over the last 20000 timesteps of the simulation. The execution time refers to the wall-clock time and must be multiplied by the number of used processors (768) to get the actual used CPU time.}
 	\label{tab:performanceMetric}
 \end{table}
 
@@ -115,7 +124,7 @@ In the previous section, we compared the new electromagnetic model in an L-mode 
 
 
 
-\subsection{Energy steady-state}
+\subsection{Parallel heat conduction}
 
 Akin the simple magnetic inductive scenario the low-power scenario, the system reaches rapidly a quasi-steady state after 3ms. However, there is no uncontrolled collapse of the density and temperature in the core, at the contrary, steep gradients build up in the edge and just behind the separatrix. In the SOL, gradients are very small up to the first wall, leaving convenient low values throughout the region. This can be observed in the outer-mid plane profiles for ion density and temperature, taken at increasing simulation times in Fig. \ref{fig:TCV_highPower_OMP}. \\
 
@@ -134,7 +143,7 @@ The temperature profile could indicate the formation of a pedestal, characterist
 		\subcaption{Ion temperature}
 		\label{fig:TCV_highPower_OMPT}
 	\end{subfigure}
-	\caption{Averaged profiles at the outer mid plane taken at different simulation times for the TCV scenarion with a 1.2MW heat source.}
+	\caption[Averaged profiles at the outer mid plane taken at different simulation times for the TCV scenarion with a 1.2MW heat source]{Averaged profiles at the outer mid plane taken at different simulation times for the TCV scenarion with a 1.2MW heat source.}
 	\label{fig:TCV_highPower_OMP}
 \end{figure}
 
@@ -157,7 +166,7 @@ In Fig. \ref{fig:TCV_decompHeatFluxFlutter}, we compare the evolution of each in
 		\subcaption{Ion power flux}
 		\label{fig:TCV_decompHeatFluxFlutter_ion}
 	\end{subfigure}
-	\caption{Contribution of the different terms in the energy conservation equation to the power transfer from the core to the SOL.}
+	\caption[Contribution of the different terms in the energy conservation equation to the power transfer from the core to the SOL]{Contribution of the different terms in the energy conservation equation to the power transfer from the core to the SOL.}
 	\label{fig:TCV_decompHeatFluxFlutter}
 \end{figure}
 
@@ -165,11 +174,11 @@ In Fig. \ref{fig:TCV_decompHeatFluxFlutter}, we compare the evolution of each in
 
 
 
-\subsection{A glance at flutter}
+\subsection{Characteristics of the fluctuating field}
 
 As electromagnetic transport in the tokamak edge starts to play a role, the time has come to investigate electromagnetic flutter a bit more in detail. 
 
-\subsubsection{View of the fluctuating magnetic field}
+\subsubsection{View of the flutter field}
 
 
 Let us trace the perturbed field lines driven by flutter on the first poloidal plane at the end of the simulation. Fig. \ref{fig:TCV_poincareFlutter} shows the field lines starting at 2500 points seeded randomly across the entire domain. As the integration length for each line has been fixed beforehand, longer lines correlate with higher magnitudes of $\mathbf{\tilde{B}}$. This is not a true Poincaré plot however, as flutter also contains a toroidal component, that is much smaller than the other two components, but was neglected for this analysis. If it was included, field lines would immediately leave the plane of interest and only return sporadically, leaving not much more than the seed points on the Poincaré plot. It could also have been possible to create this plot for the full magnetic field, including the equilbrium component, but then it would have been utterly hard to distinguish unique features of flutter. \newline 
@@ -177,7 +186,7 @@ Let us trace the perturbed field lines driven by flutter on the first poloidal p
 \begin{figure}[H]\centering
 	\centering
 	\includegraphics[width=1\textwidth]{schemes/poincareFlutterHighPower.png}
-	\caption{Poincaré plot of the fluctuating magnetic field in the TCV high-power case for a random seed of 2500 points in a TCV poloidal plane.}
+	\caption[Poincaré plot of the fluctuating magnetic field in the TCV high-power case for a random seed of 2500 points in a TCV poloidal plane]{Poincaré plot of the fluctuating magnetic field in the TCV high-power case for a random seed of 2500 points in a TCV poloidal plane.}
 	\label{fig:TCV_poincareFlutter}	
 \end{figure}
 
@@ -207,7 +216,7 @@ In Sec. \ref{ssec:S3X_flutter}, we discussed the necessity of removing the equil
 		\subcaption{Flutter field from \\ the fluctuating $A_\parallel$}
 		\label{fig:TCV_poloidalFieldGS_Btilde_fluctuatingA}
 	\end{subfigure}
-	\caption{Comparison of the magnitude of the flutter field to the poloidal magnetic field strength $B_{pol}$. Snapshot on the first poloidal plane at the end of the high-power scenario.}
+	\caption[Comparison of the magnitude of the flutter field to the poloidal magnetic field strength $B_{pol}$]{Comparison of the magnitude of the flutter field to the poloidal magnetic field strength $B_{pol}$. Snapshot on the first poloidal plane at the end of the high-power scenario.}
 	\label{fig:TCV_poloidalFieldGS}
 \end{figure}
 

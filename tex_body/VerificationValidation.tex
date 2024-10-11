@@ -1,6 +1,30 @@
 \chapter{Verification and Validation}
 \label{chap:VV}
+
+
+\begin{chaptersummarybox}
+	The implementation of the electromagnetic model is verified using the method of manufactured solutions on a three-dimensional, curved geometry with non-uniform meshing. Physical quantities are initialized as sinusoidal functions, and analytic source terms are computed to compensate for all time-independent terms in the equations, such that the simulation maintains a steady state. The root mean square difference between the initial state and the plasma state after one timestep is a appropriate to estimate the discretization error introduced by the implementation. First, the electromagnetic vorticity system with magnetic induction and electron inertia is verified. The complex geometry provides an advanced test for the correct implementation of fields on a staggered grid. The discrete parallel Laplacian operator developed for diffusion problems with flutter is tested separately on the parallel heat conduction term in the energy conservation equation. A resolution scan demonstrates that the error decreases with the square of the mesh size, consistent with the second-order schemes used for the tested stencils. \\
+	
+	The physical accuracy is validated on true 2D and 3D slabs with a uniform magnetic field against the linear behavior expected from the dispersion relation. The test setup is first checked on trivial advection and the electrostatic vorticity equation. Next, Alfvén waves are observed on a 2D slab with pure magnetic induction in the vorticity equation. The most comprehensive test is performed on a 3D slab with a (uniform) poloidal and toroidal magnetic field in a four-field model, where $A_\parallel$ and $j_\parallel$ evolve with a $\pi/2$ phase shift relative to $\Phi$ and $n_e$. A scan over the perpendicular wave motion exhibits the transition from Alfvén dynamics to thermal electron waves. The observed speeds are:
+	
+	\begin{align*}
+		v_A &= \frac{B}{\sqrt{m_in_i\mu_0}} & v_{th,e} &= \sqrt{\frac{T_e}{m_e}}
+	\end{align*} 
+	
+	where waves propagate at $v_A$ in the low $k_\perp$ limit and at $v_{th,e}$ in the upper $k_\perp$ limit.
+	
+\end{chaptersummarybox}
+
+\newpage
+
+
+
+
+The electromagnetic extension of the SOLEDGE3X framework required considerable modifications of the code. Before investigating new physics, it is wise to verify the correctness of the implementation and validate electromagnetic plasma behavior with it. In a first series of tests in Sec. \ref{sec:verification}, the implementation of the electromagnetic vorticity equation and the parallel diffusion with flutter are checked against analytic source term. The physical behavior is validated in Sec. \ref{sec:validation}, where test cases on 2D and 3D slabs with increasing model complexity are confronted to the expected linear behavior.
+
+
 \section{Verification by the method of manufactured solutions}
+\label{sec:verification}
 To ensure the correctness of the newly implemented system with the magnetic vector potential $A_\parallel$, a test model has been set up with the method of manufactured solutions (MMS) \cite{ManufacturedSolution}. This allows to directly compare the numerical and analytic solutions and therefore validate the implementation and verify the order of convergence of the numerical operators. 
 
 \subsection{Test set-up}
@@ -20,7 +44,7 @@ The MMS test model is a fraction of a torus with a circular cross-section with a
 		\subcaption{View of a cross-section of the torus in the $\psi-\theta$ plane \\ \textit{The cross-section is at $\varphi=0$}}
 		\label{fig:MMSModelTorturedCrossSection}
 	\end{subfigure}	
-	\caption{Distorted MMS mesh geometry with $N=20$ cells per dimension on a 3rd of a torus}
+	\caption[Distorted MMS mesh geometry with $N=20$ cells per dimension on a 3rd of a torus]{Distorted MMS mesh geometry with $N=20$ cells per dimension on a 3rd of a torus}
 	\label{fig:MMSModelScheme}
 \end{figure}
 
@@ -113,7 +137,7 @@ where we sum the residual for each point in the domain excluding the imposed Dir
 		\subcaption{3D system}
 		\label{fig:MMSTorturedVortAPara3DConvergence}
 	\end{subfigure}
-	\caption{Relative error between the initial plasma and the solution after one timestep for the electromagnetic vorticity system. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$ (resp. $N_{tot}^{2D} = 4\cdot X^2$). The dashed lines indicate the slope of the ideal 2nd order convergence}
+	\caption[Relative error between the initial plasma and the solution after one timestep for the electromagnetic vorticity system]{Relative error between the initial plasma and the solution after one timestep for the electromagnetic vorticity system. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$ (resp. $N_{tot}^{2D} = 4\cdot X^2$). The dashed lines indicate the slope of the ideal 2nd order convergence}
 	\label{fig:MMSTorturedVortAParaConvergence}
 \end{figure}
 
@@ -138,7 +162,7 @@ To be as realistic as possible with the real flutter, it is scaled by the magnit
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{schemes/err_rel_paradif_Brad_grid2_3D.png}
-	\caption{Relative error between the initial plasma and the solution after one timestep for the parallel 3D heat diffusion system with flutter. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$. The dashed lines indicate the slope of the ideal 2nd order convergence}
+	\caption[Relative error between the initial plasma and the solution after one timestep for the parallel 3D heat diffusion system with flutter]{Relative error between the initial plasma and the solution after one timestep for the parallel 3D heat diffusion system with flutter. The $x$-axis indicates the number of points per zone in each direction, the total number of points is thus $N_{tot}^{3D} = 8\cdot X^3$. The dashed lines indicate the slope of the ideal 2nd order convergence}
 	\label{fig:MMSTorturedFlutterDiffParaConvergence}
 \end{figure}
 
@@ -146,10 +170,12 @@ To be as realistic as possible with the real flutter, it is scaled by the magnit
 
 
 \section{Validation on linear systems}
+\label{sec:validation}
+The MMS verification confirmed the correctness of the implementation. A more integrative, physics-based validation of the electromagnetic model is proposed here to recover the linear behavior in ideal slab configurations. We first verify the general test framework on the transport term and the electrostatic vorticity equation before investigating Alfvén dynamics and the interaction with electron inertia effects.
 
-.... 
+
 \subsection{Pure advection}
-A first step to verify the correct physical behaviour of the simulation and to test the general validation framework would be to investigate the plasma advection equations. We can hence define parallel and perpendicular wavenumbers $k_\parallel$ and $k_\perp$ that  For this objective we set up a simplistic plasma model on a rectangular 2D SLAB topology, where magnetic field is uniform in poloidal Z direction. Periodic boundary conditions in all directions allow to properly observe wave propagation without any inference at the domain boundaries. In an isothermal hydrogen plasma without source terms and drifts, the governing equations then simplify to:
+A first step to validate the correct physical behaviour of the simulation and to test the general validation framework would be to investigate the plasma advection equations. We can hence define parallel and perpendicular wavenumbers $k_\parallel$ and $k_\perp$ that  For this objective we set up a simplistic plasma model on a rectangular 2D SLAB topology, where magnetic field is uniform in poloidal Z direction. Periodic boundary conditions in all directions allow to properly observe wave propagation without any inference at the domain boundaries. In an isothermal hydrogen plasma without source terms and drifts, the governing equations then simplify to:
 
 \begin{align}
 	\partial_t n_i + \grad\cdot\left(n_i\mathbf{u}_i\right) &= 0 \label{eq:AdvectionLinearAnalysis_ionMass} \\
@@ -198,7 +224,7 @@ It is apparent that both solutions for $\omega$ are real therefore non-decaying 
 		\subcaption{time Fourier transform of the density and velocity}
 		\label{fig:AdvectionSLAB_FFT}
 	\end{subfigure}
-	\caption{Evolution of the 1D SLAB system with 64 cells in poloidal direction over 10000 timesteps with the RK4 scheme. For a better readability only parts of the graphs are represented}
+	\caption[Evolution of the 1D SLAB system with 64 cells in poloidal direction over 10000 timesteps with the RK4 scheme]{Evolution of the 1D SLAB system with 64 cells in poloidal direction over 10000 timesteps with the RK4 scheme. For a better readability only parts of the graphs are represented}
 	\label{fig:AdvectionSLAB}
 \end{figure}
 
@@ -245,7 +271,7 @@ The time integration of this system can only be performed by solving the implici
 		\subcaption{Estimated decay rates for different wavemodes}
 		\label{fig:electrostaticSLAB_decayRateFit}
 	\end{subfigure}
-	\caption{Evolution of the 2D electrostatic SLAB system with 64 cells in radial and poloidal direction over 10000 timesteps with the implicit Euler scheme. The system is grounded at the center of the domain to $\Phi^G = 0$V.}
+	\caption[Evolution of the 2D electrostatic SLAB system with 64 cells in radial and poloidal direction over 10000 timesteps with the implicit Euler scheme]{Evolution of the 2D electrostatic SLAB system with 64 cells in radial and poloidal direction over 10000 timesteps with the implicit Euler scheme. The system is grounded at the center of the domain to $\Phi^G = 0$V.}
 	\label{fig:electrostaticSLAB}
 \end{figure}
 
@@ -332,7 +358,7 @@ As in the electrostatic case from the previous section, the just described syste
 		\subcaption{Time evolution of $A_\parallel(t)$ in the lower left corner of the domain}
 		\label{fig:electromagneticSLAB_evolution_A}
 	\end{subfigure}
-	\caption{Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points. All point at the radial center with $i_\psi^G$ are grounded.}
+	\caption[Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points]{Snapshot of an electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points. All point at the radial center with $i_\psi^G$ are grounded.}
 	\label{fig:electromagneticGroundedSLAB_system}
 \end{figure}
 
@@ -354,7 +380,7 @@ We investigate the underdamped scenario by opposing simulation results to the ex
 		\subcaption{Radial mode fixed to $k_\perp = 100m^{-1}$}
 		\label{fig:electromagneticSLAB_errorGrounded_kPerp_fixed}
 	\end{subfigure}
-	\caption{Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$ with respect to the expected values in a grounded electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points.}
+	\caption[Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$]{Relative error for the fits of the frequency $\omega_0$ and the decay rate $\lambda$ on the evolution of $A_\parallel$ with respect to the expected values in a grounded electromagnetic SLAB simulation on a domain with $N_\psi=32$ and $N_\theta=64$ grid points.}
 	\label{fig:electromagneticSLAB_errorGrounded}
 \end{figure}
 
@@ -401,7 +427,7 @@ Again we need to ground the potential somewhere to make the system invertible. F
 		\subcaption{Evolution of the four fields in one point of the domain}
 		\label{fig:electromagneticSLAB_evolution}
 	\end{subfigure}
-	\caption{Characteristic evolution of the four-field electromagnetic model in a domain with $N_\psi=N_\theta=N_\varphi=63$ grid points.}
+	\caption[Characteristic evolution of the four-field electromagnetic model in a domain with $N_\psi=N_\theta=N_\varphi=63$ grid points]{Characteristic evolution of the four-field electromagnetic model in a domain with $N_\psi=N_\theta=N_\varphi=63$ grid points.}
 	\label{fig:electromagneticSLAB_fourFieldModel}
 \end{figure}
 
@@ -419,7 +445,7 @@ From Eq. \ref{eq:VV_dispersionRelation}, we expect a wave in the parallel direct
 \begin{figure}[h]\centering
 	\centering
 	\includegraphics[width=0.7\textwidth]{schemes/transitionAlfvenThermal.png}
-	\caption{Fitted wave frequencies as a function of the perpendicular wave numbers. The lines indicate the theoretical wave frequencies in the electrostatic case with finite electron mass (ES), the electromagnetic case with $m_e = 0$ (EM), and the complete electromagnetic case with electron inertia (ES + EM).}
+	\caption[Fitted wave frequencies as a function of the perpendicular wave numbers]{Fitted wave frequencies as a function of the perpendicular wave numbers. The lines indicate the theoretical wave frequencies in the electrostatic case with finite electron mass (ES), the electromagnetic case with $m_e = 0$ (EM), and the complete electromagnetic case with electron inertia (ES + EM).}
 	\label{fig:transitionSLAB}
 \end{figure}
 

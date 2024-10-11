@@ -26,7 +26,7 @@
 
 \newpage
 
-The SOLEDGE3X framework uses a finite-volume method (FVM) with an implicit-explicit time integration scheme and variable stepsize (VSIMEX)\cite{wang2008variable}. In turbulence simulations, we focus on timescales slower than the cyclotronic frequency $\omega_C$, allowing explicit time-stepping for advection, friction, pressure, and energy source terms. This multi-step method is implemented for orders 1 to 3, with the timestep updated to match a targeted CFL value.
+The SOLEDGE3X framework uses a finite-volume method (FVM) with an implicit-explicit time integration scheme and variable stepsize (VSIMEX)\cite{wang2008variable}. The second-order conservative FVM scheme associated with a 3rd-order WENO reconstruction and Donat, Marquina fluxes for a modified Riemann solver for the advection terms to handle both shocks and complicated smooth solution structures \cite{tamain2016tokam3x, Bufferand2021}. In turbulence simulations, we focus on timescales slower than the cyclotronic frequency $\omega_C$, allowing explicit time-stepping for advection, friction, pressure, and energy source terms. This multi-step method is implemented for orders 1 to 3, with the timestep updated to match a targeted CFL value.
 
 Ionization/recombination processes, resistive and viscous effects from the Spitzer-Härm model, electron inertia, and Alfvén dynamics involve faster dynamics than the ion cyclotronic time, and would strongly restrict the timestep size. These terms are therefore solved implicitly. To reduce complexity, they can be decoupled and solved sequentially for density, parallel velocity, temperature, and the vorticity equation.
 
@@ -72,7 +72,7 @@ In order to keep a structured flux-surfaces aligned mesh for any magnetic equili
 		\label{fig:TCV_domains}
 	\end{subfigure}
 	
-	\caption{ Example of typical mesh and domain decomposition mapping the real domain (a) to a Cartesian multiple zones domain (b). Each colored zone is isomorphic to a cube, the lines connecting the edges indicate the neighbours mapping. }
+	\caption[Example of typical mesh and domain decomposition mapping the real domain to a Cartesian multiple zones domain]{ Example of typical mesh and domain decomposition mapping the real domain (a) to a Cartesian multiple zones domain (b). Each colored zone is isomorphic to a cube, the lines connecting the edges indicate the neighbours mapping. }
 	\label{fig:TCVzoneDecomposition}
 \end{figure}
 
@@ -118,14 +118,14 @@ Next, we introduce the metric coefficients $g_{ij} = \mathbf{e}_i\cdot \mathbf{e
 	v^i =& g^{ij}v_j & \mathbf{e}^i =& g^{ij}\mathbf{e}_j 
 \end{align}
 
-It may be noted that the matrices formed by the indices $i,j\in\{\theta,\psi,\varphi\}$ are each other's inverse matrix. \\
+It may be noted that the matrices formed by the indices $i,j\in\{\theta,\psi,\varphi\}$ are each other's inverse matrix. Further details on the curvilinear metric applied to the magnetic configuration are given in App. \ref{app_linearAlgebra}. \\
 
 
 
 \section{The staggered mesh}
 \label{sec:impl_staggeredMesh}
 
-In order to benefit from the first-order parallel derivative that separates the $A_\parallel$ and $j_\parallel$ from the other plasma fields $\Phi$, $n_e$, and $T_e$ (Eqs. \ref{eq:MagneticPotential} and \ref{eq:VorticityEquation}), these two variables are defined on a toroidally $\varphi$ and poloidally $\theta$ staggered grid. They are calculated at cell edges in the parallel direction and can be directly matched to the fluxes entering and leaving the collocated cells. One of the major benefits is to minimize numerical diffusion and preserve turbulent structures, following findings in FVM simulations for fluid mechanics \cite{meier1999comparison}. In the radial $\psi$ direction, we keep the collocated position as the only parallel gradient in $\psi$ comes from the flutter term, which in nature is much smaller than the equilibrium field. If the mesh were also staggered in $\psi$, we would face strong numerical radial diffusion of parallel fluxes, defying the motivation of a staggered grid for $A_\parallel$ and $j_\parallel$. \newline
+In order to benefit from the first-order parallel derivative that separates the $A_\parallel$ and $j_\parallel$ from the other plasma fields $\Phi$, $n_e$, and $T_e$ (Eq. \ref{eq:S3X_vorticityEquation_FullElectromagnetic}), these two variables are defined on a toroidally $\varphi$ and poloidally $\theta$ staggered grid. They are calculated at cell edges in the parallel direction and can be directly matched to the fluxes entering and leaving the collocated cells. One of the major benefits is to minimize numerical diffusion and preserve turbulent structures, following findings in FVM simulations for fluid mechanics \cite{meier1999comparison}. In the radial $\psi$ direction, we keep the collocated position as the only parallel gradient in $\psi$ comes from the flutter term, which in nature is much smaller than the equilibrium field. If the mesh were also staggered in $\psi$, we would face strong numerical radial diffusion of parallel fluxes, defying the motivation of a staggered grid for $A_\parallel$ and $j_\parallel$. \newline
 
 
 
@@ -135,7 +135,7 @@ The scalar variable $A_\parallel$ is the magnitude of the parallel magnetic vect
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.4\textwidth]{schemes/StaggeredGrid.pdf}
-	\caption{General view of the staggered grid points marked as crosses on top of the collocated cells. The red cross at the position $[i_\psi, i_\theta - \frac{1}{2}, i_\varphi-\frac{1}{2}]$ corresponds to the central cell with index $[i_\psi, i_\theta, i_\varphi]$}
+	\caption[General view of the staggered grid points marked as crosses on top of the collocated cells]{General view of the staggered grid points marked as crosses on top of the collocated cells. The red cross at the position $[i_\psi, i_\theta - \frac{1}{2}, i_\varphi-\frac{1}{2}]$ corresponds to the central cell with index $[i_\psi, i_\theta, i_\varphi]$}
 	\label{fig:StaggeredGridOverview}
 \end{figure}
 
@@ -148,12 +148,12 @@ In the following work, quantities evaluated at staggered grid points are indicat
 
 \subsection{Boundary cells}
 
-Staggered quantities require a different treatment at the domain boundary. On the collocated mesh, cells are located either entirely in the plasma or in the physical wall. Staggered quantities in the boundary layer are thus always half a cell width away from the wall and boundary conditions are enforced accordingly. For the magnetic vector potential this holds for walls in $\psi$ direction but in $\varphi$ and $\theta$ directions, the staggered grid points are on the tokamak wall for the boundary cells with lowest index and one cell width away at the highest index. For consistency, accuracy and symmetry purposes, the staggered solvable domain shall be either extended by one row of cells at the upper index to include the wall in the solution or or reduced by one row at the lower end. In both cases, the number of collocated and staggered grid points do not match anymore and inhibit all eventual symmetry properties of the matrix in the dual-grid system (\ref{eq:vorticityEquation_electromagnetic_dedimensionalized_implicitEulerSystem}). $A_\parallel$ requires Dirichlet boundary conditions with the value 0 everywhere, thus the solution on the wall is already known and is not needed in the system. The parallel current $j_\parallel$ is fixed by the sheath current perpendicular to the wall, but is still needed for the parallel component tangential to the sheath. In Fig. \ref{fig:StaggeredGridBC}, the 
+Staggered quantities require a different treatment at the domain boundary. On the collocated mesh, cells are located either entirely in the plasma or in the physical wall. Staggered quantities in the boundary layer are thus always half a cell width away from the wall and boundary conditions are enforced accordingly. For the magnetic vector potential this holds for walls in $\psi$ direction but in $\varphi$ and $\theta$ directions, the staggered grid points are on the tokamak wall for the boundary cells with lowest index and one cell width away at the highest index. For consistency, accuracy and symmetry purposes, the staggered solvable domain shall be either extended by one row of cells at the upper index to include the wall in the solution or or reduced by one row at the lower end. In both cases, the number of collocated and staggered grid points do not match anymore and inhibit all eventual symmetry properties of the matrix in the dual-grid system. $A_\parallel$ requires Dirichlet boundary conditions with the value 0 everywhere, thus the solution on the wall is already known and is not needed in the system. The parallel current $j_\parallel$ is fixed by the sheath current perpendicular to the wall, but is still needed for the parallel component tangential to the sheath. In Fig. \ref{fig:StaggeredGridBC}, the position of the staggered fields $A_\parallel$ and $j_\parallel$ along the wall is shown.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.6\textwidth]{schemes/staggeredGridBoundary.png}
-	\caption{General view of the staggered grid points in the $\theta-\varphi$ plane. The field $A_\parallel$ is defined at the green crosses and $j_\parallel$ at the red circles. Crossed cells are boundary cells where the mask is $\chi = 1$. }
+	\caption[General view of the staggered grid points in the $\theta-\varphi$ plane]{General view of the staggered grid points in the $\theta-\varphi$ plane. The field $A_\parallel$ is defined at the green crosses and $j_\parallel$ at the red circles. Crossed cells are boundary cells where the mask is $\chi = 1$. }
 	\label{fig:StaggeredGridBC}
 \end{figure}
 
@@ -221,7 +221,7 @@ This discrete operator involves four neighbors, as shown in Fig. \ref{fig:Impl_G
 		\subcaption{Gradient in radial direction}
 		\label{fig:Impl_GradPara_PsiTheta}
 	\end{subfigure}
-	\caption{Neighbors involved to calculated staggered parallel gradients}
+	\caption[Neighbors involved to calculated staggered parallel gradients]{Neighbors involved to calculated staggered parallel gradients.}
 	\label{fig:Impl_GradPara}
 \end{figure}
 
@@ -251,7 +251,7 @@ The divergence of $j_\parallel$ needs to be calculated at the collocated grid in
 	\left[\grad\cdot X^{stg}\mathbf{b}\right]_{[i_\psi,i_\theta, i_\varphi]}
 \end{equation}
 
-In \autoref{eq:MetricDivergenceParallel}, the divergence of a parallel vector field has been introduced. We consider a collocated cell as in \autoref{fig:StaggeredGridOverview}. The divergence is then the sum of all in- and outgoing fluxes $\pdv{\left(J X b^i\right)}{u^i}$ across the six cell faces. 
+In Eq. \ref{eq:MetricDivergenceParallel}, the divergence of a parallel vector field has been introduced. We consider a collocated cell as in Fig. \ref{fig:StaggeredGridOverview}. The divergence is then the sum of all in- and outgoing fluxes $\pdv{\left(J X b^i\right)}{u^i}$ across the six cell faces. 
 
 \begin{equation}
 	\label{eq:NumericalStaggeredDivergenceStencil}
@@ -264,7 +264,7 @@ We want calculate these fluxes from the flux $F^{X,i} = JXb^i$ of the staggered 
 	F_{[i_\psi,i_\theta, i_\varphi]}^{X,\theta} &= \frac{1}{2}\left(F_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]}^{X,\theta} + F_{[i_\psi,i_\theta-\frac{1}{2}, i_\varphi+\frac{1}{2}]}^{X,\theta} \right)
 \end{align*}
 
-In the radial direction, we need, again, the fluxes at eight neighboring staggered locations to calculate a flux on a single cell face. 
+In the radial direction, we need, again, the fluxes at eight neighboring staggered locations (see Fig. \ref{fig:Impl_DivPara_PsiTheta}) to calculate a flux on a single cell face. 
 
 \begin{align*}
 	F_{[i_\psi,i_\theta, i_\varphi]}^{X,\psi} = \frac{1}{8}&\left(
@@ -294,7 +294,7 @@ In the radial direction, we need, again, the fluxes at eight neighboring stagger
 		\subcaption{Divergence in radial direction}
 		\label{fig:Impl_DivPara_PsiTheta}
 	\end{subfigure}
-	\caption{Neighbors involved to calculated the parallel divergence. The arrows indicate the in- and outgoing fluxes that need to be calculated, and the dashed lines connect the arrows to the staggered points they require.}
+	\caption[Neighbors involved to calculated the parallel divergence]{Neighbors involved to calculated the parallel divergence. The arrows indicate the in- and outgoing fluxes that need to be calculated, and the dashed lines connect the arrows to the staggered points they require.}
 	\label{fig:Impl_DivPara}
 \end{figure}
 
@@ -308,7 +308,7 @@ Ampère's law requires the perpendicular Laplacian on the staggered grid to link
 	\left[\grad\cdot\grad_{\perp}X^{stg}\right]^{stg}_{[i_\psi,i_\theta, i_\varphi]}
 \end{equation}
 
-Let us consider a staggered cell over the regular mesh, depicted in red in Fig. \ref{fig:StaggeredCell}. Since the Laplacian operator can be treated as a divergence of a gradient, the task . Each flux $F^{Y,i}$ is defined as the perpendicular gradient at the corresponding cell face, approximated with finite differences. The metric and diffusion coefficients $JD(g^{ij}-b^ib^j)$ are also required at the faces and we obtain them by taking their average on the closest collocated points. In poloidal and toroidal directions two collocated points shown in green in \autoref{fig:StaggeredFluxTheta} and \autoref{fig:StaggeredFluxPhi} are sufficient but in radial direction we need to consider eight points around the face to calculate the correct coefficients. \\
+Let us consider a staggered cell over the regular mesh, depicted in red in Fig. \ref{fig:StaggeredCell}. Since the Laplacian operator can be treated as a divergence of a gradient, the task . Each flux $F^{Y,i}$ is defined as the perpendicular gradient at the corresponding cell face, approximated with finite differences. The metric and diffusion coefficients $JD(g^{ij}-b^ib^j)$ are also required at the faces and we obtain them by taking their average on the closest collocated points. In poloidal and toroidal directions two collocated points shown in green in Fig. \ref{fig:StaggeredFluxTheta} and Fig. \ref{fig:StaggeredFluxPhi} are sufficient but in radial direction we need to consider eight points around the face to calculate the correct coefficients. \\
 
 \begin{figure}[H]
 	\centering
@@ -337,7 +337,7 @@ Let us consider a staggered cell over the regular mesh, depicted in red in Fig. 
 		\label{fig:StaggeredFluxPhi}
 	\end{subfigure}
 	
-	\caption{Depiction of the relevant cell faces to calculate fluxes of a staggered field at coordinate index $[i_\psi, i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]$}
+	\caption[Depiction of the relevant cell faces to calculate fluxes of a staggered field]{Depiction of the relevant cell faces to calculate fluxes of a staggered field at coordinate index $[i_\psi, i_\theta-\frac{1}{2}, i_\varphi-\frac{1}{2}]$.}
 	\label{fig:StaggeredPerpendicularLaplancianCellSurfaces}
 \end{figure}
 
@@ -345,23 +345,23 @@ Let us consider a staggered cell over the regular mesh, depicted in red in Fig. 
 \subsection{Discretization around the X-point}
 \label{ssec:DiscretizationXPt}
 
-The staggered grid has direct implications on the estimation of fluxes around mesh singularities: while for regular fields, every cell around the X-point has well-defined neighbors (see Fig. \ref{fig:CenteredXpoint}), radial fluxes in and out of staggered cells directly cross the X-point (see Fig. \ref{fig:StaggeredXpoint}). They affect the perpendicular Laplacian operator on $A_\parallel$ in Ampere's law (Eq. \ref{eq:MagneticPotential}), advection on $j_\parallel$ in Eq. \ref{eq:advectionJpara}, and the anomalous perpendicular diffusion $\mathcal{D}_\perp$. To cope with the ill-defined cell faces, fluxes across the X-point are forced to 0 by Neumann-like boundary conditions. Neighbors of the involved cells must be defined separately from the regular cells with the same index. \newline
+The staggered grid has direct implications on the estimation of fluxes around mesh singularities: while for regular fields, every cell around the X-point has well-defined neighbors (see Fig. \ref{fig:CenteredXpoint}), radial fluxes in and out of staggered cells directly cross the X-point (see Fig. \ref{fig:StaggeredXpoint}). They affect the perpendicular Laplacian operator on $A_\parallel$ in Ampere's law (Eq. \ref{eq:S3X_AmpereLaw}), advection on $j_\parallel$ in Eq. \ref{eq:S3X_advectionJPara}, and the anomalous perpendicular diffusion $\mathfrak{D}_{A,j}$. To cope with the ill-defined cell faces, fluxes across the X-point are forced to 0 by Neumann-like boundary conditions. Neighbors of the involved cells must be defined separately from the regular cells with the same index. \newline
 
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[t]{0.39\textwidth}
+	\begin{subfigure}[t]{0.48\textwidth}
 		\centering
-		\includegraphics[width=1\textwidth]{schemes/XpointCentered.png}
+		\includegraphics[height=7cm]{schemes/XpointCentered.png}
 		\subcaption{View of collocated cells}
 		\label{fig:CenteredXpoint}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.39\textwidth}
+	\begin{subfigure}[t]{0.48\textwidth}
 		\centering
-		\includegraphics[width=1\textwidth]{schemes/XpointStaggered.png}
+		\includegraphics[height=7cm]{schemes/XpointStaggered.png}
 		\subcaption{View of staggered cells}
 		\label{fig:StaggeredXpoint}
 	\end{subfigure}
-	\caption{ Sketches of the mesh around the X-point. For collocated cells (a), 8 cells touch the X-point at a corner. For staggered cells (b), the X-point is located at the radial face of 4 cells, effectively modifying the shape of the cells to pentagons. Fluxes across the involved faces are hence ill-defined. }
+	\caption[Sketches of the mesh around the X-point]{ Sketches of the mesh around the X-point. For collocated cells (a), 8 cells touch the X-point at a corner. For staggered cells (b), the X-point is located at the radial face of 4 cells, effectively modifying the shape of the cells to pentagons. Fluxes across the involved faces are hence ill-defined. }
 	\label{fig:XpointDiscretization}
 \end{figure}
 
@@ -377,18 +377,17 @@ The staggered grid has direct implications on the estimation of fluxes around me
 \section{Electromagnetic vorticity system}
 \label{sec:impl_EMvorticity}
 
-The newly introduced fields $j_\parallel$ and $A_\parallel$ are solved implicitly along with the electric potential $\Phi$. As we face a coupled system that connects all points in the domain, direct solvers such as PASTIX are not suitable, especially for fine 3D meshes. We instead prefer to use iterative solvers available in the the PETSc or HYPRE libraries. For the original vorticity system, the Stabilized version of the Biconjugate Gradient method (BiCGStab) along with the Geometric Algebraic Multigrid (GAMG) preconditionner proved to be very efficient and it is desirable to use them on the new systems. This section describes some special numerical features in the construction of the system to facilitate the convergence of the above iterative scheme. \autoref{ssec:equilibrationBLockMatrices} introduces specific row and column scaling to equilibrate the blocks in the new system and \autoref{ssec:StaggeredFieldsMatrix} describes how to handle staggered fields to be compatible with the iterative scheme.
+The newly introduced fields $j_\parallel$ and $A_\parallel$ are solved implicitly along with the electric potential $\Phi$. As we face a coupled system that connects all points in the domain, direct solvers such as PASTIX are not suitable, especially for fine 3D meshes. We instead prefer to use iterative solvers available in the the PETSc or HYPRE libraries. For the original vorticity system, the Stabilized version of the Biconjugate Gradient method (BiCGStab) along with the Geometric Algebraic Multigrid (GAMG) preconditionner proved to be very efficient and it is desirable to use them on the new systems. This section describes some special numerical features in the construction of the system to facilitate the convergence of the above iterative scheme. Sec. \ref{ssec:equilibrationBLockMatrices} introduces specific row and column scaling to equilibrate the blocks in the new system and Sec. \ref{ssec:StaggeredFieldsMatrix} describes how to handle staggered fields to be compatible with the iterative scheme.
 
 \subsection{Matrix formulation of the electromagnetic system}
 
-With the values for $n_e$ and $T_e$ known at time-step $n+1$, the vorticity equation (Eq. \ref{eq:VorticityEquation}) corresponds to a 3D costly system involving $\Phi$, $j_\parallel$, and $A_\parallel$. To solve it efficiently, the $j_\parallel$ advection and perpendicular diffusion are treated explicitly, allowing the integration of Ohm's law into the vorticity equation and Ampère's law. Then, at time-step $n+1$, the following dimensionless system coupling the two potentials $\Phi$ and $A_\parallel$ must be solved: \newline
+With the values for $n_e$ and $T_e$ known at time-step $n+1$, the vorticity equation (Eq. \ref{eq:S3X_vorticityEquation_FullElectromagnetic}) corresponds to a 3D costly system involving $\Phi$, $j_\parallel$, and $A_\parallel$. To solve it efficiently, the advection of $j_\parallel$ and the anomalous perpendicular diffusion are treated explicitly. Following the discussion in Sec. \ref{sec:S3X_formulationEMsystem}, we integrate Ohm's law into the vorticity equation and Ampère's law. Then, at time-step $n+1$, the following dimensionless system coupling the two potentials $\Phi$ and $A_\parallel$ must be solved: \\
 
 \begin{align}
-		\label{eq:impl_implicitVorticitySystem}
 	\begin{pmatrix}
 		\nabla \cdot \left[ D_\perp \nabla_\perp \circ \right] + \nabla \cdot \left[ D_\parallel \nabla_\parallel \circ \mathbf{b} \right]  
 		& \frac{\beta_0}{\delta_t} \nabla \cdot \left[ D_\parallel \circ \mathbf{b} \right] \\
-		-D_\parallel \nabla_\parallel \circ &
+		D_\parallel \nabla_\parallel \circ &
 		\frac{\beta_0}{\delta_t} D_\parallel \circ - \nabla \cdot \left[ \nabla_\perp \circ \right]
 	\end{pmatrix}
 	\begin{pmatrix}
@@ -399,6 +398,7 @@ With the values for $n_e$ and $T_e$ known at time-step $n+1$, the vorticity equa
 		\nabla \cdot \left[ D_t j^{n}_\parallel \mathbf{b} \right] + \text{RHS}^\Phi \\
 		D_t j^{n}_\parallel + \text{RHS}^{A_\parallel}
 	\end{pmatrix}
+	\label{eq:impl_implicitVorticitySystem}
 \end{align}
 
 with $D_\perp = \frac{m_i n_i}{B^2 \delta_t}$, $D_\parallel = \frac{1}{\eta_\parallel + \mu}$, $D_t = \frac{\mu}{\eta_\parallel + \mu}$, and $\mu = m_e / (n_e \delta_t)$ accounting for electron inertia effects. The parameter $\delta_t$ derives from the integration scheme and is equal to the time-step in the case of a first-order implicit Euler scheme. \newline
@@ -408,27 +408,64 @@ Since $\eta_\parallel \propto T_e^{-1.5}$, the parallel resistivity $\eta_\paral
 
 \subsubsection{Equilibration of the Matrix Blocks}
 \label{ssec:equilibrationBLockMatrices}
-The matrices in the electromagnetic model \autoref{sec:DedimensionalizedElectromagneticModelS3X} can be decomposed in 2x2 or 3x3 block matrices that apply on the respective fields $\Phi$, $A_\parallel$ and/or $j_\parallel$. Apart of the use of dedimensionalized quantities, no effort was made so far to ensure that the blocks are roughly of the same order of the magnitude, which is important for the condition number of the matrix, nor that the matrix is diagonally dominant, which is generally a desirable feature for fast convergence of iterative schemes. \\
-In the following bits, we introduce some column $c_X$ and row $r_X$ scaling factors that are specific to the blocks $X$ of the matrix such that the above conditions are fullfilled as well as possible. To ensure a correct solution, the row scaling factor $r_X$ must be applied to the corresponding entry in the RHS vector and as a matter of fact, in the original vorticity matrix, we already have $r_\Phi = J$ the metrical Jacobian from \autoref{ssec:MetricCurvilinearCoordinates} to remove the effect of different mesh sizes in the domain on the discrete Laplacian operators. The column scaling factors $c_X$ must be taken care of when retrieving the fields from the numerical solution and it is strongly recommended to apply them to the initial guess for the iterative scheme. \\ 
-Some exisiting algorithms optimize the scaling task such as  --- cite ----. However, they all require an expensive matrix analysis phase that must be repeated regularly since the matrix changes with the progress of the simulation. Therefore, we use the knowledge about the construction of the matrix blocks to define sufficiently good scaling factors. An educated row and column scaling can considerably increase the condition number of a matrix\cite{van1969condition}.\\
+Apart of the use of dimensionless quantities, no effort was made so far to ensure that the blocks in the electromagnetic matrix (Eq. \ref{eq:impl_implicitVorticitySystem}) are roughly of the same order of the magnitude, which is important for the condition number of the matrix, nor that the matrix is diagonally dominant, which is generally a desirable feature for fast convergence of iterative schemes. \\
 
-Due to the large size of the system, it must be resolved using iterative solvers. Note that the two diagonal blocks already have a convenient shape, and the anti-diagonal blocks contain parallel divergence and gradient operators, whose discrete stencils are very similar. Therefore, by scaling both the second column and row with $\sqrt{\delta_t / \beta_0}$, the resulting matrix becomes almost symmetric, which is convenient for most iterative solvers.
+In the following bits, we introduce some column $c_X$ and row $r_X$ scaling factors that are specific to the blocks $X$ of the matrix such that the above conditions are fullfilled as well as possible. To ensure a correct solution, the row scaling factor $r_X$ must be applied to the corresponding entry in the RHS vector. As a matter of fact, in the original vorticity matrix, we already have $r_\Phi = J$ the metrical Jacobian from Sec. \ref{ssec:MetricCurvilinearCoordinates} to remove the effect of different mesh sizes in the domain on the discrete Laplacian operators. The column scaling factors $c_X$ must be taken care of when retrieving the fields from the numerical solution and it is strongly recommended to apply them to the initial guess for the iterative scheme. \\ 
+
+Some strategies exist to optimize the scaling task\cite{sinkhorn1967concerning,parlett1969balancing}. However, they all require an expensive matrix analysis phase that must be repeated regularly since the system changes with the progress of the simulation. Therefore, we use the knowledge about the construction of the matrix blocks to define sufficiently good scaling factors. An educated row and column scaling can considerably improve the condition number of a matrix\cite{van1969condition}. In fact, we do not want the perfect scaling to minimize the condition number (which would be as expensive as a direct solver), but give the matrix the best possible shape for the subsequent use of the GAMG pre-conditioner. It was designed for positive-definite (almost) symmetric matrices\cite{brandt1984algebraic} as they occur in elliptic PDEs and performs reasonably for diffusion-dominated parabolic problems. Note that the two diagonal blocks already have a convenient shape, and the anti-diagonal blocks contain parallel divergence and gradient operators, whose discrete stencils are almost equal and somewhat similar to the off-diagonal elements of a discrete Laplacian operator. Therefore, by scaling the second column with $c_A = \sqrt{\delta_t / \beta_0}$ and the second row with $r_A = -J\sqrt{\delta_t / \beta_0}$ the resulting matrix becomes almost symmetric and well-suited for GAMG. The minus sign is important to have the same sign for the Laplacians on $\Phi$ and $A_\parallel$, ensuring global positive definiteness, and to make the off-diagonal truly symmetric. The scalings $r_\Phi = J$ and $c_\Phi = 1$ remain unchanged from the original vorticity implementation.
 
 
 \subsubsection{Staggered Fields in the Matrix}
 \label{ssec:StaggeredFieldsMatrix}
 
-The GAMG multigrid solves the system on different coarser levels by restricting the matrix and the RHS vector and then interpolates the solution back to the finer levels. In the new system, two consecutive entries belong to different fields, which makes the whole restriction-interpolation task obsolete from the very first level since neither the solution nor the matrix entries are similar between neighbours. In general, PETSc takes care of multiple fields in a coupled system if one defines a block size (in our case either 2 or 3) that indicates GAMG how to match corresponding entries.vim  However, as seen in \autoref{ssec:SpatialDiscretization}, the fields $A_\parallel$ and $j_\parallel$ are defined on a staggered grid in poloidal and toroidal directions as opposed to the collocated field for $\Phi$. For the system it means that at each wall in negative directions (at the left target and for non-axisymmetric geometries), a line and column for $\Phi$ exists but not for the two other fields. This in turn is problematic for GAMG as the blocks are globally defined and two different fields would again end up together and the total system size might even not be a multiple of the blocksize (2 resp. 3), which at all prevents the initialization of the preconditioner. \\
+The GAMG multigrid solves the system on different coarser levels by restricting the matrix and the RHS vector and then interpolates the solution back to the finer levels. In the new system, two consecutive entries belong to different fields, which makes the whole restriction-interpolation task obsolete from the very first level since neither the solution nor the matrix entries are similar between neighbours. PETSc takes care of multiple fields in a coupled system if one defines a block size that indicates GAMG how to match corresponding entries. However, as seen in Fig. \ref{fig:impl_staggeredFieldMatrix}, the fields $A_\parallel$ is defined on a staggered grid in parallel direction as opposed to the collocated field $\Phi$. For the system it means that at each wall in negative directions, a line and column for $\Phi^1$ exists but not for the  corresponding $A_\parallel^1$. This in turn is problematic for GAMG as the blocks are globally defined and two different fields would again end up together and the total system size might even not be a multiple of the blocksize, which at all prevents the initialization of the preconditioner. As a solution, a dummy line is added to the matrix for $A_\parallel^1$ with a 1 on the diagonal that is not coupled to any other line. \\
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{schemes/staggeredMatrixLocation.jpg}
+	\caption[Sketches of the mesh around the X-point]{Ordering of the fields in the vorticity equation along the $\theta$ direction}
+	\label{fig:impl_staggeredFieldMatrix}
+\end{figure}
+
+It is important for GAMG to alternate entries for $A_\parallel$ and $\Phi$ in the matrix and not have one big block for each field as it reduces the distance of the non-zeros from the diagonal. It was also found that the pre-conditioner performs much better if each block is ordered $[A_\parallel^{i_\theta},\Phi^{i_\theta}]$ as the staggered grid point lies between $\Phi^{i_\theta-1}$ and $\Phi^{i_\theta}$ and the matrix ordering hence better reflects the geometrical configuration. For the geometry in Fig. \ref{fig:impl_staggeredFieldMatrix}, the matrix entries for the off-diagonal blocks would ressemble: 
+
+\begin{equation}
+	\begin{pmatrix}
+		0 & \partial_\theta \\
+		-\partial_\theta  & 0 
+	\end{pmatrix}\begin{pmatrix}
+	\Phi \\ A_\parallel
+	\end{pmatrix} =
+	\begin{pmatrix}
+		1  & & & & & &     \\		
+		   & & 1 & & & & & \\
+		& 1 & & -1 & & & & \\
+		& & -1 & & 1 & & & \\
+		& &  & \ddots & & \ddots & & \\
+		& & & & 1 & & -1 & \\
+		& & & & & -1 & & 1 \\
+	\end{pmatrix}
+	\begin{pmatrix}
+		A_\parallel^1    \\
+		\Phi_\parallel^1 \\
+		A_\parallel^2    \\
+		\Phi_\parallel^2 \\
+		\vdots           \\
+		A_\parallel^5    \\
+		\Phi_\parallel^5 \\		
+	\end{pmatrix}
+\end{equation}
+
 
 
 
 \subsection{Evaluation of the condition number}
 
-The electromagnetic vorticity system needs to be solved implicitly, and the condition number of the matrix is an important property that essentially defines the speed of convergence of iterative solvers. Extensive research in the past decade\cite{pyzara2011influence, strakos1991linear, drkovsova1995numerical, greenbaum1997numerical}, particularly on GMRES and conjugate gradient methods as they are used in SOLEDGE3X, has shown that a high condition number results in an increased number of iterations to reach convergence. The condition number of a matrix $\textbf{M}$ is defined as the ratio between its largest and smallest eigenvalues:
+The electromagnetic vorticity system needs to be solved implicitly, and the condition number of the matrix is an important property that essentially defines the speed of convergence of iterative solvers. Extensive research over the past decade\cite{pyzara2011influence, strakos1991linear, drkovsova1995numerical, greenbaum1997numerical}, particularly on GMRES and conjugate gradient methods as they are used in SOLEDGE3X, has shown that a high condition number results in an increased number of iterations to reach convergence. The condition number of a matrix $\textbf{M}$ is defined as the ratio between its largest and smallest eigenvalues:
 
 \begin{equation}
-	\label{eq:Impl_defConditionNumber}
 	\kappa\left(\textbf{M}\right) = \frac{\left|\lambda_{\text{max}}(\textbf{M})\right|}{\left|\lambda_{\text{min}}(\textbf{M})\right|}
+	\label{eq:Impl_defConditionNumber}
 \end{equation}
 
 It is therefore of particular interest to investigate how the electromagnetic extension of the system affects the conditioning of the vorticity system. While there are efficient algorithms to estimate the largest eigenvalue of a matrix, the smallest is much more expensive to compute. For the large 3D vorticity system, directly calculating the condition number is not feasible. Instead, we approach this question analytically. \\
@@ -439,13 +476,14 @@ Consider a 2D orthonormal system, with perpendicular gradients exclusively in th
 \begin{equation}
 	\textbf{M} = 
 	\begin{pmatrix}
-		\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel & \gamma \textbf{G}_\parallel \\ -\gamma \textbf{G}_\parallel^T & \sigma \textbf{I} - \gamma^2\textbf{L}_\perp
+		\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel & \gamma \textbf{G}_\parallel \\ -\gamma \textbf{G}_\parallel^T & \gamma^2\textbf{L}_\perp - \sigma \textbf{I} 
 	\end{pmatrix}
 \end{equation}
 
 where $\alpha = \frac{m_in_i}{B^2\delta_t}$, $\sigma = \frac{1}{\eta_\parallel + \frac{m_e}{n_e \delta_t}}$, and $\gamma = \sqrt{\frac{\delta_t }{\beta_0}}$. The stencil matrices $\textbf{L}_\perp$ and $\textbf{L}_\parallel$ describe the Laplacians between the $x$ and $y$ neighbors, respectively, while $\textbf{G}_\parallel$ represents the gradient over $y$. Their matrices take the following forms:
 
-\begin{align}
+\begin{gather}
+	\begin{aligned}
 	\mathbf{L}_\perp =& \begin{pmatrix}
 		-2 & 1 & 0 & \cdots & 0 \\
 		1 & -2 & 1 & \cdots & 0 \\
@@ -460,13 +498,16 @@ where $\alpha = \frac{m_in_i}{B^2\delta_t}$, $\sigma = \frac{1}{\eta_\parallel +
 		\vdots & \vdots & \vdots & \ddots & \vdots \\
 		1 & 0 & 0 & \cdots & -2
 	\end{pmatrix}_{N_y \times N_y} \nonumber\\
-	\mathbf{G}_\parallel =& \begin{pmatrix}
+	\end{aligned} \\
+	\begin{aligned}
+	\mathbf{G}_\parallel = \begin{pmatrix}
 		-1 & 1 & 0 & \cdots & 0 \\
 		0 & -1 & 1 & \cdots & 0 \\
 		\vdots & \vdots & \vdots & \ddots & \vdots \\
 		1 & 0 & 0 & \cdots & -1
 	\end{pmatrix}_{N_y \times N_y}
-\end{align}
+	\end{aligned}
+\end{gather}
 
 In order to make the system invertible and avoid an infinite condition number, we assume Dirichlet-0 boundary conditions in the perpendicular direction and periodic boundary conditions in the parallel direction. This can be viewed as a region of closed flux surfaces connected to a region with a very crude sheath-dominated plasma. We can compute the eigenvalues of the two Laplacians and the gradient coupling matrix exactly.
 
@@ -479,22 +520,22 @@ where $k_x\in[0,N_x-1]$ and $k_y\in[0,N_y-1]$ are indices for all eigenvalues. W
 Let us now evaluate the extremal eigenvalues of the diagonal blocks of $\mathbf{M}$. For the upper-left block, which contains the sum of Laplacians, the eigenvalues correspond to the combinations of $(k_x,k_y)$ such that $|\lambda_{k_x}|+|\lambda_{k_y}|$ is minimized or maximized:
 
 \begin{align}
-	\label{eq:Impl_EVupperLeftBlock}
 	\lambda_{min}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel) &= \alpha\cdot\frac{\pi^2}{N_x^2} & \lambda_{max}(\alpha \textbf{L}_\perp + \sigma \textbf{L}_\parallel) &= 4(\alpha + \sigma)
+	\label{eq:Impl_EVupperLeftBlock}
 \end{align}
 
 For the lower-right block matrix, the identity matrix will shift the eigenvalues of the perpendicular Laplacian by $\sigma$:
 
 \begin{align}
+	\lambda_{min}(\sigma \textbf{I} - \gamma^2 \textbf{L}_\perp) &= \sigma - 4\gamma^2 & \lambda_{max}(\gamma^2 \sigma \textbf{I} - \textbf{L}_\perp ) &= \sigma - \gamma^2\frac{\pi^2}{N_x^2}
 	\label{eq:Impl_EVlowerRightBlock}
-	\lambda_{min}(\sigma \textbf{I} - \gamma^2 \textbf{L}_\perp) &= \sigma - 4\gamma^2 & \lambda_{max}(\sigma \textbf{I} - \gamma^2 \textbf{L}_\perp) &= \sigma - \gamma^2\frac{\pi^2}{N_x^2}
 \end{align}
 
 For sufficiently large systems, the largest eigenvalue will be on the order of $\sigma$. If $\sigma \gg \gamma^2$, all eigenvalues will be close to $\sigma$, resulting in an excellent matrix condition. However, if $\sigma < 4\gamma^2$, some eigenvalues may become negative, causing the system to lose its positive-definiteness. This can lead to strong instabilities, and standard iterative solvers (e.g., GMRES or BiCGStab) may fail or produce unreliable results, as these methods are generally designed for positive-definite matrices. To ensure that the problem remains well-posed, we must enforce the constraint:
 
 \begin{equation}
-	\label{eq:Impl_conditionPositiveDefinite}
 	\frac{1}{4}\beta_0 > \delta_t\eta_\parallel + \frac{m_e}{n_e} 
+	\label{eq:Impl_conditionPositiveDefinite}
 \end{equation}
 
 This condition states that $\beta_0$ cannot be too small for the system to remain solvable. Assuming this lower condition on $\beta_0$ holds with a sufficient margin, the minimum and maximum eigenvalues in Eq. \ref{eq:Impl_EVlowerRightBlock} are simply $\lambda_{min} = \lambda_{max} = \sigma$. \\
@@ -585,7 +626,7 @@ From these expressions for the condition number, we observe a degradation as the
 		\subcaption{Perpendicular \\ resolution $N_\perp$}
 		\label{fig:Impl_conditionNumber_Nperp}
 	\end{subfigure}
-	\caption{Impact of different parameters on the condition number. Plasma parameters are taken as constant: $B=1$, $m_i = 2$, $n_e = n_i = 2$, $m_e = 5.5\cdot 10^{-4}$, $\beta_0 = 10^{-3}$, $\eta_\parallel = 10^{-6}$, $\delta_t = 1$ and $N_\perp = 100$. The parameters $\beta_0$ and $n_e$ are deliberately chosen large to ensure the validity of the positive-definiteness condition \ref{eq:Impl_conditionPositiveDefinite}. Black curves correspond to the electrostatic system, and red curves to the electromagnetic matrices, with full lines indicating electron inertia and dashed lines representing $m_e = 0$.}
+	\caption[Impact of different parameters on the condition number]{Impact of different parameters on the condition number. Plasma parameters are taken as constant: $B=1$, $m_i = 2$, $n_e = n_i = 2$, $m_e = 5.5\cdot 10^{-4}$, $\beta_0 = 10^{-3}$, $\eta_\parallel = 10^{-6}$, $\delta_t = 1$ and $N_\perp = 100$. The parameters $\beta_0$ and $n_e$ are deliberately chosen large to ensure the validity of the positive-definiteness condition \ref{eq:Impl_conditionPositiveDefinite}. Black curves correspond to the electrostatic system, and red curves to the electromagnetic matrices, with full lines indicating electron inertia and dashed lines representing $m_e = 0$.}
 	\label{fig:Impl_conditionNumber}
 \end{figure}
 
@@ -608,16 +649,21 @@ and the code proceeds as usual. \\
 In this section, we describe how the radial magnetic field has been included in all parallel operators, namely in the advection scheme, the implicit diffusion problems on viscosity and heat and, crucially, the electromagnetic vorticity system.
 
 
-\subsection{Finite volumes with flutter}
+\subsection{Radial advection}
+\label{ssec:impl_flutterAdvection}
 
-The spatial discretization is based on a second-order conservative FVM scheme associated with a 3rd-order WENO reconstruction and Donat, Marquina fluxes for a modified Riemann solver for the advection terms to handle both shocks and complicated smooth solution structures \cite{tamain2016tokam3x, Bufferand2021}. In this structure, flutter is treated equivalent to drift velocities. 
+All conserved fields are advected by the total velocity. In the drift-reduced approach, it decomposes into a parallel advection along the magnetic field lines with velocity $v_\parallel=\gamma_\parallel / n$ and a perpendicular advection with the plasma drifts. Flutter then corresponds to an additional transport term at $v_\parallel$ in radial direction. For any quantity $X$, the advection term can be expressed to: 
 
+\begin{equation}
+	\grad\cdot \left[X\left(v_\parallel\mathbf{b}_{eq}+v_\parallel\tilde{\mathbf{b}} + \mathbf{u}_\perp\right)\right]
+\end{equation}
 
+In  the WENO scheme, fluxes in and out a cell are treated independently for each direction. The only novelty with flutter appears for radial fluxes, where the contravariant $v_\parallel \tilde{b}^\psi$ adds to the existing advection by $u_\perp^\psi$. Effectively, flutter acts a new drift velocity and required relatively little adaptation of the code.
 
-\subsection{Parallel diffusion operator with flutter}
+\subsection{Parallel diffusion}
 \label{ssec:impl_3DGunter}
 
-In the magnetostatic setting, the parallel diffusion operator on $v_i$ and $T_\alpha$ can be solved independently on each flux surface in a 2D system on the $\theta - \varphi$ plane. The scheme developed by Günter et al. \cite{gunter2005} has proven well-suited to solve the 2D parallel Laplacian equations with minimized numerical spread for highly anisotropic problems. For an operator of the type $\nabla \cdot (\kappa \nabla_\parallel \circ \mathbf{b} )$, parallel gradients are first calculated in cell corners with finite differences and then used in the fluxes across each cell face to get the divergence. The corners where gradients are calculated are shown in Figure \ref{fig:Gunter2D}. This scheme is particularly effective if the poloidal and toroidal components $b^\theta$ and $b^\varphi$ of the contravariant magnetic unit vector in the curvilinear metric have similar magnitudes. This is usually enforced through careful mesh generation. \\
+In the magnetostatic setting, the parallel diffusion operator on $v_i$ and $T_\alpha$ can be solved independently on each flux surface in a 2D system on the $\theta - \varphi$ plane. The scheme developed by Günter et al. \cite{gunter2005} has proven well-suited to solve the 2D parallel Laplacian equations with minimized numerical spread for highly anisotropic problems. For an operator of the type $\nabla \cdot (\kappa \nabla_\parallel \circ \mathbf{b} )$, parallel gradients are first calculated in cell corners with finite differences and then used in the fluxes across each cell face to get the divergence. The corners where gradients are calculated are shown in Figure \ref{fig:Gunter2D}.  \\
 
 However, with flutter (Sec. \ref{ssec:S3X_flutter}), magnetic flux surfaces are no longer aligned to the $\theta - \varphi$ plane because of the new radial component $b^\psi$. As a consequence, all independent 2D problems across flux surfaces are now coupled into a single 3D problem. For the parallel diffusion solver, a first approach would be to extend the above scheme by calculating gradients in the 3D corners of our cells. However, the new component $b^\psi$ is a pure fluctuation, which is therefore expected to be much smaller than $b^\theta$ or $b^\varphi$ and can even vanish locally. This results in significant spurious numerical diffusion in the radial direction of equilibrium gradients. To prevent this diffusion, and still properly capture radial flutter gradients, only crossed derivatives $b^\theta b^\psi$ and $b^\varphi b^\psi$ as well as the principal radial diffusion $b^\psi b^\psi$ use gradients evaluated at 3D corners, while the equilibrium diffusion remains aligned to the $\theta - \varphi$ plane. Examples of the gradients used in this new scheme are shown in Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. The new discretization stencil then corresponds exactly to the equilibrium 2D stencil in the limit $b^\psi=0$. \newline
 
@@ -640,18 +686,29 @@ However, with flutter (Sec. \ref{ssec:S3X_flutter}), magnetic flux surfaces are 
 		\caption{ Gradients for the $\psi$-flux with flutter}
 		\label{fig:GunterD_psi}
 	\end{subfigure}
-	\caption{Sketches showing the calculation of gradients for the parallel diffusion scheme. It shows the position where the different gradients are calculated that are relevant for a flux across the cell face with a solid line. Green and red arrows symbolize gradients in the equilibrium and in the radial direction, respectively.}
+	\caption[Sketches showing the calculation of gradients for the parallel diffusion scheme]{Sketches showing the calculation of gradients for the parallel diffusion scheme. It shows the position where the different gradients are calculated that are relevant for a flux across the cell face with a solid line. Green and red arrows symbolize gradients in the equilibrium and in the radial direction, respectively.}
 	\label{fig:GunterStencils_flutter}
 \end{figure}
 
 
 
-\subsection{Vorticity equation with flutter}
+\subsection{Vorticity equation}
 
-For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:impl_3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the position of the green gradients in Fig. \ref{fig:GunterStencils_flutter}.
+For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:impl_3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the corners of the gradients in Fig. \ref{fig:GunterStencils_flutter}. \\
 
+Generally spoken, Combining a divergence with a gradient stencil to form a discrete Laplacian is a bad idea. The information for the finite differences scheme stems from two cells away, skipping the intermediate cell. The decoupling between even and odd grid points is prone to high-frequency oscillations and  formation of a checkerboard pattern. This behavior is evident if one looks at the stencil neighbors for the Laplacian on a Cartesian grid in Fig. \ref{fig:impl_vorticityLaplStencilFlutter}, where all mixed derivatives vanish.
 
+\begin{figure}[H]\centering
+	\centering
+	\includegraphics[width=0.6\textwidth]{schemes/vorticityLaplacianStencilFlutter.jpg}
+	\caption[Neighbors of the parallel Laplacian stencil with flutter for the vorticity equation]{Neighbors of the parallel Laplacian stencil with flutter for the vorticity equation}
+	\label{fig:impl_vorticityLaplStencilFlutter}
+\end{figure}
+
+For the specific application in the vorticity equation, checkerboards are not at risk to appear, because the radial component in the parallel stencil is superseded with the perpendicular Laplacian on $\Phi$ from the polarization current that considers direct neighbors, which smoothens any high-frequency modes at the resolution. Conversely, it is impossible to run stable simulations with the "better" parallel diffusion stencil with flutter from Sec. \ref{ssec:impl_3DGunter}, as it does not preserve consistency between the diffused $\Phi^n$ and $\Phi^{n-1}$. The potential $\Phi^{n-1}$ from the previous timestep enters the system through the divergence of $\partial_t j_\parallel$, whose time discretization relies on $j_\parallel^{n-1}$, and as such on $\grad_\parallel \Phi^{n-1}$. Note that this reasoning also applies for the parallel Laplacians on $\log n_e$ and $T_e$ that appear in the right-hand side of the vorticity equation and are important for the non-adiabatic plasma response. 
  
-\subsection{Radial sheath boundary conditions}
+
+
+
 
 

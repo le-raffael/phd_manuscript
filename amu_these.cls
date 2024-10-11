@@ -78,6 +78,9 @@
 	citestyle=numeric-comp,					%% style de citation auteur-année$
 %	bibstyle=alphabetic,					%% style de bibliographie alphabétique
 	bibstyle=numeric,						%% style de bibliographie ISO 690
+	giveninits=true,						%% affiche seulement les initiales des prénoms
+	url=false,								%% ne pas afficher les URLs
+	doi=true,								%% afficher les DOI
 	backref=true							%% liens retour des références (cf. p.)
 	}
 	{biblatex}
