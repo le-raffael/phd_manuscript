@@ -1,21 +1,145 @@
 \chapter{New software modules}
 \label{chap:newModules}
-In the course of the PhD, several software modules were created outside of SOLEDGE3X.
+In the course of the PhD, several software modules were extended or created. This appendix gives an overview of the major novelties and might be of interest for SOLEDGE3X users. 
+
+\section{New options in SOLEDGE3X}
+\label{sec:app_newS3Xoptions}
+
+The \texttt{param\_raptorX.txt} file is a text formatted file which sets main SOLEDGE3X simulation parameters. The files contains a set of namelist that will be read by the code at initialisation. The new or modified entries related to the electromagnetic model and other necessary developments in the thesis are summarized here.
+\begin{longtable}[!h]{>{\raggedright\arraybackslash}p{0.3\textwidth}p{0.1\textwidth}>{\raggedright\arraybackslash}p{0.6\textwidth}}
+	Parameter & Value & Properties \\
+	\hline
+	\endhead
+	\texttt{solveAPara} & logical & If set to \texttt{.TRUE.}, the parallel projection of the magnetic vector potential $A_\parallel$ is computed along with potential $\Phi$, introducing electromagnetic induction. At higher power, inductive effects may have a decisive impact on turbulent structures. The implicit vorticity system doubles in size and the solve time is affected accordingly.
+	\\ \hline
+	\texttt{solveJPara} & logical & If set to \texttt{.TRUE.}, we take a finite electron mass to compute the parallel current density $j_\parallel$ in Ohm's law. This adds an inertial term to the vorticity equation and is deemed crucial for electromagnetic simulations. As a positive side effect, it reduces the anisotropy of the vorticity equation, facilitating thereby its iterative solving.
+	\\ \hline
+	\texttt{EnableEMflutter} & logical & If set to \texttt{.TRUE.}, electromagnetic flutter is calculated. A perturbation of the magnetic field is calculated from the local value of the parallel magnetic vector potential $A_\parallel$. The magnetic configuration looses its axi-symmetry and particularly, a (small) radial component $b_{\psi}$ appears. Parallel gradients and transport are affected by flutter in first place. It affects the solve time of the parallel diffusion operators (if $\texttt{NuParal =.TRUE.}$) as $N$ independent 2D system are combined to one 3D system.
+	\\ \hline
+	\texttt{BpertScale} & $F \in ]-\infty,\infty[$ & This float parameter can be used to rescale the external perturbation to the magnetic field. To supress the perturbated field, set \texttt{BpertScale=0}. Useful for non-axisymmetric configurations as for ripple.
+	\\ \hline
+	\texttt{LphiDiv} & $I \in [\![1,\infty[\![$ & Sets the angular length in the toroidal direction. The angular length of the domain in degrees is given by $360^\circ / \texttt{LphiDiv}$. E.g., set to 1 for full torus simulation, 2 for half-torus... In simulations with mesh loaded from external files (\texttt{PrecodedMesh=0}), the toroidal extent of the mesh in the input mesh file is scaled by 1/\texttt{LphiDiv}. In analytic meshes, a negative LphiDiv will multiply the toroidal extent by its absolute value (e.g. -2 for 4pi, -3 for 6pi ...). This last option shall be used with care, it allows to artificially increase the connection length in a toroidal configuration while keeping a high curvature.
+	\\ \hline
+	\texttt{nu0} & f-list & List of comma separated floats. Cross-field viscosity (parallel momentum balance) for every element including electrons expressed in $m^2s^{-1}$. The size of the list is $N_{elt}+1$. The first element, for electrons, is only used for the parallel current density $j_\parallel$ and is only effective in combination with \texttt{solvejPara=.TRUE.}.  When \texttt{loadDiffusionMap} is set to \texttt{.TRUE.}, the value is used as a lower bound for viscosity.
+	\\ \hline
+	\texttt{xi0} & float & Cross-field diffusivity for the parallel vector potential $A_\parallel$ expressed in $m^2s^{-1}$.
+	\\ \hline
+	\texttt{ElectronMassMultiplier} & $f \in[0,\infty[$ & Artificially modify the electron mass for electron inertia effects. Set \texttt{ElectronMassMultiplier=1} for the physical mass and \texttt{ElectronMassMultiplier=0} to remove electron inertia.
+	\\ \hline
+	\texttt{BetaMultiplier} & $f \in[0,\infty[$ & Artificially modify the reference pressure ratio $\beta_0$. Set \texttt{BetaMultiplier=1} for the physical value.
+	\\ \hline
+	\texttt{filteringAPara} & logical & If \texttt{.TRUE.}, a diffusive filtering is applied on the magnetic vector potential before computing flutter. The smoothed potential is stored in the variable \texttt{AParaSmooth}. 
+	\\ \hline
+	\texttt{LsmoothAPara} & $f \in [0,\infty[$ & Radius of the diffusive filtering set in meter. The parameter is ignored if \texttt{filteringAPara=.FALSE.}.
+	\\ \hline
+	\texttt{NgroundedPoints} & $i \in [0,\infty[$ & If greater than  0, the electric potential at a set of points in the grid will be forced to zero. Grounding points can be useful to simulate a domain without wall where no reference potential exists. Setting a point to zero then makes the vorticity equation inversible.
+	\\ \hline
+	\texttt{groundedDiagonal} & logical & If \texttt{.TRUE.}, an array of points diagonal to the domain is grounded. This option is reasonable in slab cases with an identical number of discretization points in all directions. In 2D, the diagonal is line from the $[\psi^-,\theta^+]$ to the $[\psi^+,\theta^-]$ corners. In 3D, the diagonal is the plane orthogonal to the $[\psi^-,\theta^-,\varphi^-] - [\psi^+,\theta^+,\varphi^+]$ line at the center of the domain (ignored if \texttt{NgroundedPoints=0})
+	\\ \hline
+	\texttt{groundedZone} & i-list & List of zone indices of the grounded points. If 0, it is applied to all zones (ignored if \texttt{NgroundedPoints=0} or \texttt{groundedDiagonal=.TRUE.})
+	\\ \hline
+	\texttt{groundedipsi} & i-list & List of radial indices of the grounded points. If 0, it is applied to all radial indices (ignored if \texttt{NgroundedPoints=0} or \texttt{groundedDiagonal=.TRUE.})
+	\\ \hline
+	\texttt{groundeditheta} & i-list & List of poloidal indices of the grounded points. If 0, it is applied to all poloidal indices (ignored if \texttt{NgroundedPoints=0} or \texttt{groundedDiagonal=.TRUE.})
+	\\ \hline
+	\texttt{groundediphi} & i-list & List of toroidal indices of the grounded points. If 0, it is applied to all toroidal indices (ignored if \texttt{NgroundedPoints=0} or \texttt{groundedDiagonal=.TRUE.})
+	\\ \hline
+	\texttt{excitationFrequency} & f-list  & If non-zero, a list of frequencies at which the respective grounded points shall be excited [unit: $1/(\tau_0s)$]. If \texttt{groundedDiagonal=.TRUE.}, the first array value is used(ignored if \texttt{NgroundedPoints=0})
+	\\ \hline
+	\texttt{excitationAmplitude} & f-list  & If non-zero, a list of amplitudes to which the respective grounded points shall be excited [in $1/(\Phi_0 V)$]. If \texttt{groundedDiagonal=.TRUE.}, the first array value is used (ignored if \texttt{NgroundedPoints=0})
+	\\ \hline
+	\texttt{forceSingleMatrix2DSolvers} & logical & Generate a single matrix with independent block matrices for 2D solvers? Unless one has a good reason to do so (like solving with GPU), it is advised to keep this parameter to \texttt{.FALSE.} for bette performances.
+	\\ \hline
+   \caption[New or modified parameters for the SOLEDGE3X parameter file.]{New or modified parameters for the SOLEDGE3X parameter file \\ \texttt{param\_raptorX.txt}}
+\end{longtable}
+
+The \texttt{param\_geom.txt} file is a text formatted file to generate analytic meshes in circular or slab configuration.
+
+\begin{longtable}[!h]{>{\raggedright\arraybackslash}p{0.3\textwidth}p{0.1\textwidth}>{\raggedright\arraybackslash}p{0.6\textwidth}}
+	Parameter & Value & Properties 
+	\\ \hline 
+	\endhead	
+	\texttt{blob\_r}& $F\in [r_{min},r_{max}]$ & The radial position of the center blob. It is expressed in relative units to the separatrix. In poloidal direction, it is always set at the outer midplane or at the center of the box in slab simulations.
+	\\ \hline 
+	\texttt{blob\_radius} & $F\in [0,\infty[$ & The radius of the blob, in units relative to the separatrix. It defines the variance of the Gaussian profile for the blob. The blob will then get a 2D Gaussian profile on the cartesian R-Z grid.
+	\\ \hline 
+	\texttt{blob\_amp} & $F\in ]-\infty,\infty[$ & Amplitude of the blob w.r.t the background plasma. 		
+	\\ \hline
+	\caption[New parameters for analytic meshes]{New parameters for analytic meshes in the file \texttt{param\_geom.txt}}
+\end{longtable}
+
 
 \section{Grad-Shafranov solver}
 \label{sec:app_GradShafranovSolver}
-Python script
+
+A short script was developed to calculate the poloidal flux function $\Psi$ for given minor and major radii $a$ and $R_0$ and a given pressure profile $p(r)$ as a function of the minor radius. Dirichlet boundary conditions 0 are imposed outside the domain defined by $a$. It solves the Grad-Shafranov equation: 
+
+\begin{equation}
+	\Delta^* \Psi = R\partial_R\left(\frac{1}{R}\partial_R\Psi\right) + \partial_Z^2\Psi
+\end{equation}
+
+iteratively using the Newton-Krylov solver of the Python package \texttt{scipy.optimize}.
 
 
 \section{Poincaré plots}
 \label{sec:app_PoincarePlots}
-Python script
 
-\section{Generation of a modulated magnetic configuration}
-\label{sec:app_rippleGeneration}
-Python script
-cite ERGOS here. 
+A new script was created to generate the Poincaré of a given magnetic configuration. The code follows a particle along its magnetic field line and plot a dot at every intersection with a poloidal plane. Several particles can be plotted in parallel. The script automatically detects the presence of a perturbated field (e.g. ripple) in the provided \texttt{mesh\_raptorX.h5} file. If electromagnetic flutters modifies the equilibrium, a plasma save file is additionally required. It is also possible to only plot the flutter field. \\
 
-\section{Toroidal plots in pySOLEDGE3X}
-\label{sec:app_toroidalPlots}
-Python script
+The user must specify the plane (or planes) on which you want to visualize the intersection with the particle trajectory. If none are provided, it plots the poloidal position at every integrated point (not a true Poincare plot anymore). This script requires to define seed points from which the integrator starts in  both directions until it hits the core, a wall or reaches the integration length. There are three ways to define seed points on a list of poloidal planes (usually one or all), that can be combined:
+\begin{itemize}
+  	\item define a line with equally spaced seed points along its length
+	\item define a box with N seed points
+	\item randomly distribute N seed points in the domain (preferred method) 
+\end{itemize}
+
+The code first extracts all mesh points in the $[R,Z,\varphi]$ coordinate system and the total magnetic field components $B_R$, $B_Z$ and $B_\varphi$ and store them in 1D arrays. A Delaunay triangulation is then performed of the poloidal geometry, such that the magnetic field at any point in the domain can be easily interpolated. The integration of the field lines, starting in both directions from the seeding points using the initial value problem solver of \texttt{scipy.integrate}.
+ 
+
+
+\section{Time plots}
+\label{sec:app_timePlots}
+A script was developed to track global metrics over the simulation time and compare different scenarios. $V$ desribes the total volume of the domain $\Omega$ and $A_{sep}$ the surface of the separatrix.
+
+\begin{longtable}[!h]{>{\raggedright\arraybackslash}p{0.2\textwidth}p{0.7\textwidth}>{\raggedright\arraybackslash}p{0.1\textwidth}}
+	Name & Expression & Unit 
+	\\ \hline 
+	\endhead	
+	Root mean square of density & $$\frac{1}{V}\int_V \sqrt{\frac{(n-\langle n\rangle_\varphi)^2}{\langle n\rangle_\varphi^2}} d\Omega$$ & -
+	\\ \hline
+	Root mean square of temperature & $$\frac{1}{V}\int_V \sqrt{\frac{(T-\langle T\rangle_\varphi)^2}{\langle T\rangle_\varphi^2}} d\Omega$$ & -
+	\\ \hline
+	Kinetic energy of ExB drifts for a species $\alpha$ & $$\frac{1}{2}m_\alpha \int_V n\norm{\mathbf{u}}^2 d\Omega$$ & J
+	\\ \hline
+	Total thermal energy & $$\sum_\alpha \frac{3}{2} \int_V enT d\Omega$$ & J
+	\\ \hline
+	ExB flux across the separatrix & $$\int_{sep} \left|n \mathbf{e}_\psi\cdot \mathbf{u}^{E\cross B} \right| dA_{sep} $$ & m$^{-2}$s$^{-1}$ 
+	\\ \hline
+	Flutter flux across the separatrix & $$\int_{sep} \left|n v_\parallel \mathbf{e}_\psi\cdot\mathbf{b} \right| dA_{sep} $$ & m$^{-2}$s$^{-1}$ 
+	\\ \hline
+	Turbulent kinetic energy at the separatrix & $$\frac{1}{A_{sep}}\int_{sep} \frac{n\mathbf{e}_\psi\cdot \mathbf{u} - \langle n\mathbf{e}_\psi\cdot \mathbf{u}\rangle_\varphi}{\langle n\rangle_\varphi}\left|n v_\parallel \mathbf{e}_\psi\cdot\mathbf{b} \right| dA_{sep} $$ & m$^{2}$s$^{-2}$ 
+	\\ \hline
+	Components to the total heat flux across the separatrix & $$\underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{ExB} dA_{sep}}_{\text{ExB}} + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{\grad B} dA_{sep}}_{\text{gradB}} $$ 
+	$$+ \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n v_\parallel \mathbf{b} dA_{sep}}_{\text{EM}} + \underbrace{\int_{sep} \mathbf{e}_\psi\cdot\left[-\kappa_{SH} \grad_\parallel T\mathbf{b}\right] dA_{sep}}_{\text{qpara}}$$ & W
+	\\ \hline
+	Total entering and leaving heat fluxes & $$\sum_{\alpha}P_{in,\alpha}\quad\text{,}\quad\sum_{\alpha}P_{out,\alpha}$$ & W
+	\\ \hline
+	Number of iterative steps to solve the vorticity system & - & -
+	\\ \hline
+	Norm of the vorticity matrix & - & -
+	\\ \hline
+	Norm of the vorticity RHS vector & - & -
+	\\ \hline
+	Norm of the vorticity solution vector & - & -
+	\\ \hline
+	Time to solve the vorticity system & - & s
+	\\ \hline
+	Ideal CFL timestep size and actual timestep size & - & s
+	\\ \hline
+	\caption{Global metrics available to plot the time evolution}
+\end{longtable}
+
+
+
+
+

@@ -45,8 +45,8 @@ With a different turbulence level, the heat exhaust is also affected, as shown i
 \begin{figure}[H]\centering
 	\begin{subfigure}[t]{0.45\textwidth}
 		\centering
-		\includegraphics[width=1\textwidth]{schemes/KE_ExB.jpg}
-		\subcaption{Kinetic energy of the "ExB" drift on D$^+$ ions.}
+		\includegraphics[width=1\textwidth]{schemes/Eturb_sep.png}
+		\subcaption{Turbulent kinetic energy of D$^+$ ions \\ at the separatrix.}
 		\label{fig:KE_ExB}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.45\textwidth}
@@ -55,7 +55,7 @@ With a different turbulence level, the heat exhaust is also affected, as shown i
 		\subcaption{Total heat exhaust}
 		\label{fig:HeatExhaust}
 	\end{subfigure}
-	\caption[Evolution of the kinetic energy and heat exhaust over time iterations on the turbulent TCV scenario]{Evolution of the kinetic energy and heat exhaust over time iterations on the turbulent TCV scenario. It indicates the turbulence level and its consequence on the total heat transport.}
+	\caption[Evolution of the turbulent energy and heat exhaust over time iterations on the turbulent TCV scenario]{Evolution of the turbulent energy and heat exhaust over time iterations on the turbulent TCV scenario. It indicates the turbulence level and its consequence on the total heat transport.}
 	\label{fig:plasmaEvolution}
 \end{figure}
 
@@ -88,7 +88,7 @@ The change in turbulence intensity naturally impacts the mean profiles in Fig. \
 
 In previous works about the electrostatic model\cite{tamain2016tokam3x, Bufferand2021}, it was pointed out that solving the implicit 3D vorticity operator is the most expensive and tricky operation in the algorithm. Adding new variables inevitably modifies the code's performance. With the rather coarse mesh used in the present work, simulations have been run on 16 nodes with 48 CPUs each on the MARCONI supercomputer operated by CINECA \cite{iannone2018marconi-fusion}. Implicit systems, such as the 3D vorticity operator, have been inverted using the stabilized biconjugate gradient method (BCGS) \cite{vandervorst1992bicgstab} with the generalized algebraic multigrid preconditioner (GAMG) by PETSc \cite{petsc-web-page}. \newline
 
-The overall performance of the code largely depends on how quickly a certain plasma timespan can be calculated. Table \ref{tab:performanceMetric} presents the average simulation time for one timestep, broken down by the cost of each implicit solver. For the vorticity system, we also provide the number of iterations the BCGS needed to match the imposed tolerance ($10^{-8}$), as it relates to the condition number of the matrix. This system has always accounted for a considerable share of the total execution time and was heavily modified with the new electromagnetic model. Finally, the timestep size is provided, as a higher timestep size can compensate a costlier problem because the desired simulation time is reached in fewer iterations. As described earlier in Sec. \ref{sec:EquationDiscretization}, SOLEDGE3X uses a variable timestep scheme to maximize the CFL condition with the calculated fluxes. \newline
+The overall performance of the code largely depends on how quickly a certain plasma timespan can be calculated. Table \ref{tab:performanceMetric} presents the average simulation time for one timestep, broken down by the cost of each implicit solver. For the vorticity system, we also provide the number of iterations the BCGS needed to match the imposed tolerance ($10^{-8}$), as it relates to the condition number of the matrix. This system has always accounted for a considerable share of the total execution time and was heavily modified with the new electromagnetic model. Finally, the timestep size is provided, as a higher timestep size can compensate a costlier problem because the desired simulation time is reached in fewer iterations. As described earlier in Chap. \ref{chap:Implementation}, SOLEDGE3X uses a variable timestep scheme to maximize the CFL condition with the calculated fluxes. \newline
 
 \begin{table}[h!]
 	\centering
@@ -120,7 +120,7 @@ In total, electron inertia decreases the computing time with an excellent improv
 
 \section{Flutter in higher power}
 
-In the previous section, we compared the new electromagnetic model in an L-mode scenario inspired by the TCV-X21 benchmark. Electromagnetic effects scale with the pressure ratio $\beta$, so it would be more than interesting to study electromagnetic plasma behavior. The main difference to the previous set-up is a constant heat source of 1.2MW equally distributed among ions and electrons at the core boundary. For higher fidelity, we also replace the fixed particle source by interaction with fluid neutrals using the most recent implemented model\cite{quadri2024}. For this study we only consider the full model with magnetic induction, electron inertia and flutter. \\
+In the previous section, we compared the new electromagnetic model in an L-mode scenario inspired by the TCV-X21 benchmark. Electromagnetic effects scale with the pressure ratio $\beta$, so it would be more than interesting to study electromagnetic plasma behavior. The main difference to the previous set-up is a constant heat source of 1.2MW equally distributed among ions and electrons at the core boundary. For higher fidelity, we also replace the fixed particle source by interaction with fluid neutrals using the most recent implemented model\cite{quadri2024}. However, this simulation setup is not entirely realistic, as at such high power, substantial external heating is applied to the edge plasma, and we cannot assume that all of it originates from the unsimulated core. Moreover, thresholding issues with the neutral model lead to an excessive particle source in the core, distorting density profiles. For this study we only consider the full model with magnetic induction, electron inertia and flutter.  \\
 
 
 
@@ -149,7 +149,9 @@ The temperature profile could indicate the formation of a pedestal, characterist
 
 We can still investigate heat fluxes to understand the behavior of the temperature. Let us examine the components to the total heat flux at the separatrix, as they will ultimately define the confinement of the core plasma. For that, we have a closer look to the different contributions to the radial heat flux in the energy conservation equation. The main terms are advection of thermal and kinetic plasma energy by electric and curvature drifts as well as the radial redirection of parallel fluxes due to flutter. The parallel heat conduction $q_\parallel$ now also contains a radial component. The contribution of the viscous fluxes vanishes for electrons and is negligible for the ion heat flux, so we do not consider it in our analysis. We can express the total radial power transfer from core to SOL as: 
 
-
+\begin{equation}
+	P_\psi^{sep} = \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{ExB}_\psi dA_{sep}}_{\text{ExB}} + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{\grad B}_\psi dA_{sep}}_{\text{gradB}} + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n v_\parallel \mathbf{b}_\psi dA_{sep}}_{\text{EM}} + \underbrace{\int_{sep} \mathbf{e}_\psi\cdot\left[-\kappa_{SH} \grad_\parallel T\mathbf{b}_\psi\right] dA_{sep}}_{\text{qpara}}
+\end{equation}
 
 In Fig. \ref{fig:TCV_decompHeatFluxFlutter}, we compare the evolution of each individual term to the total power the over the simulation time, integrated over the entire separatrix flux surface. The simulation outputs were also scaled by a factor four to express the power on the full torus (and not only the simulated quarter).
 

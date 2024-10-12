@@ -234,7 +234,7 @@ The linear phase only concerns the very beginning of the simulation. During the 
 
 At first, let us compare temperature profiles at the outer mid-plane for the electrostatic scenarios with and without electron inertia. The evolution of the profiles, as well as the associated particle fluxes, are given in Fig. \ref{fig:CIRC_EI_OMPevolution}. The corresponding plots for the density are found in App. \ref{app:turbulentProfiles}.
 
-One can recognize the linear growth phase in the beginning of the simulation, during which temperature builds up in direct vicinity to the core. After about 0.04ms plasma time, the hot plasma collapses into energy bursts that start traveling towards the separatrix. It immediately appears that these bursts travel 
+One can recognize the linear growth phase in the beginning of the simulation, during which temperature builds up in direct vicinity to the core. After about 0.04ms plasma time, the hot plasma collapses into energy bursts that start traveling towards the separatrix. With a finite electron mass, bursts travel at twice the speed and hence propagate into the SOL much further. As the bursts dissipate, a stable background temperature around 80eV establishes almost immediately at the beginning of the nonlinear turbulence phase throughout the SOL, In the reference electrostatic case, this process is diffusive and the temperature spreads at a much lower pace towards the wall. 
 
 \begin{figure}[H]\centering
 	\begin{subfigure}[t]{0.45\textwidth}
@@ -261,6 +261,7 @@ One can recognize the linear growth phase in the beginning of the simulation, du
 	\label{fig:CIRC_EI_OMPevolution}
 \end{figure}
 
+In Fig. \ref{fig:CIRC_EM_OMPevolution}, the same graph is shown for the electromagnetic cases without and with flutter. As with electron inertia only, the background temperature reaches the wall quickly at even higher fluxes. Bursts appear at a lower frequency, but are more powerful and cannot maintain high temperatures even at the core boundary, where the heat source is located. As bursts also penetrate deeper into the SOL with a higher energy, temperatures there reach values around 100eV. In this scenario, flutter does not have a strong effect on the turbulence structure.
 
 \begin{figure}[H]\centering
 	\begin{subfigure}[t]{0.45\textwidth}
@@ -291,7 +292,7 @@ One can recognize the linear growth phase in the beginning of the simulation, du
 
 \subsection{Mode structures}
 
-In the simulation snapshots in Fig. \ref{fig:anal_CIRC_fluctT}, we observe turbulent blobs on all four graphs. To assess the turbulence, it could be interesting to compare their structures and detect any differences between the scenarios. For this purpose, we rather consider a flux surface instead of a poloidal plane. Specifically, we choose the surface at $i_\psi=70$ as it is just short of the separatrix on the core side. The advantage of a closed surface is its periodicity in both directions, such that we can easily perform a modal analysis there. To remove any constant mode, we first remove the toroidal average of the density field $n_i' = n_i-\rangle n_i\rangle_\varphi$. A view of the field is in Fig. \ref{fig:CIRC_fluxSurface_flutter_real}. We observe long, seemingly toroidally attached filaments that appear regularly in the perpendicular direction. \newline 
+In the simulation snapshots in Fig. \ref{fig:anal_CIRC_fluctT}, we observe turbulent blobs on all four graphs. To assess the turbulence, it could be interesting to compare their structures and detect any differences between the scenarios. For this purpose, we rather consider a flux surface instead of a poloidal plane. Specifically, we choose the surface at $i_\psi=70$ as it is just short of the separatrix on the core side. The advantage of a closed surface is its periodicity in both directions, such that we can easily perform a modal analysis there. To remove any constant mode, we first remove the toroidal average of the density field $n_i' = n_i-\langle n_i\rangle_\varphi$. A view of the field is in Fig. \ref{fig:CIRC_fluxSurface_flutter_real}. We observe long, seemingly toroidally attached filaments that appear regularly in the perpendicular direction. \newline 
 
 On this field, we now perform a two-dimensional Fourier transform, and extract its power spectrum:
 
@@ -332,7 +333,7 @@ In the perpendicular direction, we can distinguish some bands that characterize 
 	\tilde{n}_\perp(k_\perp) = \int_{\mathbb{R}\setminus (-30, 30)}\tilde{n}dk_\parallel
 \end{equation}
 
-We can then plot the evolution of the power spectrum $\tilde{n}_\perp$ over the simulated plasma time. For the electrostatic and flutter scenarios, they are in Fig. \ref{fig:CIRC_evolutionKperp} and for the electron inertia and induction scenarios in App. \ref{sec:turbulentProfiles_CIRCmodal}.
+We can then plot the evolution of the power spectrum $\tilde{n}_\perp$ over the simulated plasma time. For the electrostatic and flutter scenarios, they are in Fig. \ref{fig:CIRC_evolutionKperp}. The size of the largest eddies (with the lowest $k_\perp$) are similar at around 2cm, of the order of a few ion Larmor radii as one expects in drift-wave turbulence. A difference appears for the higher harmonics: in the electrostatic case, initial small structures collapse into large eddies and progressively excite higher modes again. With the full electromagnetic model, the base mode and its harmonics are excited simultaneously in regular intervals. Especially higher harmonics are clearly separated and multiples of the base mode, which is not the case for the electrostatic case. A look at the eddies in the electron inertia and induction scenarios (see App. \ref{sec:turbulentProfiles_CIRCmodal}) reveals that this regular mode structure already appears with a finite electron mass.   
 
 \begin{figure}[H]\centering
 	\begin{subfigure}[t]{0.45\textwidth}

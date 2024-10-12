@@ -3,7 +3,11 @@
 
 
 \begin{chaptersummarybox}
-	The SOLEDGE3X code was adapted to impose external non-axisymmetric perturbations of the magnetic equilibrium. In tokamaks such as WEST, the pronounced toroidal magnetic ripple significantly affects plasma confinement and power exhaust, modulating both the poloidal and toroidal components of the equilibrium field. Using a discrete Biot-Savart law, the ripple field is calculated as a magnetic perturbation on the SOLEDGE3X mesh. Preliminary simulations of a WEST scenario reveal a "snake-skin" heat deposition pattern in the divertor region, consistent with experimental observations from infrared cameras.
+	The SOLEDGE3X code was adapted to impose external non-axisymmetric perturbations of the magnetic equilibrium. In tokamaks such as WEST, the pronounced toroidal magnetic ripple significantly affects plasma confinement and power exhaust, modulating both the poloidal and toroidal components of the equilibrium field. Using the Biot-Savart law, the ripple field is calculated as a magnetic perturbation on the SOLEDGE3X mesh. It is calulated at every grid point from the current in discretized coil segments:
+	\begin{equation*}
+		\textbf{B}_{ripple} = \frac{\mu_0}{4\pi}I_c\sum_{i=1}^{N_{c}}\sum_{j=1}^{N_{seg}}\frac{\textbf{d}_{i,j}\cross\left(\textbf{s}_{i,j+1} - \textbf{s}_{i,j}\right)}{\norm{\textbf{d}_{i,j}}^3}
+	\end{equation*}	
+	Preliminary simulations of a WEST scenario reveal a "snake-skin" heat deposition pattern in the divertor region, consistent with experimental observations from infrared cameras.
 \end{chaptersummarybox}
 
 \newpage
@@ -137,7 +141,7 @@ Even if the amplitude of the ripple field is small compared to the axisymmetric 
 		\includegraphics[width=1\textwidth]{schemes/rippleStreamlines_phi4.png}
 		\subcaption{$3/4$}\label{fig:ripple_Xpoint_phi4}
 	\end{subfigure}
-	\caption[Map of the poloidal field $B_{pol}$ \[T\] at several poloidal planes within a ripple perdiod around the lower X-point and the divertor targets]{Map of the poloidal field $B_{pol}$ [T] at several poloidal planes within a ripple perdiod around the lower X-point and the divertor targets. Streamlines are supperposed to the fields to better visualize the position of the X-point and the separatrix at the divertor. The phase shifts $0$ and $1/2$ with respect to the coil positions are identical to the axisymmetric configuration as $B_{pert}^{\psi}$ vanishes while the planes at $1/4$ and $3/4$ correspond to the respective maximum and minimum of $B_{pert}^{\psi}$}
+	\caption[Map of the poloidal field $B_{pol}$ at several poloidal planes within a ripple perdiod around the lower X-point and the divertor targets]{Map of the poloidal field $B_{pol}$ [T] at several poloidal planes within a ripple perdiod around the lower X-point and the divertor targets. Streamlines are supperposed to the fields to better visualize the position of the X-point and the separatrix at the divertor. The phase shifts $0$ and $1/2$ with respect to the coil positions are identical to the axisymmetric configuration as $B_{pert}^{\psi}$ vanishes while the planes at $1/4$ and $3/4$ correspond to the respective maximum and minimum of $B_{pert}^{\psi}$}
 	\label{fig:ripple_Xpoint}
 \end{figure}
 
