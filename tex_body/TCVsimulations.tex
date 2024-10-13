@@ -149,9 +149,10 @@ The temperature profile could indicate the formation of a pedestal, characterist
 
 We can still investigate heat fluxes to understand the behavior of the temperature. Let us examine the components to the total heat flux at the separatrix, as they will ultimately define the confinement of the core plasma. For that, we have a closer look to the different contributions to the radial heat flux in the energy conservation equation. The main terms are advection of thermal and kinetic plasma energy by electric and curvature drifts as well as the radial redirection of parallel fluxes due to flutter. The parallel heat conduction $q_\parallel$ now also contains a radial component. The contribution of the viscous fluxes vanishes for electrons and is negligible for the ion heat flux, so we do not consider it in our analysis. We can express the total radial power transfer from core to SOL as: 
 
-\begin{equation}
-	P_\psi^{sep} = \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{ExB}_\psi dA_{sep}}_{\text{ExB}} + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{\grad B}_\psi dA_{sep}}_{\text{gradB}} + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n v_\parallel \mathbf{b}_\psi dA_{sep}}_{\text{EM}} + \underbrace{\int_{sep} \mathbf{e}_\psi\cdot\left[-\kappa_{SH} \grad_\parallel T\mathbf{b}_\psi\right] dA_{sep}}_{\text{qpara}}
-\end{equation}
+\begin{align}
+	P_\psi^{sep} =& \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{ExB} dA_{sep}}_{\text{ExB}} + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n \mathbf{u}^{\grad B} dA_{sep}}_{\text{gradB}} \nonumber\\
+	& + \underbrace{\int_{sep} \mathbf{e}_\psi \cdot \varepsilon n v_\parallel \mathbf{b} dA_{sep}}_{\text{EM}} + \underbrace{\int_{sep} \mathbf{e}_\psi\cdot\left[-\kappa_{SH} \grad_\parallel T\mathbf{b}\right] dA_{sep}}_{\text{qpara}}
+\end{align}
 
 In Fig. \ref{fig:TCV_decompHeatFluxFlutter}, we compare the evolution of each individual term to the total power the over the simulation time, integrated over the entire separatrix flux surface. The simulation outputs were also scaled by a factor four to express the power on the full torus (and not only the simulated quarter).
 
