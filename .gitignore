@@ -1,6 +1,7 @@
 # specific files
 these.pdf
-
+theseFinal_v*.pdf
+review*.txt
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

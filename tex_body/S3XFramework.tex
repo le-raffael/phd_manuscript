@@ -28,14 +28,32 @@ In the previous chapter, we laid the foundations of drift-reduced models for edg
 
 By the end of this chapter, we will have formulated a set of self-consistent transport equations that include electromagnetic effects. The existing SOLEDGE3X framework is extended to accomodate a finite electron mass in Ohm's law, an inductive term in the parallel electric field and flutter perturbations of the magnetic equilibrium. This requires the addition of two new fields: the parallel current density $j_\parallel$ and the parallel magnetic vector potential $A_\parallel$. \\
 
-In the first section \ref{sec:S3X_referenceValues}, we introduce reference values for all quantities against which all variables are normalized, including the new electromagnetic fields. Then, section \ref{sec:S3X_TransportEquations} recaps the density, momentum, energy and charge conservation equations and their exact formulation in SOLEDGE3X. The entire section \ref{sec:S3X_electromagneticModel} is dedicated to the electromagnetic model and its formulation within the charge balance equation. Finally, section \ref{sec:S3X_boundaryConditions} describes boundary conditions imposed at the sheath, the core and the first wall.
+The first section \ref{sec:S3X_CoordinateSystem} introduces the underlying magnetic configuration and in \ref{sec:S3X_referenceValues}, we introduce reference values for all quantities against which all variables are normalized, including the new electromagnetic fields. Then, section \ref{sec:S3X_TransportEquations} recaps the density, momentum, energy and charge conservation equations and their exact formulation in SOLEDGE3X. The entire section \ref{sec:S3X_electromagneticModel} is dedicated to the electromagnetic model and its formulation within the charge balance equation. Finally, section \ref{sec:S3X_boundaryConditions} describes boundary conditions imposed at the sheath, the core and the first wall.
+
+
+
+\section{Magnetic configuration}
+\label{sec:S3X_CoordinateSystem}
+Let $R_0$ be the major radius on the magnetic axis and $(R, Z, \varphi)$ a fixed cylindrical coordinate system. The magnetic equilibrium is assumed to be toroidally symmetric and to encompass both closed and open flux surfaces with singularities at one or more X-points. The 2D equilibrium magnetic field $\mathbf{B}_{eq} = B_{eq} \mathbf{b}_{eq}$ is a combination of a toroidal field, $\mathbf{B}_{eq,\varphi}$, and a poloidal field, $\mathbf{B}_{eq,p}$, as described in Sec. \ref{ssec:intro_tokamakConfiguration}:
+
+\begin{equation}
+	\mathbf{B}_{eq} = \mathbf{B}_{eq,\varphi} + \mathbf{B}_{eq,p} = F \nabla{\varphi} + \nabla{\Psi} \times \nabla{\varphi}
+\end{equation}
+
+where $\varphi$ is the toroidal angle, $F$ a toroidal flux function, and $\Psi(R,Z)$ a poloidal flux function from which $\mathbf{B}_{eq,\varphi}$ and $\mathbf{B}_{eq,p}$ are respectively derived (see Sec. \ref{sec:intro_GradShafranov}). The iso-$\Psi$ surfaces are tangent to the magnetic field and $\Psi$ labels flux surfaces (one value for each flux surface). It is thus natural to define a curvilinear system of coordinates denoted $(\psi, \theta, \varphi)$. $\psi$ defines a radial coordinate based on the poloidal magnetic flux $\Psi$, which is by construction always perpendicular to a magnetic flux surface. $\theta$ denotes a curvilinear abscissa along the poloidal direction in the $(R, Z)$ plane that defines the poloidal plane, i.e., along iso-$\Psi$ surfaces and orthogonal to $\grad  \varphi$. \newline
+
+In the base $(\boldsymbol{e}_{\psi}, \boldsymbol{e}_{\theta}, \boldsymbol{e}_{\varphi})$ associated with $(\psi, \theta, \varphi)$, the magnetic equilibrium field is written as:
+
+\begin{equation}
+	\boldsymbol{B}_{eq} = B_{eq,p} \frac{\boldsymbol{e}_{\theta}}{\vert \boldsymbol{e}_{\theta} \vert} + B_{eq,\varphi} \frac{\boldsymbol{e}_{\varphi}}{\vert \boldsymbol{e}_{\varphi} \vert}
+\end{equation}
 
 
 
 \section{Dimensionless fields}
 \label{sec:S3X_referenceValues}
 
-To simplify the equations and improve the numerical stability, the code solves the equation for dimensionless physical quantities. It means that each variable $X$ is scaled by a factor $X_0$ to obtain a dimensionless $\hat{X} = X/X_0$, where $X_0$ is representative for the range of values of $X$. Therefore, all quantities $\hat{X}$ have similar values and we can prevent some numerical issues that might occur in equations containing variables with strongly different orders of magnitude. \\
+To simplify the equations, parametrize problems and to improve the numerical stability, the code solves the equation for dimensionless physical quantities. It means that each variable $X$ is scaled by a factor $X_0$ to obtain a dimensionless $\hat{X} = X/X_0$, where $X_0$ is representative for the range of values of $X$. Therefore, all quantities $\hat{X}$ have similar values and we can prevent some numerical issues that might occur in equations containing variables with strongly different orders of magnitude. \\
 
 The reference density $n_0$, temperature $T_0$ and magnetic field $B_0$ are free parameters that must be specified by the user to best match the conditions of the simulated scenario. Masses are expressed as factors of the atomic unit mass $m_u$ and the Coulomb logarithm for particle collisions is set to $\Lambda = 15$. In the sheath-dominated SOL, the electric potential $\Phi$ is proportional to the temperature with $\Phi_{se} = $ln$\left(\sqrt{m_i/(2\pi m_e})\right)T\approx3T$. The potential is hence of the same order of magnitude as the temperature and it is convenient to set $\Phi_0 = T_0$. In this context, it is important to remember that temperatures are always expressed as energies in units of electronvolts [eV]. From the set of free parameters, we can derive spatial and temporal reference values to match the cyclotronic time $\tau_0$ and the Larmor radius $\rho_0$:
 \begin{align}
@@ -93,7 +111,7 @@ $A_\parallel^{0(1)}$ and $A_\parallel^{0(2)}$ are about four orders of magnitude
 \section{Conservation equations}
 \label{sec:S3X_TransportEquations}
 
-For simulations of the SOL in SOLEDGE3X, the three fluid moments in Eqs. \ref{eq:ZeroMomentTransportEquation}, \ref{eq:FirstMomentTransportEquation} and \ref{eq:SecondMomentTransportEquation} are used for the ion density and momentum conservation, electron and ion energy conservation, and vorticity conservation equations. In the drift-reduced formulation, to compute the different drifts that compose the velocity $\mathbf{u}$, it is convenient to decompose it into a parallel component $u_\parallel$ along the magnetic field lines $\mathbf{b}$ and orthogonal $\mathbf{u}_\perp$ components. This relationship is given by:
+For simulations of the plasma edge in SOLEDGE3X, the three fluid moments in Eqs. \ref{eq:ZeroMomentTransportEquation}, \ref{eq:FirstMomentTransportEquation} and \ref{eq:SecondMomentTransportEquation} are used for the ion density and momentum conservation, electron and ion energy conservation, and vorticity conservation equations. In the drift-reduced formulation, to compute the different drifts that compose the velocity $\mathbf{u}$, it is convenient to decompose it into a parallel component $u_\parallel$ along the magnetic field lines $\mathbf{b}$ and orthogonal $\mathbf{u}_\perp$ components. This relationship is given by:
 
 \begin{align}
 	\label{eq:RelationPerpParallelVelocity}
@@ -439,7 +457,7 @@ This leads to:
 
 The gradient $\nabla \tilde{A}_\parallel$ scales with the characteristic turbulent length $1/L_\perp$ and the curl $\nabla \times \mathbf{b}$ with the machine dimension $1/a$. Therefore, $\frac{\mathbf{b}_{eq} \times \nabla \tilde{A}_\parallel}{\norm{\mathbf{B}}}$ is the main contributor to the flutter field.
 
-Note that Hager \emph{et al.}\cite{hager2022} have suggested an additional time-averaged $\left<A_\parallel\right>_{\varphi,t}$ to evaluate fluctuations in the parallel electromagnetic potential, arguing that turbulent structures might appear at the same position on all poloidal planes and should therefore not be removed in the flutter calculation. This approach has been used in recent work in the GRILLIX code \cite{zhang2024}, but was not adopted in the present work, as it was estimated that the gain in accuracy did not compensate for the additional computation and memory costs. \\
+Note that Hager \emph{et al.}\cite{hager2022} have suggested an additional time-averaged $\left<A_\parallel\right>_{\varphi,t}$ to evaluate fluctuations in the parallel electromagnetic potential, arguing that turbulent structures might appear at the same position on all poloidal planes and should therefore not be removed in the flutter calculation. This approach has been used recently  in the GRILLIX code\cite{zhang2024}, but has not been adopted in the present work at this stage of development, on the assumption that the gain in accuracy would not compensate for the additional computational and memory costs. First observations in production runs (later presented in Sec. \ref{ssec:TCV_GradShafranovShift}) indicate that the used toroidal average is sufficient to suppress all transient large-scale structures. A careful comparison between the two options is planned for a future work. 
 
 The perturbed magnetic unit field $\tilde{\mathbf{b}}$ is calculated at the beginning of each timestep and added to the equilibrium unit vector $\mathbf{b}_{eq}$. The complete vector $\mathbf{b} = \mathbf{b}_{eq} + \tilde{\mathbf{b}}$ is then used in all parallel advection, gradient, and diffusion terms. Since we base our calculations on plasma fields from the previous timestep, this perturbation can be seen as an additional first-order drift in the equations. The expression in the framework of the conservation equations does not change with flutter, but the underlying definition of parallel gradients and divergence surely increases in complexity. \\
 

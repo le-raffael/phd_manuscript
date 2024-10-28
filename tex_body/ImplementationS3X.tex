@@ -36,27 +36,9 @@ This chapter details the implementation of the new electromagnetic model in this
 \section{Geometrical consideration}
 \label{sec:impl_geometry}
 
-\subsection{Coordinate system}
-\label{ssec:Implementation_CoordinateSystem}
-Let $R_0$ be the major radius on the magnetic axis and $(R, Z, \varphi)$ a fixed cylindrical coordinate system. The magnetic equilibrium is assumed to be toroidally symmetric and to encompass both closed and open flux surfaces with singularities at one or more X-points. The 2D equilibrium magnetic field $\mathbf{B}_{eq} = B_{eq} \mathbf{b}_{eq}$ is a combination of a toroidal field, $\mathbf{B}_{eq,\varphi}$, and a poloidal field, $\mathbf{B}_{eq,p}$, as described in Sec. \ref{ssec:intro_tokamakConfiguration}:
-
-\begin{equation}
-	\mathbf{B}_{eq} = \mathbf{B}_{eq,\varphi} + \mathbf{B}_{eq,p} = F \nabla{\varphi} + \nabla{\Psi} \times \nabla{\varphi}
-\end{equation}
-
-where $\varphi$ is the toroidal angle, $F$ a toroidal flux function, and $\Psi(R,Z)$ a poloidal flux function from which $\mathbf{B}_{eq,\varphi}$ and $\mathbf{B}_{eq,p}$ are respectively derived (see Sec. \ref{sec:intro_GradShafranov}). The iso-$\Psi$ surfaces are tangent to the magnetic field and $\Psi$ labels flux surfaces (one value for each flux surface). It is thus natural to define a curvilinear system of coordinates denoted $(\psi, \theta, \varphi)$. $\psi$ defines a radial coordinate based on the poloidal magnetic flux $\Psi$, which is by construction always perpendicular to a magnetic flux surface. $\theta$ denotes a curvilinear abscissa along the poloidal direction in the $(R, Z)$ plane that defines the poloidal plane, i.e., along iso-$\Psi$ surfaces and orthogonal to $\grad  \varphi$. \newline
-
-In the base $(\boldsymbol{e}_{\psi}, \boldsymbol{e}_{\theta}, \boldsymbol{e}_{\varphi})$ associated with $(\psi, \theta, \varphi)$, the magnetic equilibrium field is written as:
-
-\begin{equation}
-	\boldsymbol{B}_{eq} = B_{eq,p} \frac{\boldsymbol{e}_{\theta}}{\vert \boldsymbol{e}_{\theta} \vert} + B_{eq,\varphi} \frac{\boldsymbol{e}_{\varphi}}{\vert \boldsymbol{e}_{\varphi} \vert}
-\end{equation}
-
-
-
 \subsection{Domain decomposition and mesh design}
 \label{ssec:impl_meshDecomposition}
-In order to keep a structured flux-surfaces aligned mesh for any magnetic equilibrium, the real domain is mapped into a Cartesian domain decomposed into multiple connected zones \cite{tamain2016tokam3x}. Each point of the domain is distinctly identified by the set of curvilinear coordinates $[\psi, \theta, \varphi]$ defined in Sec. \ref{ssec:Implementation_CoordinateSystem}. The domain is segmented along the toroidal coordinate $\varphi$, into $N_{\varphi}$ poloidal planes. Tables of data fields are provided for each subdomain. Ghost cells store the information on the neighborhood within a matrix that defines how these subdomains are connected to each other. Depending on the domain, these ghost cells contain either the values of the neighboring subdomains' fields or the values imposed by the boundary conditions. An example of the mesh and its zone decomposition is shown in Fig. \ref{fig:TCVzoneDecomposition}, where the X-point requires six zones. \newline
+In order to keep a structured flux-surfaces aligned mesh for any magnetic equilibrium, the real domain is mapped into a Cartesian domain decomposed into multiple connected zones \cite{tamain2016tokam3x}. Each point of the domain is distinctly identified by the set of curvilinear coordinates $[\psi, \theta, \varphi]$ defined in Sec. \ref{sec:S3X_CoordinateSystem}. The domain is segmented along the toroidal coordinate $\varphi$, into $N_{\varphi}$ poloidal planes. Tables of data fields are provided for each subdomain. Ghost cells store the information on the neighborhood within a matrix that defines how these subdomains are connected to each other. Depending on the domain, these ghost cells contain either the values of the neighboring subdomains' fields or the values imposed by the boundary conditions. An example of the mesh and its zone decomposition is shown in Fig. \ref{fig:TCVzoneDecomposition}, where the X-point requires six zones. \newline
 
 \begin{figure}[H]\centering
 	\begin{subfigure}[c]{0.5\textwidth}
@@ -308,7 +290,7 @@ Ampère's law requires the perpendicular Laplacian on the staggered grid to link
 	\left[\grad\cdot\grad_{\perp}X^{stg}\right]^{stg}_{[i_\psi,i_\theta, i_\varphi]}
 \end{equation}
 
-Let us consider a staggered cell over the regular mesh, depicted in red in Fig. \ref{fig:StaggeredCell}. Since the Laplacian operator can be treated as a divergence of a gradient, the task . Each flux $F^{Y,i}$ is defined as the perpendicular gradient at the corresponding cell face, approximated with finite differences. The metric and diffusion coefficients $JD(g^{ij}-b^ib^j)$ are also required at the faces and we obtain them by taking their average on the closest collocated points. In poloidal and toroidal directions two collocated points shown in green in Fig. \ref{fig:StaggeredFluxTheta} and Fig. \ref{fig:StaggeredFluxPhi} are sufficient but in radial direction we need to consider eight points around the face to calculate the correct coefficients. \\
+Let us consider a staggered cell over the regular mesh, depicted in red in Fig. \ref{fig:StaggeredCell}. Since the Laplacian operator can be viewed as the divergence of a gradient, we perform the task by calculating the perpendicular component of the gradient flux at every cell face. Each flux $F^{Y,i}$ is defined as the perpendicular gradient at the corresponding cell face, approximated with finite differences. The metric and diffusion coefficients $JD(g^{ij}-b^ib^j)$ are also required at the faces and we obtain them by taking their average on the closest collocated points. In poloidal and toroidal directions two collocated points shown in green in Fig. \ref{fig:StaggeredFluxTheta} and Fig. \ref{fig:StaggeredFluxPhi} are sufficient but in radial direction we need to consider eight points around the face to calculate the correct coefficients. \\
 
 \begin{figure}[H]
 	\centering
@@ -696,7 +678,7 @@ However, with flutter (Sec. \ref{ssec:S3X_flutter}), magnetic flux surfaces are 
 
 For the parallel diffusion on the electric potential $\nabla \cdot \left[ D_\parallel \nabla_\parallel \Phi \mathbf{b} \right]$ with flutter, we do not use the stencil introduced in Sec. \ref{ssec:impl_3DGunter}. To avoid numerical difficulties and the appearance of unphysical modes, the discretization of this term needs to be consistent with the parallel gradient and divergence operators in the same system. Since the grid for $A_\parallel$ and $j_\parallel$ is only staggered in the $\theta$ and $\varphi$ directions, we do not know them in the radial corners from Figs. \ref{fig:Gunter3D_theta} and \ref{fig:GunterD_psi}. Instead, the discrete diffusion operator is defined as the combination of the operators for the gradient and the divergence. It involves two neighbors on both radial sides, so the resulting stencil is less compact but consistent with the remaining system. Note that in cases without flutter ($b^\psi = 0$), the diffusion operator exactly corresponds to Günter's scheme \cite{gunter2005} because the staggered fields are known at the corners of the gradients in Fig. \ref{fig:GunterStencils_flutter}. \\
 
-Generally spoken, Combining a divergence with a gradient stencil to form a discrete Laplacian is a bad idea. The information for the finite differences scheme stems from two cells away, skipping the intermediate cell. The decoupling between even and odd grid points is prone to high-frequency oscillations and  formation of a checkerboard pattern. This behavior is evident if one looks at the stencil neighbors for the Laplacian on a Cartesian grid in Fig. \ref{fig:impl_vorticityLaplStencilFlutter}, where all mixed derivatives vanish.
+Generally spoken, combining a divergence with a gradient stencil to form a discrete Laplacian is a bad idea. The information for the finite differences scheme stems from two cells away, skipping the intermediate cell. The decoupling between even and odd grid points is prone to high-frequency oscillations and  formation of a checkerboard pattern. This behavior is evident if one looks at the stencil neighbors for the Laplacian on a Cartesian grid in Fig. \ref{fig:impl_vorticityLaplStencilFlutter}, where all mixed derivatives vanish.
 
 \begin{figure}[H]\centering
 	\centering

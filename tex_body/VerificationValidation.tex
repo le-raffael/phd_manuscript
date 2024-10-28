@@ -3,9 +3,9 @@
 
 
 \begin{chaptersummarybox}
-	The implementation of the electromagnetic model is verified using the method of manufactured solutions on a three-dimensional, curved geometry with non-uniform meshing. Physical quantities are initialized as sinusoidal functions, and analytic source terms are computed to compensate for all time-independent terms in the equations, such that the simulation maintains a steady state. The root mean square difference between the initial state and the plasma state after one timestep is a appropriate to estimate the discretization error introduced by the implementation. First, the electromagnetic vorticity system with magnetic induction and electron inertia is verified. The complex geometry provides an advanced test for the correct implementation of fields on a staggered grid. The discrete parallel Laplacian operator developed for diffusion problems with flutter is tested separately on the parallel heat conduction term in the energy conservation equation. A resolution scan demonstrates that the error decreases with the square of the mesh size, consistent with the second-order schemes used for the tested stencils. \\
+	The implementation of the electromagnetic model is verified using the method of manufactured solutions on a three-dimensional, circular geometry with non-uniform meshing. Physical quantities are initialized as sinusoidal functions, and analytic source terms are computed to compensate for all time-independent terms in the equations, such that the simulation maintains a steady state. The root mean square difference between the initial state and the plasma state after one timestep is a appropriate to estimate the discretization error introduced by the implementation. First, the electromagnetic vorticity system with magnetic induction and electron inertia is verified. The used complex MMS geometry also provides an appropriate test for the correct implementation of fields on a staggered grid. The discrete parallel Laplacian operator developed for diffusion problems with flutter is tested separately on the parallel heat conduction term in the energy conservation equation. A resolution scan demonstrates that the error decreases with the square of the mesh size, consistent with the second-order schemes used for the tested stencils. \\
 	
-	The physical accuracy is validated on true 2D and 3D slabs with a uniform magnetic field against the linear behavior expected from the dispersion relation. The test setup is first checked on trivial advection and the electrostatic vorticity equation. Next, Alfvén waves are observed on a 2D slab with pure magnetic induction in the vorticity equation. The most comprehensive test is performed on a 3D slab with a (uniform) poloidal and toroidal magnetic field in a four-field model, where $A_\parallel$ and $j_\parallel$ evolve with a $\pi/2$ phase shift relative to $\Phi$ and $n_e$. A scan over the perpendicular wave motion exhibits the transition from Alfvén dynamics to thermal electron waves. The observed speeds are:
+	The physical accuracy is validated on true 2D and 3D slab geometries with a uniform magnetic field against the linear behavior expected from the dispersion relation. The test setup is first checked on trivial advection and the electrostatic vorticity equation. Next, Alfvén waves are observed on a 2D slab with pure magnetic induction in the vorticity equation. The most comprehensive test is performed on a 3D slab with a (uniform) poloidal and toroidal magnetic field in a four-field model, where $A_\parallel$ and $j_\parallel$ evolve with a $\pi/2$ phase shift relative to $\Phi$ and $n_e$. A scan over the perpendicular wave motion exhibits the transition from Alfvén dynamics to thermal electron waves. The observed speeds are:
 	
 	\begin{align*}
 		v_A &= \frac{B}{\sqrt{m_in_i\mu_0}} & v_{th,e} &= \sqrt{\frac{T_e}{m_e}}
@@ -44,7 +44,7 @@ The MMS test model is a fraction of a torus with a circular cross-section with a
 		\subcaption{View of a cross-section of the torus in the $\psi-\theta$ plane \\ \textit{The cross-section is at $\varphi=0$}}
 		\label{fig:MMSModelTorturedCrossSection}
 	\end{subfigure}	
-	\caption[Distorted MMS mesh geometry with $N=20$ cells per dimension on a 3rd of a torus]{Distorted MMS mesh geometry with $N=20$ cells per dimension on a 3rd of a torus}
+	\caption[Distorted MMS mesh geometry with $N=20$ cells per dimension on the toroidal domain length $2\pi / 3$]{Distorted MMS mesh geometry with $N=20$ cells per dimension on the toroidal domain length $2\pi / 3$. Periodic boundary conditions are applied in the toroidal direction such that the test represents a third of a torus. }
 	\label{fig:MMSModelScheme}
 \end{figure}
 
@@ -284,7 +284,7 @@ While acoustic waves are characteristic for a physical medium, Alfvén waves dom
 	v_A = \frac{B}{\sqrt{m_in_i\mu_0}} \label{eq:AlfvenGroupVelocity}
 \end{equation}
 
-With the new parallel magnetic vector potential $A_\parallel$ into the vorticity Eq. \ref{eq:vorticityEquation_electromagnetic} Alfvén waves should appear in the simulation and the aim of this section is to prove their existence. We follow the same approach as in the previous section for the electrostatic case and reduce the system to the strict necessary minimum and keep following equations: 
+With the new parallel magnetic vector potential $A_\parallel$ into the vorticity Eq. \ref{eq:S3X_vorticityEquation_MagneticInduction}, Alfvén waves should appear in the simulation and the aim of this section is to prove their existence. We follow the same approach as in the previous section for the electrostatic case and reduce the system to the strict necessary minimum and keep following equations: 
 
 \begin{align}
 	\partial_t\grad\cdot\left[\frac{m_in_i}{B^2}\grad_\perp\Phi\right] &= \grad\cdot\sigma_\parallel\left(-\grad_\parallel\Phi-\partial_tA_\parallel\right) \label{eq:electromagneticSLAB_PHI} \\

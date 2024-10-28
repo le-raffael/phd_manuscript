@@ -167,10 +167,10 @@
 	bookmarksopen=false,					%% signets repliés par défaut
 	linktocpage=false,						%% lien numéro de page dans TOC
 %% métadonnées :							%% ATTENTION à compléter
-	pdftitle={Titre},
+	pdftitle={A 3D Electromagnetic Model in SOLEDGE3X},
 	pdfauthor={Raffael DÜLL},
 	pdfsubject={PhD thesis},
-	pdfkeywords = {mot clé, keyword, ...},
+	pdfkeywords = {tokamak, edge plasma, turbulent simulations, electromagnetism, SOLEDGE3X},
 	}
 
 %%% glossaires

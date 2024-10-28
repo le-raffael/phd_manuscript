@@ -1,9 +1,9 @@
-\chapter{Perspectives for Studying Magnetic Ripple}
+\chapter{First Studies on Magnetic Ripple}
 \label{chap:RippleMagnetic}
 
 
 \begin{chaptersummarybox}
-	The SOLEDGE3X code was adapted to impose external non-axisymmetric perturbations of the magnetic equilibrium. In tokamaks such as WEST, the pronounced toroidal magnetic ripple significantly affects plasma confinement and power exhaust, modulating both the poloidal and toroidal components of the equilibrium field. Using the Biot-Savart law, the ripple field is calculated as a magnetic perturbation on the SOLEDGE3X mesh. It is calulated at every grid point from the current in discretized coil segments:
+	The new electromagnetic model implemented in SOLEDGE3X also allows investigating of the impact of external non-axisymmetric perturbations of the magnetic equilibrium on the turbulence and transport properties. In tokamaks such as WEST, the pronounced toroidal magnetic ripple significantly affects plasma confinement and power exhaust, modulating both the poloidal and toroidal components of the equilibrium field. Using the Biot-Savart law, the ripple field is calculated as a magnetic perturbation on the SOLEDGE3X mesh. It is calulated at every grid point from the current in discretized coil segments:
 	\begin{equation*}
 		\textbf{B}_{ripple} = \frac{\mu_0}{4\pi}I_c\sum_{i=1}^{N_{c}}\sum_{j=1}^{N_{seg}}\frac{\textbf{d}_{i,j}\cross\left(\textbf{s}_{i,j+1} - \textbf{s}_{i,j}\right)}{\norm{\textbf{d}_{i,j}}^3}
 	\end{equation*}	
@@ -44,7 +44,7 @@ The SOLEDGE3X framework is capable of addressing magnetic configurations with si
 	\textbf{B}_{axi} = \textbf{B}_t + \textbf{B}_{pol} = F\grad{\varphi} + \grad{\Psi}\cross\grad{\varphi} \label{eq:axiSymBfield}
 \end{equation}
 
-where $\varphi$ represents the toroidal angle. The toroidal field $\textbf{B}_t$ is derived from a toroidal flux $F$ and $\textbf{B}_{pol}$ from a poloidal flux function $\Psi$. For high numerical accuracy, the meshing in SOLEGE3X is aligned to magnetic flux surfaces, treating singularities with a multi-domain decomposition shown in Fig. \ref{fig:WESTmesh} \newline 
+where $\varphi$ represents the toroidal angle. The toroidal field $\textbf{B}_t$ is derived from a toroidal flux $F$ and $\textbf{B}_{pol}$ from a poloidal flux function $\Psi$. For high numerical accuracy, the meshing in SOLEDGE3X is aligned to magnetic flux surfaces, treating singularities with a multi-domain decomposition shown in Fig. \ref{fig:WESTmesh} \newline 
 
 \begin{figure}[H]\centering
 	\centering
@@ -141,7 +141,7 @@ Even if the amplitude of the ripple field is small compared to the axisymmetric 
 		\includegraphics[width=1\textwidth]{schemes/rippleStreamlines_phi4.png}
 		\subcaption{$3/4$}\label{fig:ripple_Xpoint_phi4}
 	\end{subfigure}
-	\caption[Map of the poloidal field $B_{pol}$ at several poloidal planes within a ripple perdiod around the lower X-point and the divertor targets]{Map of the poloidal field $B_{pol}$ [T] at several poloidal planes within a ripple perdiod around the lower X-point and the divertor targets. Streamlines are supperposed to the fields to better visualize the position of the X-point and the separatrix at the divertor. The phase shifts $0$ and $1/2$ with respect to the coil positions are identical to the axisymmetric configuration as $B_{pert}^{\psi}$ vanishes while the planes at $1/4$ and $3/4$ correspond to the respective maximum and minimum of $B_{pert}^{\psi}$}
+	\caption[Map of the poloidal field $B_{pol}$ at several poloidal planes within a ripple period around the lower X-point and the divertor targets]{Map of the poloidal field $B_{pol}$ [T] at several poloidal planes within a ripple period around the lower X-point and the divertor targets. Streamlines are supperposed to the fields to better visualize the position of the X-point and the separatrix at the divertor. The phase shifts $0$ and $1/2$ with respect to the coil positions are identical to the axisymmetric configuration as $B_{pert}^{\psi}$ vanishes while the planes at $1/4$ and $3/4$ correspond to the respective maximum and minimum of $B_{pert}^{\psi}$}
 	\label{fig:ripple_Xpoint}
 \end{figure}
 
