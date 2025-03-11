@@ -48,7 +48,7 @@ In the most general description, each particle in a tokamak—whether neutron, i
 	\pdv{\mathbf{x}}{t} &= \mathbf{v}
 \end{align}
 where $\mathbf{E}$ is the electric field, $\mathbf{B}$ the magnetic field, and $q$ the charge of the particle. \newline
-Given that a medium-sized tokamak like WEST contains approximately $N_p \approx 10^{20}$ particles, each with six degrees of freedom, direct numerical simulation is infeasible. Computational effort can be reduced by using macro-particles, which represent many real particles. A prominent approach utilizing this concept is the particle-in-cell (PIC) method\cite{tskhakaya2007particle}, where macro-particles evolve in pre-calculated fields on a mesh or interact directly with one another. PIC methods are employed to study phenomena such as collisions with neutral particles\cite{birdsall1991particle}, plasma-wall interactions\cite{khaziev2018hpic}, or instabilities induced by fusion products\cite{cook2013particle}.
+Given that a medium-sized tokamak like WEST contains approximately $N_p \approx 10^{20}$ particles, each with six degrees of freedom, direct numerical simulation is infeasible. Computational effort can be reduced by using macro-particles, which represent many real particles. A prominent approach utilizing this concept is the particle-in-cell (PIC) method\cite{tskhakaya2007particle}, where macro-particles evolve in pre-calculated fields on a mesh or interact directly with one another. PIC methods are employed to study phenomena such as collisions with neutral particles\cite{birdsall1991particle}, plasma-wall interactions\cite{khaziev2018hpic}, or instabilities induced by fusion products\cite{cook2013particle}. Because they require a high resolution, PIC methods are limited to simulating small regions and time scales.
 
 
 
@@ -66,10 +66,10 @@ To achieve sufficient accuracy, approximately $N_x = 10^9$ spatial discretizatio
 Further simplification is achieved through the gyrokinetic approach. While particles in a plasma predominantly follow magnetic field lines, their motion forms a helical trajectory characterized by the Larmor frequency and radius:
 
 \begin{equation}
-	\omega_L = \frac{eZB}{m} \qquad\qquad l_L = \frac{mv_\perp}{eZB}
+	\omega_c = \frac{qB}{m} \qquad\qquad l_L = \frac{mv_\perp}{qB}
 \end{equation}
 
-This allows the elimination of one degree of freedom in the distribution function, as the velocity can be described by its parallel component $v_\parallel$ along the magnetic field line and its perpendicular component $v_\perp$. This simplification is valid only when the Larmor frequency and radius are much smaller than any characteristic frequency or length in the system, which is typically true in the core of the tokamak but not in the scrape-off layer (SOL), where the gyrokinetic approach is less suitable. \\
+This allows the elimination of one degree of freedom in the distribution function, as the velocity can be described by its parallel component $v_\parallel$ along the magnetic field line and its perpendicular component $v_\perp$. This simplification is valid only when the Larmor frequency are much smaller than any characteristic frequency in the system, which is typically true in the core of the tokamak but not in the scrape-off layer (SOL), where the gyrokinetic approach is less suitable. \\
 
 Gyrokinetic models are particularly useful to study transport barriers and turbulence driven by ion and electron temperature gradients (ITG/ETG) or trapped electron mode (TEM) instabilities and typically use full-\textit{f} turbulence models. The code GYSELA\cite{grandgirard2007global,grandgirard20165d} follows a semi-Lagrangian method to study core turbulence, zonal flows an neoclassical transport and is capable of relatively long simulated plasma times. Plasma-wall interactions and kinetic neutrals make XGC\cite{hager2022} particularly well-suited for edge and SOL turbulence. It allowed for comprehensive divertor heat exhaust studies\cite{chang2017gyrokinetic} and is capable of complex 3D magnetic configurations found in stellarators\cite{cole2019verification}. The Eulerian code GENE-X\cite{goerler2011global,michels2021gene} is ideal for full-\textit{f} electromagnetic simulations of turbulence at multiple scale in the core-edge region. 
 
@@ -127,7 +127,7 @@ The pressure tensor $\boldsymbol{\Pi}$ can then be expressed as:
 Substituting this into the first moment equation, we obtain the conservation equation for momentum:
 \begin{equation}
 	\label{eq:FirstMomentTransportEquation}
-	m \partial_t (n \mathbf{u}) + m \nabla \cdot \left( n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right) = enZ \mathbf{E} + enZ \mathbf{u} \times \mathbf{B} + S_u + R
+	m \partial_t (n \mathbf{u}) + \nabla \cdot \left( mn \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right) = nq \mathbf{E} + nq \mathbf{u} \times \mathbf{B} + S_u + R
 \end{equation}
 Here, $S_u$ represents the momentum source term, and $R$ accounts for friction, both arising from $C_{\text{coll}}$ and $C_{\text{other}}$.
 
@@ -144,7 +144,7 @@ To derive a conservation equation for $\varepsilon$, we multiply Vlasov's equati
 This simplifies to:
 \begin{equation}
 	\label{eq:SecondMomentTransportEquation}
-	\partial_t \varepsilon + \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ n \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = enZ \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
+	\partial_t \varepsilon + \nabla \cdot \left( \varepsilon \mathbf{u} + \left[ mn \mathbf{u} \otimes \mathbf{u} + \boldsymbol{P} \right] \cdot \mathbf{u} + \mathbf{q} \right) = nq \mathbf{E} \cdot \mathbf{u} + Q + R_\varepsilon
 \end{equation}
 The collisional heat flux $\mathbf{q}$ arises from the fluid closure, replacing all higher-order moments. The term $Q$ represents a collisional heat source, while $R_\varepsilon$ accounts for sources associated with non-Coulombian collisions in $C_{\text{other}}$. Notably, the magnetic field term $\mathbf{u} \times \mathbf{B}$ does not appear in the energy equation, as the torque $\frac{1}{2} u^2 \mathbf{u} \times \mathbf{B} \cdot \nabla_{\mathbf{v}} f$ does not perform work and therefore does not contribute to energy changes. \newline
 
@@ -154,7 +154,7 @@ The three conservation equations for density $n$, momentum $\boldsymbol{\gamma}$
 
 \subsection{MHD description of plasmas}
 \label{sec:desc_MHD}
-In the magnetohydrodynamics (MHD) approach, the conservation equations are coupled to Maxwell's and Ohm's laws, introducing electromagnetic behavior into the system. Unlike earlier models, the magnetic equilibrium is not static; the electric and magnetic fields evolve over time. MHD models typically differentiate between ideal MHD and extended models that include resistive and two-fluid effects, which are essential for accurately describing tokamak plasmas. The ideal MHD model and its extension with tokamak-specific terms in Sec. \ref{ssec:desc_extendedMHD} is the most accurate approach to simulate the electromagnetic intrications in plasmas. Fast wave dynamics represent a major restriction and reduced models in Sec. \ref{ssec:desc_reducedMHD} are therefore much more widespread. 
+In the magnetohydrodynamics (MHD) approach, the conservation equations are coupled to Maxwell's and Ohm's laws, such that the electric and magnetic fields evolve over time together with plasma fluid quantities. MHD models typically differentiate between ideal MHD and extended models that include resistive and two-fluid effects, which are essential for accurately describing tokamak plasmas. The ideal MHD model and its extension with tokamak-specific terms in Sec. \ref{ssec:desc_extendedMHD} is the most accurate approach to simulate the electromagnetic intrications in plasmas. Fast wave dynamics represent a major restriction and reduced models in Sec. \ref{ssec:desc_reducedMHD} are therefore much more widespread. 
 
 \subsubsection{Extended MHD model}
 \label{ssec:desc_extendedMHD}
@@ -177,7 +177,7 @@ The terms enclosed in boxes represent the additional terms required for extendin
 	\item \textbf{Fast magnetoacoustic waves}: These waves can propagate in any direction and compress magnetic field lines. They have a propagation speed approximately given by $v_f^2 = v_A^2 + c_s^2$.
 \end{itemize}
 
-Fast waves, in particular, pose challenges for numerical modeling as they require very small timesteps and implicit methods to be accurately resolved. The full MHD model introduces two additional dispersive waves into the system.
+Fast waves, in particular, pose challenges for numerical modeling as they require very small timesteps or implicit methods to be accurately resolved. The full MHD model introduces two additional dispersive waves into the system.
 
 
 \subsubsection{Reduced MHD model}
@@ -221,7 +221,7 @@ The unit vector $\textbf{b}$ defines the direction of the magnetic field. Simila
 Braginskii only considered electrons and one type of ions, The work was extended by Zhdanov\cite{zhdanov2002transport} to handle multi-species plasmas. Particle collisions between different species lead to a friction force, proportional to the velocity difference, and a thermal force along the temperature gradient. For a species $\alpha$, the contribution of all other species $\beta$ to these forces is:
 
 \begin{equation}
-	\textbf{F}_\alpha  =\sum_\beta \underbrace{-\omega_{\alpha\beta}m_\alpha n_\alpha(\mathbf{v_\alpha}-\mathbf{v}_\beta)}_{\text{Friction}} \underbrace{-\frac{m_\alpha n_\alpha}{eZ_\alpha}\delta_\alpha\grad T_\alpha}_{\text{Thermal}}
+	\textbf{F}_\alpha  =\sum_\beta \underbrace{-\omega_{\alpha\beta}m_\alpha n_\alpha(\mathbf{v_\alpha}-\mathbf{v}_\beta)}_{\text{Friction}} \underbrace{-\frac{m_\alpha n_\alpha}{q_\alpha}\delta_\alpha\grad T_\alpha}_{\text{Thermal}}
 \end{equation}
 
 The coefficient $\delta_\alpha$ describes the thermal diffusion of particles driven by the temperature gradient. For electron-ion collisions, the friction force corresponds to the electric to the current resistive. The force $\textbf{F}_\alpha$ needs to be included in the conservation equations in the closure. An instanteneous force balance on electrons, projected on the parallel direction, gives a first expression for the generalized Ohm's law in plasmas:
@@ -252,7 +252,7 @@ The separation of scales allows for fluid-drift models, where the parallel and p
 where $\rho_L$ is the ion Larmor radius, and $\lambda_c$ is the mean free path between collisions. The electric force is much weaker than the magnetic force. Similarly, characteristic plasma frequencies should be much lower than the ion cyclotron frequency, giving rise to the following ordering parameters:
 
 \begin{align}
-	\epsilon_E &= \frac{mE}{eZB^2} \ll 1 & \epsilon_l &= \frac{L_\perp}{L_\parallel} \ll 1 & \epsilon_t &= \frac{\omega_\perp}{\omega_L} \ll 1
+	\epsilon_E &= \frac{mE}{qB^2} \ll 1 & \epsilon_l &= \frac{L_\perp}{L_\parallel} \ll 1 & \epsilon_t &= \frac{\omega_\perp}{\omega_c} \ll 1
 \end{align}
 
 The averaged gyromotion of particles is parallel to the magnetic field lines, with parallel velocities $v_\parallel \approx \sqrt{2T/m}$ consistent with the kinetic energy in the plasma. Drift velocities, on the other hand, are typically much slower. Since $\nabla B$ and the curvature radius $R_c$ occur at machine scales $L_\parallel$, we can provide orders of magnitude for the drift velocities introduced in Sec. \ref{ssec:intro_plasmaDrifts}:
@@ -266,43 +266,67 @@ This leads to the assumption in the Lorentz equation \ref{eq:edge_LorentzEquatio
 \begin{align}
 	\mathbf{b}\cross\left[\partial_t \left(mn\mathbf{v}\right) + \grad\cdot\left(mn\mathbf{v}\otimes\mathbf{v}\right)\right] =& -\mathbf{b}\cross\grad p_\perp - \mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}} + nq\mathbf{b}\cross\mathbf{E} \nonumber\\ & \qquad + nq\left(\mathbf{b}\cross\mathbf{v}\cross\mathbf{B}\right) + \mathbf{b}\cross\mathbf{R} + \mathbf{b}\cross\mathbf{S}_u \nonumber \\
 	\Leftrightarrow\qquad \qquad \qquad
-	\mathbf{v}_\perp =& \frac{\mathbf{b}\cross\grad p}{enZB} + \frac{\mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}}}{enZB} +  \frac{\mathbf{E}\cross\mathbf{b}}{B} + \frac{\left(\textbf{R}+\textbf{S}\right)\cross\mathbf{b}}{enZB} \nonumber\\ & \qquad + \frac{\mathbf{b}}{enZB} \cross \left(\partial_t \left(mn\mathbf{v}\right) + \grad\cdot\left(mn\mathbf{v}\otimes\mathbf{v}\right)\right)
+	\mathbf{b}\cross\mathbf{v}\cross\mathbf{b} = \mathbf{v}_\perp =& \frac{\mathbf{b}\cross\grad p}{nqB} + \frac{\mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}}}{nqB} +  \frac{\mathbf{E}\cross\mathbf{b}}{B} + \frac{\left(\textbf{R}+\textbf{S}_u\right)\cross\mathbf{b}}{nqB} \nonumber\\ & \qquad + \frac{\mathbf{b}}{nqB} \cross \left(\partial_t \left(mn\mathbf{v}\right) + \grad\cdot\left(mn\mathbf{v}\otimes\mathbf{v}\right)\right)
 \end{align}
 
-In addition to the diamagnetic, electric and polarization drifts $\mathbf{v}^*$, $\mathbf{v}_E$ and $\mathbf{v}_{p}$known from Sec. \ref{ssec:intro_plasmaDrifts}, we introduce here the parallel viscous stress and friction force drifts $\mathbf{v}_{\perp,\Pi}$ and $\mathbf{v}_{\perp,S}$. The expression for the perpendicular velocity $\mathbf{v}_\perp$ is not explicit as the right-hand side depends on the full velocity vector. However, we can fairly well approximate it with two calculation steps. All terms that do not depend on $\textbf{v}$ are first evaluated to get $\mathbf{v}_\perp^{(0)}$ (and with equation \ref{eq:RelationPerpParallelVelocity} we can also calculate $\mathbf{v}^{(0)}$), and then $\mathbf{v}_\perp^{(1)}$ is calculated by replacing every occurrence of $\mathbf{v}$ by $\mathbf{v}^{(0)}$. 
+
+
+In addition to the diamagnetic, electric and polarization drifts $\mathbf{v}^*$, $\mathbf{v}_E$ and $\mathbf{v}_{p}$ known from Sec. \ref{ssec:intro_plasmaDrifts}, we introduce here the parallel viscous stress and friction force drifts $\mathbf{v}_{\perp,\Pi}$ and $\mathbf{v}_{\perp,S}$. The expression for the perpendicular velocity $\mathbf{v}_\perp$ is not explicit as the right-hand side depends on the full velocity vector. However, we can fairly well approximate it with two calculation steps. All terms that do not depend on $\textbf{v}$ are first evaluated to get $\mathbf{v}_\perp^{(0)}$. Knowing the velocity from the parallel momentum balance we can also calculate $\mathbf{v}^{(0)} = \mathbf{v}_\perp^{(0)}+v_\parallel \mathbf{b}$, and then 1st order drift velocities $\mathbf{v}_\perp^{(1)}$ are calculated by replacing every occurrence of $\mathbf{v}$ by $\mathbf{v}^{(0)}$. 
 \begin{align}
-	\mathbf{v}_\perp^{(0)} =& \frac{\mathbf{b}\cross\grad p}{enZB} + \frac{\mathbf{E}\cross\mathbf{b}}{B} = \mathbf{v}_* + \mathbf{v}_E \label{eq:VelPerp0Component} \\	
-	\mathbf{v}_\perp^{(1)} =& \frac{\mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}}(\mathbf{v}^{(0)})}{enZB} - \frac{\mathbf{b}\cross\left(R(\mathbf{v}^{(0)})+S(\mathbf{v}^{(0)})\right)}{enZB} \nonumber\\ & \qquad + \frac{\mathbf{b}}{n\omega_c} \cross \left(\partial_t \left(n\mathbf{v}^{(0)}\right) + \grad\cdot\left(n\mathbf{v}^{(0)}\otimes\mathbf{v}^{(0)}\right)\right) \nonumber \\
+	\mathbf{v}_\perp^{(0)} =& \frac{\mathbf{b}\cross\grad p}{nqB} + \frac{\mathbf{E}\cross\mathbf{b}}{B} = \mathbf{v}_* + \mathbf{v}_E \label{eq:VelPerp0Component} \\	
+	\mathbf{v}_\perp^{(1)} =& \frac{\mathbf{b}\cross\grad\cdot\bar{\bar{\Pi}}(\mathbf{v}^{(0)})}{nqB} - \frac{\mathbf{b}\cross\left(R(\mathbf{v}^{(0)})+S(\mathbf{v}^{(0)})\right)}{nqB} \nonumber\\ & \qquad + \frac{\mathbf{b}}{n\omega_c} \cross \left(\partial_t \left(n\mathbf{v}^{(0)}\right) + \grad\cdot\left(n\mathbf{v}^{(0)}\otimes\mathbf{v}^{(0)}\right)\right) \nonumber \\
 	=& \mathbf{v}_{\perp,\Pi} + \mathbf{v}_{\perp,S} + \mathbf{v}_{p} \label{eq:VelPerp1Component} \\
 	\mathbf{v}_\perp \approx& \mathbf{v}_\perp^{(0)} + \mathbf{v}_\perp^{(1)}
 \end{align}
 
-This simplification holds because the contribution of $\mathbf{v}_\perp^{(1)}$ is small, of the order of $\epsilon_t$. Next, let us extract the divergence free contribution from the diamagnetic flux $n\mathbf{v}^*$.
+This simplification holds because the contribution of $\mathbf{v}_\perp^{(1)}$ is small, of the order of $\epsilon_t$. Next, let us extract the divergence-free contribution from the diamagnetic flux $n\mathbf{v}_*$.
 
 \begin{align}
 	\label{eq:definitionDiamagneticDrift}
-	n\mathbf{v}^* =& -\grad \cross \frac{p\mathbf{B}}{eZB^2} + n\tilde{\mathbf{v}}^* \nonumber\\
-	& \quad\text{with: } \tilde{\mathbf{v}}^* = \frac{2T\mathbf{B}\cross\grad B}{eZB^3} + \frac{T}{eZB^2}\grad\cross\mathbf{B}
+	n\mathbf{v}_* =& -\grad \cross \frac{p\mathbf{B}}{qB^2} + n\tilde{\mathbf{v}}_* \nonumber\\
+	& \qquad\text{with: }\quad \tilde{\mathbf{v}}^* = \frac{2T\mathbf{B}\cross\grad B}{qB^3} + \frac{T}{qB^2}\grad\cross\mathbf{B}
 \end{align}
 
-The second term in $\tilde{\mathbf{v}}^*$ accounts for the "gradB" and curvature drifts. The polarization drift $v_{p}$ in Eq. \ref{eq:VelPerp1Component} can be found through algebraic manipulations and neglecting some small curvature terms:
+The second term in $\tilde{\mathbf{v}}^*$ accounts for the "gradB" and curvature drifts. \\
 
-\begin{align}
-	n\mathbf{v}_{p} =& \partial_t\boldsymbol{\omega} - \grad\cdot\left(\mathbf{v}^{(0)}\otimes\boldsymbol{\omega}\right) \nonumber \\
-	&\text{with: } \boldsymbol{\omega} = \frac{m}{eZB^2}\left(n\grad_\perp\Phi + \grad_{\perp}\left(p-\frac{\pi_\parallel}{3}\right)\right) - \frac{m}{q^2B^2}S_{\textbf{v}_\perp} \label{eq:definitionSmallOmega}
-\end{align}
-
-Let us introduce the vorticity $ \boldsymbol{\Omega} = \nabla \times \mathbf{v}$, which measures the local rotation of a fluid element. It is a vector quantity, where the direction indicates the axis of rotation and its magnitude indicates the strength of the rotational motion. As perpendicular phenomena are essentially described by the parallel component of $\boldsymbol{\Omega}$, we only solve for the conservation of $\Omega_\parallel$. 
+Next, let us consider the charge balance equation. With the quasi-neutrality assumption, it is equivalent to a divergence-free total current.
 
 \begin{equation}
-	\Omega_\parallel = \mathbf{b} \cdot \nabla \times \mathbf{v}_p = \nabla \cdot \boldsymbol{\omega}
+	\label{eq:edge_chargeBalanceEq}
+	\nabla \cdot \mathbf{j} = 0
 \end{equation}
 
-With the expression of the polarization drift, we obtain a conservation equation for the ion vorticity:
+Different drift velocities between electrons and ion species carry a current and the total current can be decomposed in a similar fashion. It must be noted that the "ExB" drift does not depend on the charge, therefore it does not carry any current. Instead, the dominant perpendicular term is here the polarization current. To understand its implication, we need to introduce the variable $\boldsymbol{\omega}$ that is obtained by taking the cross-product of $\frac{\mathbf{b}}{n\omega_c}$ with the particle flux $n\mathbf{v}^{(0)}$ associated to 0th-order drifts. After some algebraic manipulations, we obtain the expression:
+
+\begin{equation}
+	\boldsymbol{\omega} = \frac{m}{qB^2}\left(n\grad_\perp\Phi + \frac{1}{q} \grad_{\perp}p\right) \label{eq:definitionSmallOmega}
+\end{equation}
+
+As such, the polarization drift $v_{p}$ from Eq. \ref{eq:VelPerp1Component} can be written in terms of $\boldsymbol{\omega}$:
+
+\begin{equation}
+	\label{eq:edge_polarizationCurrentOmega}
+	n\mathbf{v}_{p} = -\partial_t\boldsymbol{\omega} - \grad\cdot\left(\mathbf{v}^{(0)}\otimes\boldsymbol{\omega}\right)
+\end{equation}
+
+Let us now introduce the vorticity $ \boldsymbol{\Omega} = \nabla \times \mathbf{v}$, which measures the local rotation of a fluid element. It is a vector quantity, where the direction indicates the axis of rotation and its magnitude indicates the strength of the rotational motion. As perpendicular phenomena are essentially described by the parallel component of $\boldsymbol{\Omega}$, we find an expression for $\Omega_\parallel$ based on the 0th order drifts.
+
+\begin{equation}
+	\Omega_\parallel = \mathbf{b} \cdot \nabla \times \mathbf{v}^{(0)} = \nabla \cdot \boldsymbol{\omega}
+\end{equation}
+
+We observe that in first order, the vorticity $\Omega_\parallel$ corresponds to the divergence of $\boldsymbol{\omega}$. Combined with Eq. \ref{eq:edge_polarizationCurrentOmega}, it allows to express the divergence of the polarization current as a conservation of the vorticity:
 
 \begin{equation}
 	\label{eq:edge_vorticityConservation}
-	\frac{n_im_i}{q_iB^2}\left(\partial_t\Omega_\parallel + (v_{i,\parallel}\mathbf{b} + \mathbf{v}_{i,\perp})\cdot\nabla\Omega_\parallel\right) = \nabla \cdot \left(j_\parallel\mathbf{b} + \mathbf{j}_\perp - en\mathbf{v}_E\right)
+	\nabla \cdot \mathbf{j}_p = -\partial_t\Omega_\parallel - \nabla \left[\sum_\alpha q_\alpha \nabla\left(\mathbf{v}^{(0)}_\alpha\otimes\boldsymbol{\omega}_\alpha\right)\right]
+\end{equation}
+
+where we take the sum over all ion species $\alpha$. It can then be plugged into the charge balance equation Eq. \ref{eq:edge_chargeBalanceEq}.
+
+\begin{equation}
+	\label{eq:edge_vorticityEquation}
+	\partial_t\Omega_\parallel + \nabla \left[\sum_\alpha q_\alpha \nabla\left(\mathbf{v}^{(0)}_\alpha\otimes\boldsymbol{\omega}_\alpha\right)\right] = \nabla \cdot \left(j_\parallel\mathbf{b} + \mathbf{j}_\perp\right)
 \end{equation}
 
 where the perpendicular current arises from drifts in opposite directions for electrons and ions, $\mathbf{j}_\perp = q_i n_i \mathbf{v}_{i,\perp} - q_e n_e \mathbf{v}_{e,\perp}$. There is a "grad B," curvature, and polarization current, but no "ExB" current, as the electric drift is independent of the species' mass and charge. The parallel current density is given by Ohm's law:
@@ -311,7 +335,7 @@ where the perpendicular current arises from drifts in opposite directions for el
 	\eta_\parallel j_\parallel + \frac{m_e}{e}\frac{dj_\parallel}{dt} = E_\parallel + \frac{\nabla_\parallel p_e}{n_e} + 0.71\nabla_\parallel T_e
 \end{equation}
 
-In the first order, the evolution of the perpendicular electric field derives from the evolution of the potential gradient $d\mathbf{E}_\perp / dt = -d\nabla_\perp \Phi / dt$. The full electric field is given by:
+In the first order, the evolution of the perpendicular electric field derives from the evolution of the potential gradient $d\mathbf{E}_\perp / dt = -d\nabla_\perp \Phi / dt$. The perpendicular component $\mathbf{A}_\perp$ of the magnetic vector potential is neglected to suppress fast magnetoacoustic wave dynamics, in analogy to the reduced MHD model. The full electric field is then given by:
 
 \begin{align}
 	\mathbf{E}_\perp &= -\nabla_\perp \Phi &
@@ -492,8 +516,8 @@ The second term contains the plain $A_\parallel$ without its derivative, which m
 
 \begin{align}
 	\grad\cdot\mathbf{B} &= \grad\cdot B\mathbf{b}_{eq} + \grad\cdot B\mathbf{\tilde{b}} \nonumber \\
-	&= -\beta_0\mathbf{b}_{eq} \times \nabla \tilde{A}_\parallel + \beta_0\tilde{A}_\parallel \nabla \times \mathbf{b}_{eq} \nonumber \\
-	&= \beta_0\left[-\left(\grad\cross\mathbf{b}_{eq}\right)\cdot\grad A_\parallel + \mathbf{b}_{eq}\cdot\left(\grad\cross\grad A_\parallel\right) + A_\parallel\grad\cdot\left(\grad\cross\mathbf{b}_{eq}\right) + \grad A_\parallel\cdot\left(\grad\cross\mathbf{b}_{eq}\right)\right] \nonumber \\
+	&= -\grad\cdot \left(\mathbf{b}_{eq} \times \nabla \tilde{A}_\parallel\right) + \grad\cdot \left(\tilde{A}_\parallel \nabla \times \mathbf{b}_{eq}\right) \nonumber \\
+	&= -\left(\grad\cross\mathbf{b}_{eq}\right)\cdot\grad A_\parallel + \mathbf{b}_{eq}\cdot\left(\grad\cross\grad A_\parallel\right) + A_\parallel\grad\cdot\left(\grad\cross\mathbf{b}_{eq}\right) + \grad A_\parallel\cdot\left(\grad\cross\mathbf{b}_{eq}\right) \nonumber \\
 	&= 0
 \end{align}
 
@@ -501,7 +525,7 @@ The equilibrium field is externally provided such that it is divergence free, so
  
 With respect to the equilibrium field, flutter can be viewed as an additional drift acting on the plasma. In reality it is not an actual drift as flutter transport is in fact a deformation of the magnetic field lines and a redirection of the parallel advection. \\
 
-Introducing electromagnetic effects, and specifically flutter, to the drift-reduced equations reduces the gap to reduced MHD descriptions of plasma presented in Sec. \ref{ssec:desc_reducedMHD}. However, there are some considerable differences. Instead of the parallel current and magnetic vector potential, the MHD model retains only their toroidal component. The magnetic vector potential there is then self-similar to the poloidal flux function $A_\varphi = \Psi$. With the knowledge of $\Psi$, the exact poloidal field is reconstructed for example in JOREK\cite{hoelzl2021jorek}. Magnetic reconnection and island formation is fundamental for tearing modes, and it remains uncertain if the fluctuating approach pursued here is sufficient to capture electromagnetic dynamics at the machine scale.  \\
+Introducing electromagnetic effects, and specifically flutter, to the drift-reduced equations reduces the gap to reduced MHD descriptions of plasma presented in Sec. \ref{ssec:desc_reducedMHD}. However, there are some considerable differences. Instead of the parallel current and magnetic vector potential, the MHD model retains only their toroidal comp3onent. The magnetic vector potential there is then equivalent to the poloidal flux function $A_\varphi = \Psi$. With the knowledge of $\Psi$, the exact poloidal field is reconstructed for example in JOREK\cite{hoelzl2021jorek}. Magnetic reconnection and island formation is fundamental for tearing modes, and it remains uncertain if the fluctuating approach pursued here is sufficient to capture electromagnetic dynamics at the machine scale.  \\
 
 The choices made in the model reduction are motivated by differences in the targeted physics: drift-reduced codes aim to investigate edge turbulence driven by drift-wave and interchange instabilities, while MHD codes aim to investigate large-scale MHD instabilities such as ELMs\cite{pamela2017recent} or disruptions\cite{nardon2016progress}. Even if the models implemented in SOLEDGE3X or in other reduced-drift fluid codes contain sufficient physics, the algorithms are built to have small time steps to deal with short-term dynamics (the dynamics of drift waves is on the microsecond scale (see Eq. \ref{eq:desc_typicalTimes}), making it extremely expensive to simulate type-I ELMs whose cycle can last up to 100 ms.
 

@@ -3,13 +3,13 @@
 
 \vfill
 \begin{chaptersummarybox}
-	With a given initial velocity, charged particles travel along magnetic field lines on a circular trajectory with the Larmor radius $\rho_L$ and cyclotron frequency $\omega_B$. 
+	With a given initial velocity, charged particles travel along magnetic field lines on a circular trajectory with the Larmor radius $\rho_L$ and cyclotron frequency $\omega_c$. 
 	\begin{align*}
 		\rho_L   &= \frac{m\norm{\mathbf{v}_{\perp,0}}}{qB} &
-		\omega_B &= \frac{qB}{m}
+		\omega_c &= \frac{qB}{m}
 	\end{align*}	
 	Any force perpendicular to the magnetic field causes particles to drift with the velocity $\mathbf{v}_d = \frac{\mathbf{B}\cross\mathbf{F}_\perp}{qB^2}$. To control particle motion, tokamaks employ toroidal and poloidal magnetic fields $B_{\varphi}$ and $B_{p}$ to shape a helical configuration around a torus. To compensate for plasma currents, the magnetohydrodynamic equilibrium causes the so-called Grad-Shafranov shift, which pushes the poloidal field outward. A low ratio between thermodynamic to magnetic pressure, $\beta = \frac{neT}{B^2/2\mu_0}$, is important to avoid plasma instabilities. \\
-	At scales beyond the Debye length $\lambda_D = \sqrt{\frac{\varepsilon_0T_e}{n_ee^2}}$, the plasma organizes itself in a state of quasi-neutrality. Collisions between particles cause momentum, energy and charge exchanges, leading to viscosity, heat diffusion and resistivity according to the Spitzer-Härm model:
+	At scales above the Debye length $\lambda_D = \sqrt{\frac{\varepsilon_0T_e}{n_ee^2}}$, the plasma organizes itself in a state of quasi-neutrality. Collisions between particles cause momentum, energy and charge exchanges, leading to viscosity, heat diffusion and resistivity according to the Spitzer-Härm model:
 	\begin{align*}
 		\nu_{SH}    &\propto \frac{T_e^{5/2}}{Z^4 \ln \Lambda} &
 		\kappa_{SH} &\propto \frac{T_e^{5/2}}{Z \ln \Lambda}   &
@@ -43,10 +43,10 @@ To understand how charged plasma particles can be confined on a magnetic field l
 To solve this differential equation, it is convenient to decompose the velocity vector into a parallel component \( v_\parallel = \textbf{v}\cdot\textbf{b} \) and a perpendicular component \( \textbf{v}_\perp = \textbf{v} - v_\parallel \textbf{b} \). For a given initial velocity \(\mathbf{v}_0\), the general solution of this system is:
 
 \begin{equation}
-	\mathbf{v}(t) = v_{\parallel,0}\mathbf{b} + \mathbf{v}_{\perp,0}\cos(\omega_B t) + \mathbf{b} \times \mathbf{v}_{\perp,0} \sin(\omega_B t)
+	\mathbf{v}(t) = v_{\parallel,0}\mathbf{b} + \mathbf{v}_{\perp,0}\cos(\omega_c t) + \mathbf{b} \times \mathbf{v}_{\perp,0} \sin(\omega_c t)
 \end{equation}
 
-with \(\omega_B = \frac{qB}{m}\) being the cyclotron frequency. This implies that a charged particle circles around a magnetic field line while following it with its initial velocity. The opposite charges of ions and electrons result in them circling in different directions. The trajectory is qualitatively shown in Fig. \ref{fig:TokamakBasics_gyromotion}. The radius of this gyromotion is called the Larmor radius \(\rho_L\):
+with \(\omega_c = \frac{qB}{m}\) being the cyclotron frequency. This implies that a charged particle circles around a magnetic field line while following it with its initial velocity. The opposite charges of ions and electrons result in them circling in different directions. The trajectory is qualitatively shown in Fig. \ref{fig:TokamakBasics_gyromotion}. The radius of this gyromotion is called the Larmor radius \(\rho_L\):
 
 \begin{equation}
 	\rho_L = \frac{m\norm{\mathbf{v}_{\perp,0}}}{qB}
@@ -95,7 +95,7 @@ In steady-state conditions, the electric force compensates the Lorentz force, le
 
 This velocity applies uniformly to all particles at all times, as it depends only on the electric and magnetic fields in place. Since neither the mass nor the charge contributes to $\mathbf{v}_E$, both electrons and ions move in the same direction at the same speed, and under the quasi-neutrality assumption, no current is generated. \newline 
 
-Perpendicular pressure gradients also exert a force on particles. They result in the diamagnetic drift:
+Spatial variations in pressure create imbalances in particle motion, which result in forces perpendicular to both the pressure gradient and the magnetic field. They lead to the diamagnetic drift:
 
 \begin{equation}
 	\label{eq:intro_diaDrift}
@@ -181,9 +181,9 @@ The fundamental principle of a tokamak lies in its magnetic configuration, which
 	\label{fig:1_magneticConfigurationTorus}
 \end{figure}
 
-The helical configuration of a magnetic field line in a tokamak ensures that tracing its path remains within the same toroidal surface, ultimately returning to the initial point and forming a closed field line. The ensemble of all such field lines constitutes what is termed a "closed magnetic flux surface." These flux surfaces are radially concentric, and the principle of magnetic confinement is to trap plasma particles within these flux surfaces.  \\
+The helical configuration of a magnetic field line in a tokamak ensures that tracing its path remains within the same toroidal surface. The ensemble of all such field lines constitutes what is called a "closed magnetic flux surface." These flux surfaces are radially concentric, and the principle of magnetic confinement is to trap plasma particles within these flux surfaces.  \\
 
-At first glance, the toroidal field appears sufficient to close magnetic field lines. However, plasma drifts inevitably add a dynamic perpendicular to the motion parallel to the magnetic field. Internal and external perturbations can cause twisting of the magnetic field lines, potentially leading to disruptions and total loss of plasma confinement. This phenomenon is known as kink instabilities. To suppress them, the poloidal field introduces magnetic shear to the configuration, with field lines circling around the minor radius of the torus. The ratio of toroidal to poloidal rotations of the field lines is known as the safety factor \( q = \frac{aB_\varphi}{RB_p} \). In a cylindrical approximation, the Kruskal-Shafranov limit \cite{shafranov1956stability, kruskal1958instability} states that kink instabilities are suppressed for \( q > 1 \). However, the safety factor cannot be too large either, as other instabilities such as tearing \cite{furth1973tearing} or resistive wall \cite{fitzpatrick2002simple} modes might appear and deteriorate plasma confinement. \\
+At first glance, the toroidal field appears sufficient to close magnetic field lines. However, plasma drifts inevitably add a dynamic perpendicular to the motion parallel to the magnetic field. Internal and external perturbations can cause twisting of the magnetic field lines, potentially leading to disruptions and total loss of plasma confinement. This phenomenon is known as kink instabilities. To suppress them, the poloidal field introduces magnetic shear to the configuration, with field lines circling around the minor radius of the torus. The ratio of toroidal to poloidal rotations of the field lines is known as the safety factor \( q = \frac{aB_\varphi}{RB_p} \). In a cylindrical approximation, the Kruskal-Shafranov limit \cite{shafranov1956stability, kruskal1958instability} states that kink instabilities are suppressed for \( q > 1 \). Other instabilities such as tearing \cite{furth1973tearing} or resistive wall \cite{fitzpatrick2002simple} modes might also appear and deteriorate plasma confinement. However, the safety factor cannot be too large either, as it limits the achievable plasma current and the overall performance of the tokamak.  \\
 
 
 
@@ -302,7 +302,8 @@ They are completed by poloidal field coils (light purple), placed outside the ma
 
 The limited configuration is one of the simpler magnetic configurations in a tokamak. In this setup, the plasma is in direct contact with material components which act as a limiter (see Fig. \ref{fig:WEST_limited}). It effectively splits the domain in a confined core region with closed field lines and the Scrape-Off-Layer (SOL), that extends to the wall and where field lines are open, e.g. they cross the wall. The confined plasma boundary is given by the last closed flux surface, tangential to the wall in one point. Such a configuration suffers from significant power loads on the limiters, resulting in high erosion rates and potential contamination of the plasma with impurities. The confinement is generally lower in this configuration. 
 
-A diverted configuration, as depicted in Fig. \ref{fig:WEST_diverted}, improves the situation by a lot. The poloidal field coils shape the magnetic field lines in a fashion that they do not intersect with solid surfaces within the main plasma chamber but are instead directed to a separate region called the divertor. The last closed flux surface is then called "separatrix" and never touches the tokamak wall. The poloidal magnetic field contains now a singularity, the "X-point", and the area where the he divertor plate intecepts the continuation of the separatrix is called the "target line". The divertor handles the exhaust of heat and particles from the plasma and this configuration tends to improve overall plasma confinement and reduce impurity levels.
+A diverted configuration, as depicted in Fig. \ref{fig:WEST_diverted}, improves the situation considerably by separating plasma-wall interactions from the
+core plasma. The poloidal field coils shape the magnetic field lines in a fashion that they do not intersect with solid surfaces within the main plasma chamber but are instead directed to a separate region called the divertor. The last closed flux surface is then called "separatrix" and never touches the tokamak wall. The poloidal magnetic field contains now a singularity, the "X-point", and the area where the he divertor plate intecepts the continuation of the separatrix is called the "target line". The divertor handles the exhaust of heat and particles from the plasma and this configuration tends to improve overall plasma confinement and reduce impurity levels.
 
 \begin{figure}[H]
 	\centering
@@ -342,7 +343,7 @@ Debye shielding refers to the macroscopic phenomenon that electric fields natura
 	\lambda_D = \sqrt{\frac{\varepsilon_0T_e}{n_ee^2}}
 \end{equation}
 
-The Coulomb potential around a point charge $Q$ exponentially decreases for distances beyond the Debye length:
+The Coulomb potential around a point charge $Q$ exponentially decreases for distances above the Debye length:
 \begin{equation}
 	\label{eq:1_CoulombPotential}
 	\Phi(r) = \frac{Q}{4\pi\varepsilon_0r}e^{-r/\lambda_D}
@@ -427,7 +428,7 @@ This integral diverges in both limits \( b_{min} \to 0 \) and \( b_{max} \to \in
 
 \begin{itemize}
 	\item $b_{min} = b_{90}$ because the small angle approximation in Eq. \ref{eq:1_particleCollision_energyLoss} implies that $b>b_{90}$ \\
-	\item $b_{max} = \lambda_D$ because the Coulomb potential from Eq. \ref{eq:1_CoulombPotential} vanishes quickly at distances beyond the Debye length and so does the effective Coulomb force $\mathbf{F}_C$
+	\item $b_{max} = \lambda_D$ because the Coulomb potential from Eq. \ref{eq:1_CoulombPotential} vanishes quickly at distances longer than the Debye length and so does the effective Coulomb force $\mathbf{F}_C$
 \end{itemize}
 
 With these bounds, we evaluate the integral and define the Coulomb logarithm:
@@ -512,7 +513,7 @@ As presented in Sec. \ref{ssec:intro_limitedDivertedConfig}, the magnetic config
 \subsection{Fundamental sheath physics}
 \label{sec:intro_sheath}
 
-The SOL is characterized by open flux surfaces and where magnetic field lines cross the wall, the quasi-neutrality assumption from Sec. \ref{ssec:intro_DebyeShielding} does not hold anymore. The much lighter electrons travel much faster towards the wall (about $\sqrt{m_i/m_e}$ faster than ions), creating a net negative charge in the direct proximity to the wall. It is not until a few Debye lengths $\lambda_D$ before shielding restores known plasma conditions forming a region known as "electrostatic sheath". The negative charge attracts ions and repulses electrons, and we can assume that the electron density decreases exponentially approaching the wall. This eventually leads to the Bohm criterion\cite{riemann1991bohm}, which states that at the sheath entrance the ion speed must be equal or larger than the sound speed of the plasma.
+The SOL is characterized by open flux surfaces and where magnetic field lines cross the wall, the quasi-neutrality assumption from Sec. \ref{ssec:intro_DebyeShielding} does not hold anymore. The much lighter electrons travel much faster towards the wall (about $\sqrt{m_i/m_e}$ faster than ions), creating a net negative charge in the direct proximity to the wall. It is not until a few Debye lengths $\lambda_D$ before shielding restores quasineutral plasma conditions forming a region known as "electrostatic sheath". The negative charge attracts ions and repulses electrons, and we can assume that the electron density decreases exponentially approaching the wall. This eventually leads to the Bohm criterion\cite{riemann1991bohm}, which states that at the sheath entrance the ion speed must be equal or larger than the sound speed of the plasma.
 
 \begin{equation}
 	\label{eq:intro_BohmCriterion}
@@ -532,9 +533,9 @@ and a heat flux:
 with the sheath transmission coefficient $\gamma$. As the sheath is not collisional, these coefficients have to be determined from kinetic theory\cite{Stangeby_2000}. For hydrogen plasma, it is common to take the values $\gamma_i = 2.5$ for ions and $\gamma_e = 4.5$ for electrons.
 
 
-\subsection{Problematic of heat exhaust}
+\subsection{Problems of heat exhaust}
 \label{ssec:intro_heatExhaust}
-An important part of the heat produced in a tokamak, whether it originates from external heating or from the fusion reaction, is evacuated by hot plasma particles. Cross-field transport allows confined particles from the hot core to cross the separatrix. As they enter the SOL, they follow the magnetic field lines until they impact the divertor on the thin target band. This region is extremely critical as large amounts of power are directed on a fairly small area. It is projected for ITER that heat loads at the targets are very close to material limits\cite{gunn2017surface}. The peak heat flux $q_{peak}$ could reach values over $10MW/m^2$. For a safe tokamak operation, it is essential to well understand and predict heat fluxes on the strike points. An important metric to take into the consideration is the heat flux o power fall-off width $\lambda_q$. It describes the spread of the heat flux on the divertor targets, and a larger value allows to spread the power exhaust on a larger area. It allows to describe the heat flux at a distance $r$ from the target:
+An important part of the heat produced in a tokamak, whether it originates from external heating or from the fusion reaction, is evacuated by hot plasma particles. Cross-field transport allows confined particles from the hot core to cross the separatrix. As they enter the SOL, they follow the magnetic field lines until they impact the divertor on the thin target band. This region is extremely critical as large amounts of power are directed on a fairly small area. It is projected for ITER that heat loads at the targets are very close to material limits\cite{gunn2017surface}. The peak heat flux $q_{peak}$ could reach values over $10MW/m^2$. For a safe tokamak operation, it is essential to well understand and predict heat fluxes on the strike points. An important metric to take into the consideration is the heat flux power fall-off width $\lambda_q$. It describes the spread of the heat flux on the divertor targets, and a larger value allows to spread the power exhaust on a larger area. It allows to describe the heat flux at a distance $r$ from the target:
 
 \begin{equation}
 	q(r) =  q_{peak}e^{-\frac{r}{\lambda_q}}
